@@ -519,26 +519,24 @@ def max_depth(max_feat="auto", min_samp_leaf=1, max_samp=None, print_threshold=T
     plt.show()
 
 
-def min_samples_leaf(max_feat="auto", max_d=None, max_samp=None, print_threshold=True):
-    df = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/RData_parameters_sample.csv")
-    slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/slr_rcp85.csv")
+def min_samples_leaf(param_samples_df, slr_df, max_feat="auto", max_d=None, max_samp=None, print_threshold=True):
     years = ["2025", "2050", "2075", "2100"]
-    slr_threshold = slr_rcp85.quantile(q=.9)
+    slr_threshold = slr_df.quantile(q=.9)
     if print_threshold is True:
         print("SLR RCP8.5 Threshold:\n", slr_threshold)
     row_list = []
-    for i in range(slr_rcp85.shape[0]):
+    for i in range(slr_df.shape[0]):
         row = []
         for j in range(4):
-            if slr_rcp85.iloc[i, j] >= slr_threshold.iloc[j]:
+            if slr_df.iloc[i, j] >= slr_threshold.iloc[j]:
                 row.append("high")
             else:
                 row.append("low")
         row_list.append(row)
     slr_rcp85_classify = pd.DataFrame(row_list, columns=years)
-    df_slr_rcp85 = df.join(slr_rcp85_classify, how="outer")
+    df_slr_rcp85 = param_samples_df.join(slr_rcp85_classify, how="outer")
     df_slr_rcp85 = df_slr_rcp85.dropna()
-    features = df.columns.tolist()
+    features = param_samples_df.columns.tolist()
     yr = "2100"
 
     # set up subsets
@@ -565,7 +563,9 @@ def min_samples_leaf(max_feat="auto", max_d=None, max_samp=None, print_threshold
     plt.xticks(min_leaf)
     plt.xlabel("min_samples_leaf")
     plt.ylabel("accuracy")
-    plt.title("Accuracy vs min_samples_leaf for SLR RCP8.5 2100 \n(max_depth = 4, max_features = 25)")
+    title = "Accuracy vs min_samples_leaf for SLR RCP8.5 2100 \n(max_depth = " + str(max_d) + ", max_features = " + \
+            str(max_feat) + ", max_samples = " + str(max_samp) + ")"
+    plt.title(title)
     plt.show()
 
 
@@ -867,4 +867,6 @@ if __name__ == '__main__':
     """
     df = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/RData_parameters_sample.csv")
     slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85.csv")
-    make_tree_and_export(df, slr_rcp85, ["2025", "2100"], "rcp85", "./forests/")
+    #make_tree_and_export(df, slr_rcp85, ["2025", "2100"], "rcp85", "./forests/")
+
+    min_samples_leaf(df, slr_rcp85, max_feat=MAX_FEATURES, max_d=MAX_DEPTH, max_samp=MAX_SAMPLES)
