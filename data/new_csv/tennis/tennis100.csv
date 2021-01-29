@@ -1,0 +1,101 @@
+sun,wind,humidity,season,time,temp,travel,tennis
+not sunny,windy,humid,summer,AM,72.68,2,no tennis
+sunny,windy,humid,fall,PM,55.91,17,tennis
+sunny,not windy,not humid,summer,AM,58.72,4,tennis
+sunny,not windy,humid,fall,PM,56.8,5,tennis
+not sunny,not windy,humid,summer,AM,75.29,13,no tennis
+not sunny,not windy,humid,summer,PM,50.24,5,no tennis
+not sunny,windy,humid,fall,PM,59.68,6,no tennis
+sunny,windy,humid,fall,AM,80.84,21,tennis
+not sunny,windy,humid,fall,PM,77.52,29,no tennis
+not sunny,not windy,humid,summer,PM,72.37,16,no tennis
+not sunny,windy,humid,fall,PM,52.42,24,no tennis
+not sunny,windy,humid,summer,PM,90.51,29,no tennis
+sunny,windy,not humid,fall,AM,96.0,8,tennis
+not sunny,not windy,not humid,fall,AM,58.81,18,no tennis
+sunny,not windy,humid,fall,PM,97.77,4,tennis
+sunny,windy,not humid,fall,AM,85.8,5,no tennis
+not sunny,windy,humid,fall,AM,79.96,15,no tennis
+not sunny,not windy,humid,fall,AM,99.74,27,no tennis
+sunny,windy,not humid,fall,AM,63.1,2,tennis
+not sunny,not windy,humid,summer,PM,70.91,8,no tennis
+sunny,not windy,not humid,summer,AM,93.64,19,tennis
+sunny,not windy,humid,fall,PM,90.95,2,tennis
+not sunny,windy,not humid,fall,AM,99.03,24,no tennis
+sunny,not windy,not humid,fall,PM,79.04,6,tennis
+not sunny,not windy,not humid,summer,PM,55.67,21,no tennis
+sunny,not windy,humid,summer,PM,78.15,9,tennis
+sunny,windy,humid,summer,AM,72.53,10,tennis
+sunny,not windy,humid,fall,AM,65.39,11,tennis
+not sunny,not windy,humid,summer,AM,73.17,1,tennis
+not sunny,windy,not humid,fall,AM,70.66,11,no tennis
+sunny,not windy,not humid,fall,PM,74.48,2,tennis
+sunny,windy,humid,fall,AM,95.95,6,no tennis
+sunny,windy,not humid,fall,AM,79.0,18,tennis
+sunny,not windy,humid,fall,AM,81.31,21,tennis
+not sunny,not windy,not humid,fall,PM,88.44,8,no tennis
+sunny,windy,not humid,summer,AM,90.06,21,tennis
+sunny,windy,not humid,summer,AM,74.08,14,tennis
+not sunny,not windy,not humid,fall,PM,83.24,26,no tennis
+sunny,windy,humid,fall,AM,70.4,6,tennis
+sunny,windy,not humid,fall,AM,95.35,19,tennis
+not sunny,not windy,humid,summer,PM,73.27,6,no tennis
+sunny,not windy,not humid,fall,PM,56.62,12,tennis
+not sunny,windy,humid,fall,AM,58.22,22,no tennis
+not sunny,not windy,not humid,fall,AM,77.2,27,no tennis
+sunny,windy,humid,fall,PM,88.0,27,tennis
+sunny,not windy,humid,summer,PM,85.92,21,tennis
+not sunny,not windy,humid,summer,PM,99.29,27,no tennis
+not sunny,not windy,not humid,summer,PM,66.06,17,no tennis
+not sunny,not windy,humid,summer,AM,97.24,13,no tennis
+not sunny,windy,not humid,summer,PM,64.89,25,no tennis
+sunny,windy,not humid,summer,AM,70.35,28,tennis
+sunny,not windy,humid,fall,AM,78.96,9,tennis
+not sunny,not windy,humid,summer,PM,81.51,28,no tennis
+not sunny,windy,not humid,summer,PM,72.04,26,no tennis
+sunny,not windy,humid,summer,AM,92.4,27,tennis
+sunny,windy,humid,fall,PM,70.82,0,tennis
+not sunny,windy,humid,summer,PM,68.79,7,no tennis
+not sunny,not windy,not humid,fall,AM,66.4,19,no tennis
+sunny,windy,humid,summer,AM,90.13,4,tennis
+not sunny,windy,not humid,summer,AM,52.19,8,no tennis
+not sunny,windy,not humid,summer,PM,68.72,19,no tennis
+not sunny,not windy,not humid,fall,AM,67.14,20,no tennis
+not sunny,not windy,not humid,summer,AM,88.92,7,no tennis
+sunny,not windy,not humid,summer,AM,65.83,24,tennis
+sunny,not windy,humid,summer,PM,65.78,26,tennis
+not sunny,windy,humid,fall,PM,81.21,29,tennis
+not sunny,not windy,humid,summer,PM,99.46,3,no tennis
+sunny,not windy,not humid,summer,PM,73.26,6,tennis
+sunny,not windy,humid,summer,PM,75.77,0,tennis
+sunny,windy,humid,summer,PM,64.54,1,tennis
+sunny,windy,not humid,fall,AM,94.72,26,tennis
+sunny,not windy,not humid,summer,PM,68.28,27,no tennis
+sunny,windy,humid,summer,PM,64.69,20,tennis
+sunny,windy,humid,summer,AM,91.76,7,tennis
+not sunny,not windy,not humid,fall,AM,54.17,24,no tennis
+not sunny,windy,not humid,fall,PM,79.01,19,no tennis
+not sunny,windy,humid,summer,AM,80.47,9,no tennis
+not sunny,windy,humid,summer,AM,81.94,0,no tennis
+sunny,not windy,not humid,summer,PM,60.45,19,tennis
+sunny,not windy,humid,fall,AM,51.47,17,tennis
+sunny,windy,humid,summer,AM,69.02,6,tennis
+not sunny,not windy,humid,summer,AM,86.62,3,no tennis
+sunny,windy,humid,fall,PM,50.51,9,tennis
+sunny,windy,humid,summer,AM,68.39,5,tennis
+sunny,not windy,not humid,fall,AM,53.68,24,tennis
+sunny,windy,not humid,summer,AM,77.78,27,tennis
+not sunny,windy,humid,summer,PM,60.54,7,no tennis
+not sunny,windy,not humid,summer,PM,62.29,3,no tennis
+not sunny,not windy,humid,summer,PM,73.98,12,tennis
+not sunny,windy,not humid,summer,PM,96.24,2,no tennis
+not sunny,windy,not humid,summer,AM,73.73,11,no tennis
+not sunny,windy,humid,summer,AM,90.65,19,no tennis
+sunny,not windy,humid,summer,PM,58.31,0,no tennis
+not sunny,not windy,not humid,summer,PM,92.91,23,no tennis
+sunny,windy,not humid,fall,PM,50.97,8,tennis
+sunny,windy,humid,fall,PM,55.69,18,tennis
+sunny,not windy,humid,summer,PM,95.0,9,tennis
+sunny,windy,humid,fall,AM,96.21,30,tennis
+not sunny,not windy,not humid,summer,PM,69.82,27,no tennis
+sunny,not windy,humid,fall,PM,60.37,3,tennis

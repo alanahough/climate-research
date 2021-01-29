@@ -1,0 +1,31 @@
+sun,wind,humidity,season,time,temp,travel,tennis
+not sunny,not windy,not humid,summer,PM,96.1,0,no tennis
+sunny,not windy,not humid,summer,AM,75.68,17,tennis
+not sunny,not windy,not humid,summer,PM,70.64,1,no tennis
+sunny,windy,humid,fall,PM,75.1,7,tennis
+sunny,windy,humid,summer,PM,77.93,27,tennis
+not sunny,not windy,not humid,summer,AM,96.6,1,no tennis
+not sunny,windy,not humid,summer,PM,93.58,7,no tennis
+sunny,not windy,humid,fall,PM,89.65,1,tennis
+sunny,not windy,not humid,fall,PM,74.86,1,tennis
+sunny,not windy,humid,fall,AM,97.34,5,tennis
+sunny,windy,humid,fall,AM,98.71,24,tennis
+not sunny,windy,not humid,summer,AM,50.14,19,no tennis
+sunny,not windy,humid,fall,PM,81.3,23,tennis
+not sunny,not windy,not humid,summer,AM,62.3,30,tennis
+sunny,windy,humid,summer,PM,95.58,24,tennis
+sunny,not windy,not humid,fall,AM,53.43,2,tennis
+not sunny,not windy,not humid,fall,PM,56.9,1,no tennis
+sunny,windy,humid,fall,AM,56.58,22,tennis
+not sunny,not windy,not humid,fall,AM,85.69,1,no tennis
+not sunny,windy,not humid,summer,PM,66.43,11,no tennis
+sunny,windy,not humid,summer,PM,91.51,15,tennis
+not sunny,windy,not humid,summer,PM,89.64,19,no tennis
+not sunny,not windy,not humid,summer,PM,81.19,9,no tennis
+sunny,windy,not humid,summer,PM,88.9,10,no tennis
+sunny,not windy,humid,summer,AM,90.18,19,tennis
+sunny,not windy,not humid,summer,AM,91.77,1,tennis
+sunny,not windy,humid,summer,AM,94.56,10,tennis
+sunny,windy,humid,summer,PM,92.56,26,tennis
+sunny,windy,not humid,fall,AM,57.91,4,tennis
+sunny,not windy,not humid,summer,AM,56.17,7,tennis

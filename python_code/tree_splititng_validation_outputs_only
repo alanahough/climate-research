@@ -1,0 +1,63 @@
+2nd 250 rows of 500 df, 1st 250 row tree w/ 1 levels
+correct: 228 incorrect: 22
+accuracy = 0.912
+
+2nd 250 rows of 500 df, 1st 250 row tree w/ 2 levels
+correct: 228 incorrect: 22
+accuracy = 0.912
+
+2nd 250 rows of 500 df, 1st 250 row tree w/ 3 levels
+correct: 228 incorrect: 22
+accuracy = 0.912
+
+2nd 250 rows of 500 df, 1st 250 row tree w/ 4 levels
+correct: 228 incorrect: 22
+accuracy = 0.912
+
+2nd 250 rows of 500 df, 1st 250 row tree w/ 5 levels
+correct: 228 incorrect: 22
+accuracy = 0.912
+
+2nd 250 rows of 500 df, 1st 250 row tree w/ 6 levels
+correct: 228 incorrect: 22
+accuracy = 0.912
+
+2nd 250 rows of 500 df, 1st 250 row tree w/ 7 levels
+correct: 212 incorrect: 38
+accuracy = 0.848
+
+2nd 500 rows of 1000 df, 1st 500 row tree w/ 1 levels
+correct: 411 incorrect: 89
+accuracy = 0.822
+
+2nd 500 rows of 1000 df, 1st 500 row tree w/ 2 levels
+correct: 411 incorrect: 89
+accuracy = 0.822
+
+2nd 500 rows of 1000 df, 1st 500 row tree w/ 3 levels
+correct: 411 incorrect: 89
+accuracy = 0.822
+
+2nd 500 rows of 1000 df, 1st 500 row tree w/ 4 levels
+correct: 411 incorrect: 89
+accuracy = 0.822
+
+2nd 500 rows of 1000 df, 1st 500 row tree w/ 5 levels
+correct: 411 incorrect: 89
+accuracy = 0.822
+
+2nd 500 rows of 1000 df, 1st 500 row tree w/ 6 levels
+correct: 411 incorrect: 89
+accuracy = 0.822
+
+2nd 500 rows of 1000 df, 1st 500 row tree w/ 7 levels
+correct: 411 incorrect: 89
+accuracy = 0.822
+
+1000 row df, 1000 row tree w/ 1 levels
+correct: 915 incorrect: 85
+accuracy = 0.915
+
+1000 row df, 1000 row tree w/ 7 levels
+correct: 923 incorrect: 77
+accuracy = 0.923

@@ -1,0 +1,25 @@
+TOTAL FEATURES= 38
+
+max_features = 35
+Validation Mean Square Error = 0.00013139637504713288
+Test Mean Square Error = 0.0001266683654609298
+
+max_features = 30
+Validation Mean Square Error = 0.00012633838200844865
+Test Mean Square Error = 0.00013133977463875962
+
+max_features = 25
+Validation Mean Square Error = 0.00013240275436187854
+Test Mean Square Error = 0.00013008792590315523
+
+max_features = 20
+Validation Mean Square Error = 0.00012797382489685577
+Test Mean Square Error = 0.000129698079018491
+
+max_feature = 15
+Validation Mean Square Error = 0.00013087504189910774
+Test Mean Square Error = 0.0001287759059608653
+
+max_features= sqrt(38)
+Validation Mean Square Error = 0.00014311850181083707
+Test Mean Square Error = 0.0001311080865168313

@@ -1,0 +1,53 @@
+These csv files include information about the Markov Chain Monte Carlo chains
+for initial calibrations of the Hector simple climate model as described in a recently
+submitted journal article, Vega-Westhoff et al. (2019; doi: 10.1029/2018EF001082).
+Code that created these MCMC chains is available on github:
+http://doi.org/10.5281/zenodo.1472378.
+
+Files:
+T.csv - Chains for the calibration that includes 6 parameters from the 
+        Hector energy balance component (3 of which are statistical). Uses global
+	average temperature as an observational constraint.
+
+TOHC.csv - Chains for the calibration that includes 9 parameters from the
+           Hector energy balance component (6 of which are statistical). Uses global
+           average temperature and ocean heat content as observational constraints.
+
+TOHCGICGISAIS.csv - Chains for the calibration that includes 38 paramaters
+                    from both the energy balance and sea-level Hector components. Uses
+                    global average temperature, ocean heat content, glacier and ice cap
+                    volume, Greenland ice sheet volume, and Antarctic ice sheet volume
+                    observational constraints.
+
+TTE.csv - Chains for a calibration that includes 7 parameters from the Hector
+          model, (3 of which are statistical and one of which is from the sea-level 
+          component). Uses global average temperature and thermosteric
+          sea-level as observational constraints.
+
+TTEGICGISAIS.csv - Chains for the calibration that includes 36 paramaters from both 
+                   the energy balance and sea-level Hector components. Uses global 
+                   average temperature, thermosteric sea-level, glacier and ice cap
+                   volume, Greenland ice sheet volume, and Antarctic ice sheet volume
+                   observational constraints.
+
+dais_TOHCGICGISAIS.csv - Chains for the Antarctic ice sheet component, which is 
+                         calibrated separately (using paleo data). Includes
+                         corresponding indices in the TOHCGICGISAIS calibration.
+
+dais_TTEGICGISAIS.csv - Chains for the Antarctic ice sheet component, which is 
+                        calibrated separately (using paleo data). Includes
+                        corresponding indices in the TTEGICGISAIS calibration.
+
+Columns:
+chain - which chain (we performed 4 parallel MCMC chains and just stack them here
+converged - Have the chains converged at this point? Using Gelman-Rubin diagnostic.
+            Note: didn't save the pre-converged data from the Antarctic ice sheet component
+sample.rs - Was this one of the samples for the rejection sampling? In the calibration w/
+            sea level, we sampled 200k post-converged parameter sets against global
+            sea-level data.
+idx.full  - Only in dais_*.csv; which index in the Hector calibration was this set
+            of Antarctic ice sheet parameters randomly paired with for the rejection sampling?
+survive.rs - Did this index survive the rejection sampling?
+sample.prob - Did this index then get sampled for the probabilistic analysis?
+The actual parameter sets follow. 
+Parameters are described in the supplemental material to the paper.
