@@ -5,6 +5,9 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import math
 import pylab
+import joblib
+import os
+
 
 MAX_DEPTH = 5
 MAX_FEATURES = 20
@@ -154,6 +157,41 @@ def slr_forest(feature_list, x_train, x_test, x_valid, y_valid, y_train, y_test,
     print("Training Accuracy =", t_accuracy)
 
     return forest, v_accuracy, t_accuracy
+
+
+def make_tree_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, path):
+    years = slr_df.columns.tolist()
+    slr_threshold = slr_df.quantile(q=.9)
+    row_list = []
+    for i in range(slr_df.shape[0]):
+        row = []
+        for j in range(len(years)):
+            if slr_df.iloc[i, j] >= slr_threshold.iloc[j]:
+                row.append("high")
+            else:
+                row.append("low")
+        row_list.append(row)
+    slr_classify = pd.DataFrame(row_list, columns=years)
+    df_slr_classify = parameter_sample_df.join(slr_classify, how="outer")
+    df_slr_classify = df_slr_classify.dropna()
+    features = parameter_sample_df.columns.tolist()
+    for yr in yrs_to_output:
+        # set up subsets
+        x = df_slr_classify[features]
+        y = df_slr_classify[yr]
+        x_train, x_rest, y_train, y_rest = train_test_split(x, y, test_size=0.4)  # train= 60%, validation + test= 40%
+        # split up rest of 40% into validation & test
+        x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest,
+                                                                      test_size=.5)  # validation= 20%, test= 20%
+
+        forest, v_accuracy, t_accuracy = slr_forest(features, x_train, x_test, x_validation, y_validation, y_train,
+                                                    y_test, max_feat=MAX_FEATURES, max_d=MAX_DEPTH,
+                                                    max_samp=MAX_SAMPLES)
+
+        file_path = path + rcp_str + "_" + yr + ".joblib"
+        joblib.dump(forest, file_path, compress=3)
+        print(rcp_str, yr)
+        print("\t", f"Compressed Random Forest: {np.round(os.path.getsize(file_path) / 1024 / 1024, 2)} MB")
 
 
 def perform_splits(forest, feature_list, split_feature):
@@ -619,10 +657,7 @@ def slr_stacked_importances_plot(importance_threshold):
     slr_rcp26_5step = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/slr_rcp26_5yrstep.csv")
     slr_rcp85_5step = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/slr_rcp85_5yrstep.csv")
 
-    #years = ["2025", "2050", "2075", "2100"]
-    years = ["2020", "2025", "2030", "2035", "2040", "2045", "2050", "2055", "2060", "2065", "2070", "2075", "2080",
-             "2085", "2090", "2095", "2100", "2105", "2110", "2115", "2120", "2125", "2130", "2135", "2140", "2145",
-             "2150"]
+    years = slr_rcp85_5step.columns.tolist()
     name = ["RCP2.6", "RCP8.5"]
 
     slr_threshold = slr_rcp26_5step.quantile(q=.9)
@@ -779,6 +814,7 @@ if __name__ == '__main__':
     # slr_output()
     # Tgav_output()
     # slr_stacked_importances_plot(.05)
+    """
     rcp26_2025 = pd.read_csv(
         "C:/Users/hough/Documents/research/data/new_csv/SLR_splits/classification_forest/rcp26_2025_splits_d4.csv")
     rcp26_2050 = pd.read_csv(
@@ -828,3 +864,7 @@ if __name__ == '__main__':
         forest, v_accuracy, t_accuracy = slr_forest(features, x_train, x_test, x_validation, y_validation, y_train,
                                                     y_test, max_samp=MAX_SAMPLES, max_feat=MAX_FEATURES,
                                                     max_d=MAX_DEPTH)
+    """
+    df = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/RData_parameters_sample.csv")
+    slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85.csv")
+    make_tree_and_export(df, slr_rcp85, ["2025", "2100"], "rcp85", "./forests/")
