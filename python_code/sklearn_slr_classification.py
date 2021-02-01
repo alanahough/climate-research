@@ -106,9 +106,13 @@ def splits_table(forest, feature_names):
                 split = split[:-2] + 'r'
         dict_list.append(dict)
 
-    nodes = ["p", "l", "ll", "lll", "llll", "lllr", "llr", "llrl", "llrr", "lr", "lrl", "lrll", "lrlr", "lrr", "lrrl",
-             "lrrr", "r", "rl", "rll", "rlll", "rllr", "rlr", "rlrl", "rlrr", "rr", "rrl", "rrll", "rrlr", "rrr",
-             "rrrl", "rrrr"]    #for trees w/ max depth= 4
+    # for trees w/ max depth = 5
+    nodes = ["p", "l", "ll", "lll", "llll", "lllll", "llllr", "lllr", "lllrl", "lllrr", "llr", "llrl", "llrll", "llrlr",
+             "llrr", "llrrl", "llrrr", "lr", "lrl", "lrll", "lrlll", "lrllr", "lrlr", "lrlrl", "lrlrr", "lrr", "lrrl",
+             "lrrll", "lrrlr", "lrrr", "lrrrl", "lrrrr", "r", "rl", "rll", "rlll", "rllll", "rlllr", "rllr", "rllrl",
+             "rllrr", "rlr", "rlrl", "rlrll", "rlrlr", "rlrr", "rlrrl", "rlrrr", "rr", "rrl", "rrll", "rrlll", "rrllr",
+             "rrlr", "rrlrl", "rrlrr", "rrr", "rrrl", "rrrll", "rrrlr", "rrrr", "rrrrl", "rrrrr"]
+
     row_list=[]
     feature_names.append("leaf")
 
@@ -159,19 +163,26 @@ def slr_forest(feature_list, x_train, x_test, x_valid, y_valid, y_train, y_test,
     return forest, v_accuracy, t_accuracy
 
 
-def make_tree_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, path):
-    years = slr_df.columns.tolist()
-    slr_threshold = slr_df.quantile(q=.9)
+def classify_data(df, print_threshold=False):
+    years = df.columns.tolist()
+    threshold = df.quantile(q=.9)
+    if print_threshold is True:
+        print("Threshold:\n", threshold)
     row_list = []
-    for i in range(slr_df.shape[0]):
+    for i in range(df.shape[0]):
         row = []
         for j in range(len(years)):
-            if slr_df.iloc[i, j] >= slr_threshold.iloc[j]:
+            if df.iloc[i, j] >= threshold.iloc[j]:
                 row.append("high")
             else:
                 row.append("low")
         row_list.append(row)
-    slr_classify = pd.DataFrame(row_list, columns=years)
+    df_classify = pd.DataFrame(row_list, columns=years)
+    return df_classify
+
+
+def make_tree_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, path):
+    slr_classify = classify_data(slr_df)
     df_slr_classify = parameter_sample_df.join(slr_classify, how="outer")
     df_slr_classify = df_slr_classify.dropna()
     features = parameter_sample_df.columns.tolist()
@@ -223,8 +234,7 @@ def perform_splits(forest, feature_list, split_feature):
         return split_df, all, first_only
 
 
-def tree_splits(response):
-    df = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/RData_parameters_sample.csv")
+def tree_splits(param_sample_df, response):
     slr_rcp26 = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/slr_rcp26.csv")
     slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/slr_rcp85.csv")
     Tgav_rcp26 = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/Tgav_rcp26.csv")
@@ -233,65 +243,18 @@ def tree_splits(response):
     years = ["2025", "2050", "2075", "2100"]
     name = ["RCP2.6", "RCP8.5"]
 
-    slr_threshold = slr_rcp26.quantile(q=.9)
-    print("SLR RCP2.6 Threshold:\n", slr_threshold)
-    row_list=[]
-    for i in range (slr_rcp26.shape[0]):
-        row=[]
-        for j in range (4):
-            if slr_rcp26.iloc[i, j] >= slr_threshold.iloc[j]:
-                row.append("high")
-            else:
-                row.append("low")
-        row_list.append(row)
-    slr_rcp26_classify= pd.DataFrame(row_list, columns= years)
+    # classify data
+    slr_rcp26_classify = classify_data(slr_rcp26)
+    slr_rcp85_classify = classify_data(slr_rcp85)
+    Tgav_rcp26_classify = classify_data(Tgav_rcp26)
+    Tgav_rcp85_classify = classify_data(Tgav_rcp85)
 
-    slr_threshold = slr_rcp85.quantile(q=.9)
-    print("SLR RCP8.5 Threshold:\n", slr_threshold)
-    row_list = []
-    for i in range(slr_rcp85.shape[0]):
-        row = []
-        for j in range(4):
-            if slr_rcp85.iloc[i, j] >= slr_threshold.iloc[j]:
-                row.append("high")
-            else:
-                row.append("low")
-        row_list.append(row)
-    slr_rcp85_classify = pd.DataFrame(row_list, columns=years)
+    # join sample parameter df and classified data df
+    df_slr_rcp26 = param_sample_df.join(slr_rcp26_classify, how="outer")
+    df_slr_rcp85 = param_sample_df.join(slr_rcp85_classify, how="outer")
+    df_Tgav_rcp26 = param_sample_df.join(Tgav_rcp26_classify, how="outer")
+    df_Tgav_rcp85 = param_sample_df.join(Tgav_rcp85_classify, how="outer")
 
-    Tgav_threshold = Tgav_rcp26.quantile(q=.9)
-    print("Tgav RCP2.6 Threshold:\n", Tgav_threshold)
-    row_list = []
-    for i in range(Tgav_rcp26.shape[0]):
-        row = []
-        for j in range(4):
-            if Tgav_rcp26.iloc[i, j] >= Tgav_threshold.iloc[j]:
-                row.append("high")
-            else:
-                row.append("low")
-        row_list.append(row)
-    Tgav_rcp26_classify = pd.DataFrame(row_list, columns=years)
-
-    Tgav_threshold = Tgav_rcp85.quantile(q=.9)
-    print("Tgav RCP8.5 Threshold:\n", Tgav_threshold)
-    row_list = []
-    for i in range(Tgav_rcp85.shape[0]):
-        row = []
-        for j in range(4):
-            if Tgav_rcp85.iloc[i, j] >= Tgav_threshold.iloc[j]:
-                row.append("high")
-            else:
-                row.append("low")
-        row_list.append(row)
-    Tgav_rcp85_classify = pd.DataFrame(row_list, columns=years)
-
-    df_slr_rcp26 = df.join(slr_rcp26_classify, how="outer")
-    df_slr_rcp85 = df.join(slr_rcp85_classify, how="outer")
-    df_Tgav_rcp26 = df.join(Tgav_rcp26_classify, how="outer")
-    df_Tgav_rcp85 = df.join(Tgav_rcp85_classify, how="outer")
-
-    years = ["2025", "2050", "2075", "2100"]
-    name = ["RCP2.6", "RCP8.5"]
     if response == "SLR":
         dflist = [df_slr_rcp26, df_slr_rcp85]
         path = [[r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\rcp26_2025_splits_d4.csv',
@@ -337,7 +300,7 @@ def tree_splits(response):
         importances_info = []
         fig, axs = plt.subplots(1, 4)
         for j in range(len(years)):
-            features = df.columns.tolist()
+            features = param_sample_df.columns.tolist()
             yr = years[j]
             # set up subsets
             x = responsedf[features]
@@ -421,20 +384,7 @@ def Tgav_output():
 
 
 def max_features(param_samples_df, slr_df, max_d=None, min_samp_leaf=1, max_samp=None, print_threshold=True):
-    years = ["2025", "2050", "2075", "2100"]
-    slr_threshold = slr_df.quantile(q=.9)
-    if print_threshold is True:
-        print("SLR RCP8.5 Threshold:\n", slr_threshold)
-    row_list = []
-    for i in range(slr_df.shape[0]):
-        row = []
-        for j in range(4):
-            if slr_df.iloc[i, j] >= slr_threshold.iloc[j]:
-                row.append("high")
-            else:
-                row.append("low")
-        row_list.append(row)
-    slr_rcp85_classify = pd.DataFrame(row_list, columns=years)
+    slr_rcp85_classify = classify_data(slr_df, print_threshold=print_threshold)
     df_slr_rcp85 = param_samples_df.join(slr_rcp85_classify, how="outer")
     df_slr_rcp85 = df_slr_rcp85.dropna()
     features = param_samples_df.columns.tolist()
@@ -471,20 +421,7 @@ def max_features(param_samples_df, slr_df, max_d=None, min_samp_leaf=1, max_samp
 
 
 def max_depth(param_samples_df, slr_df, max_feat="auto", min_samp_leaf=1, max_samp=None, print_threshold=True):
-    years = ["2025", "2050", "2075", "2100"]
-    slr_threshold = slr_df.quantile(q=.9)
-    if print_threshold is True:
-        print("SLR RCP8.5 Threshold:\n", slr_threshold)
-    row_list = []
-    for i in range(slr_df.shape[0]):
-        row = []
-        for j in range(4):
-            if slr_df.iloc[i, j] >= slr_threshold.iloc[j]:
-                row.append("high")
-            else:
-                row.append("low")
-        row_list.append(row)
-    slr_rcp85_classify = pd.DataFrame(row_list, columns=years)
+    slr_rcp85_classify = classify_data(slr_df, print_threshold=print_threshold)
     df_slr_rcp85 = param_samples_df.join(slr_rcp85_classify, how="outer")
     df_slr_rcp85 = df_slr_rcp85.dropna()
     features = param_samples_df.columns.tolist()
@@ -520,20 +457,7 @@ def max_depth(param_samples_df, slr_df, max_feat="auto", min_samp_leaf=1, max_sa
 
 
 def min_samples_leaf(param_samples_df, slr_df, max_feat="auto", max_d=None, max_samp=None, print_threshold=True):
-    years = ["2025", "2050", "2075", "2100"]
-    slr_threshold = slr_df.quantile(q=.9)
-    if print_threshold is True:
-        print("SLR RCP8.5 Threshold:\n", slr_threshold)
-    row_list = []
-    for i in range(slr_df.shape[0]):
-        row = []
-        for j in range(4):
-            if slr_df.iloc[i, j] >= slr_threshold.iloc[j]:
-                row.append("high")
-            else:
-                row.append("low")
-        row_list.append(row)
-    slr_rcp85_classify = pd.DataFrame(row_list, columns=years)
+    slr_rcp85_classify = classify_data(slr_df, print_threshold=print_threshold)
     df_slr_rcp85 = param_samples_df.join(slr_rcp85_classify, how="outer")
     df_slr_rcp85 = df_slr_rcp85.dropna()
     features = param_samples_df.columns.tolist()
@@ -570,20 +494,7 @@ def min_samples_leaf(param_samples_df, slr_df, max_feat="auto", max_d=None, max_
 
 
 def max_samples(param_samples_df, slr_df, max_feat="auto", max_d=None, min_samp_leaf=1, print_threshold=True):
-    years = ["2025", "2050", "2075", "2100"]
-    slr_threshold = slr_df.quantile(q=.9)
-    if print_threshold is True:
-        print("SLR RCP8.5 Threshold:\n", slr_threshold)
-    row_list = []
-    for i in range(slr_df.shape[0]):
-        row = []
-        for j in range(4):
-            if slr_df.iloc[i, j] >= slr_threshold.iloc[j]:
-                row.append("high")
-            else:
-                row.append("low")
-        row_list.append(row)
-    slr_rcp85_classify = pd.DataFrame(row_list, columns=years)
+    slr_rcp85_classify = classify_data(slr_df, print_threshold=print_threshold)
     df_slr_rcp85 = param_samples_df.join(slr_rcp85_classify, how="outer")
     df_slr_rcp85 = df_slr_rcp85.dropna()
     features = param_samples_df.columns.tolist()
@@ -675,55 +586,26 @@ def feature_color_dict(params_df):
     return color_dict
 
 
-def slr_stacked_importances_plot(importance_threshold):
-    df = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/RData_parameters_sample.csv")
-    slr_rcp26 = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/slr_rcp26.csv")
-    slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/slr_rcp85.csv")
-    slr_rcp26_5step = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/slr_rcp26_5yrstep.csv")
-    slr_rcp85_5step = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/slr_rcp85_5yrstep.csv")
+def slr_stacked_importances_plot(param_sample_df, slr_rcp26_5step, slr_rcp85_5step, importance_threshold):
 
     years = slr_rcp85_5step.columns.tolist()
+    features = param_sample_df.columns.tolist()
     name = ["RCP2.6", "RCP8.5"]
 
-    slr_threshold = slr_rcp26_5step.quantile(q=.9)
-    print("SLR RCP2.6 Threshold:\n", slr_threshold)
-    row_list = []
-    for i in range(slr_rcp26_5step.shape[0]):
-        row = []
-        for j in range(len(years)):
-            if slr_rcp26_5step.iloc[i, j] >= slr_threshold.iloc[j]:
-                row.append("high")
-            else:
-                row.append("low")
-        row_list.append(row)
-    slr_rcp26_classify = pd.DataFrame(row_list, columns=years)
-
-    slr_threshold = slr_rcp85_5step.quantile(q=.9)
-    print("SLR RCP8.5 Threshold:\n", slr_threshold)
-    row_list = []
-    for i in range(slr_rcp85_5step.shape[0]):
-        row = []
-        for j in range(len(years)):
-            if slr_rcp85_5step.iloc[i, j] >= slr_threshold.iloc[j]:
-                row.append("high")
-            else:
-                row.append("low")
-        row_list.append(row)
-    slr_rcp85_classify = pd.DataFrame(row_list, columns=years)
-
-    df_slr_rcp26 = df.join(slr_rcp26_classify, how="outer")
-    df_slr_rcp85 = df.join(slr_rcp85_classify, how="outer")
+    slr_rcp26_classify = classify_data(slr_rcp26_5step)
+    slr_rcp85_classify = classify_data(slr_rcp85_5step)
+    df_slr_rcp26 = param_sample_df.join(slr_rcp26_classify, how="outer")
+    df_slr_rcp85 = param_sample_df.join(slr_rcp85_classify, how="outer")
     dflist=[df_slr_rcp26, df_slr_rcp85]
 
     #set color for each feature
-    color_dict = feature_color_dict(df)
+    color_dict = feature_color_dict(param_sample_df)
 
     for i in range(len(dflist)):
         responsedf = dflist[i]
         responsedf = responsedf.dropna()
         importances_info = {}
         for j in range(len(years)):
-            features = df.columns.tolist()
             yr = years[j]
             # set up subsets
             x = responsedf[features]
@@ -890,10 +772,10 @@ if __name__ == '__main__':
                                                     y_test, max_samp=MAX_SAMPLES, max_feat=MAX_FEATURES,
                                                     max_d=MAX_DEPTH)
     """
-    #df = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/RData_parameters_sample.csv")
-    #slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85.csv")
+    df = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/RData_parameters_sample.csv")
+    slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85.csv")
     #make_tree_and_export(df, slr_rcp85, ["2025", "2100"], "rcp85", "./forests/")
 
     #min_samples_leaf(df, slr_rcp85, max_feat=MAX_FEATURES, max_d=MAX_DEPTH, max_samp=MAX_SAMPLES)
 
-    parameter_loop_min_samples_leaf()
+    max_depth(df, slr_rcp85, min_samp_leaf=4, max_feat=20, max_samp=2000)
