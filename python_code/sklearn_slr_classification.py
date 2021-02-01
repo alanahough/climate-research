@@ -420,26 +420,24 @@ def Tgav_output():
                                     index=False)
 
 
-def max_features(max_d=None, min_samp_leaf=1, max_samp=None, print_threshold=True):
-    df = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/RData_parameters_sample.csv")
-    slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/slr_rcp85.csv")
+def max_features(param_samples_df, slr_df, max_d=None, min_samp_leaf=1, max_samp=None, print_threshold=True):
     years = ["2025", "2050", "2075", "2100"]
-    slr_threshold = slr_rcp85.quantile(q=.9)
+    slr_threshold = slr_df.quantile(q=.9)
     if print_threshold is True:
         print("SLR RCP8.5 Threshold:\n", slr_threshold)
     row_list = []
-    for i in range(slr_rcp85.shape[0]):
+    for i in range(slr_df.shape[0]):
         row = []
         for j in range(4):
-            if slr_rcp85.iloc[i, j] >= slr_threshold.iloc[j]:
+            if slr_df.iloc[i, j] >= slr_threshold.iloc[j]:
                 row.append("high")
             else:
                 row.append("low")
         row_list.append(row)
     slr_rcp85_classify = pd.DataFrame(row_list, columns=years)
-    df_slr_rcp85 = df.join(slr_rcp85_classify, how="outer")
+    df_slr_rcp85 = param_samples_df.join(slr_rcp85_classify, how="outer")
     df_slr_rcp85 = df_slr_rcp85.dropna()
-    features = df.columns.tolist()
+    features = param_samples_df.columns.tolist()
     yr="2100"
 
     # set up subsets
@@ -466,30 +464,30 @@ def max_features(max_d=None, min_samp_leaf=1, max_samp=None, print_threshold=Tru
     plt.legend()
     plt.xlabel("max_features")
     plt.ylabel("accuracy")
-    plt.title("Accuracy vs max_features for SLR RCP8.5 2100")
+    title = "Accuracy vs max_features for SLR RCP8.5 2100 \n(max_depth = " + str(max_d) + ", min_samples_leaf = " + \
+            str(min_samp_leaf) + ", max_samples = " + str(max_samp) + ")"
+    plt.title(title)
     plt.show()
 
 
-def max_depth(max_feat="auto", min_samp_leaf=1, max_samp=None, print_threshold=True):
-    df = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/RData_parameters_sample.csv")
-    slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/slr_rcp85.csv")
+def max_depth(param_samples_df, slr_df, max_feat="auto", min_samp_leaf=1, max_samp=None, print_threshold=True):
     years = ["2025", "2050", "2075", "2100"]
-    slr_threshold = slr_rcp85.quantile(q=.9)
+    slr_threshold = slr_df.quantile(q=.9)
     if print_threshold is True:
         print("SLR RCP8.5 Threshold:\n", slr_threshold)
     row_list = []
-    for i in range(slr_rcp85.shape[0]):
+    for i in range(slr_df.shape[0]):
         row = []
         for j in range(4):
-            if slr_rcp85.iloc[i, j] >= slr_threshold.iloc[j]:
+            if slr_df.iloc[i, j] >= slr_threshold.iloc[j]:
                 row.append("high")
             else:
                 row.append("low")
         row_list.append(row)
     slr_rcp85_classify = pd.DataFrame(row_list, columns=years)
-    df_slr_rcp85 = df.join(slr_rcp85_classify, how="outer")
+    df_slr_rcp85 = param_samples_df.join(slr_rcp85_classify, how="outer")
     df_slr_rcp85 = df_slr_rcp85.dropna()
-    features = df.columns.tolist()
+    features = param_samples_df.columns.tolist()
     yr = "2100"
 
     # set up subsets
@@ -515,7 +513,9 @@ def max_depth(max_feat="auto", min_samp_leaf=1, max_samp=None, print_threshold=T
     plt.legend()
     plt.xlabel("max_depth")
     plt.ylabel("accuracy")
-    plt.title("Accuracy vs max_depth for SLR RCP8.5 2100 (max_features = 25)")
+    title = "Accuracy vs max_depth for SLR RCP8.5 2100 \n(min_samples_leaf = " + str(min_samp_leaf) + \
+            ", max_features = " + str(max_feat) + ", max_samples = " + str(max_samp) + ")"
+    plt.title(title)
     plt.show()
 
 
@@ -569,26 +569,24 @@ def min_samples_leaf(param_samples_df, slr_df, max_feat="auto", max_d=None, max_
     plt.show()
 
 
-def max_samples(max_feat="auto", max_d=None, min_samp_leaf=1, print_threshold=True):
-    df = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/RData_parameters_sample.csv")
-    slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/slr_rcp85.csv")
+def max_samples(param_samples_df, slr_df, max_feat="auto", max_d=None, min_samp_leaf=1, print_threshold=True):
     years = ["2025", "2050", "2075", "2100"]
-    slr_threshold = slr_rcp85.quantile(q=.9)
+    slr_threshold = slr_df.quantile(q=.9)
     if print_threshold is True:
         print("SLR RCP8.5 Threshold:\n", slr_threshold)
     row_list = []
-    for i in range(slr_rcp85.shape[0]):
+    for i in range(slr_df.shape[0]):
         row = []
         for j in range(4):
-            if slr_rcp85.iloc[i, j] >= slr_threshold.iloc[j]:
+            if slr_df.iloc[i, j] >= slr_threshold.iloc[j]:
                 row.append("high")
             else:
                 row.append("low")
         row_list.append(row)
     slr_rcp85_classify = pd.DataFrame(row_list, columns=years)
-    df_slr_rcp85 = df.join(slr_rcp85_classify, how="outer")
+    df_slr_rcp85 = param_samples_df.join(slr_rcp85_classify, how="outer")
     df_slr_rcp85 = df_slr_rcp85.dropna()
-    features = df.columns.tolist()
+    features = param_samples_df.columns.tolist()
     yr = "2100"
 
     # set up subsets
@@ -614,26 +612,53 @@ def max_samples(max_feat="auto", max_d=None, min_samp_leaf=1, print_threshold=Tr
     plt.xticks(max_samples)
     plt.xlabel("max_samples")
     plt.ylabel("accuracy")
-    plt.title("Accuracy vs max_samples for SLR RCP8.5 2100\n(max_depth = 4, max_features = 25)")
+    title = "Accuracy vs max_samples for SLR RCP8.5 2100 \n(max_depth = " + str(max_d) + ", min_samples_leaf = " + \
+            str(min_samp_leaf) + ", max_features = " + str(max_feat) + ")"
+    plt.title(title)
     plt.show()
 
 
-def parameter_loop():
+def parameter_loop_max_features():
+    df = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/RData_parameters_sample.csv")
+    slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85.csv")
     stop = 1
     counter = 1
     max_depth_val = None
     max_samples_val = None
     while stop != 0:
         print("Iteration", counter)
-        max_features(max_d=max_depth_val, max_samp=max_samples_val, print_threshold=False)
+        max_features(df, slr_rcp85, max_d=max_depth_val, max_samp=max_samples_val, print_threshold=False)
         max_features_val = int(input("Max features: "))
-        max_depth(max_feat=max_features_val, max_samp=max_samples_val, print_threshold=False)
+        max_depth(df, slr_rcp85, max_feat=max_features_val, max_samp=max_samples_val, print_threshold=False)
         max_depth_val = int(input("Max depth: "))
-        max_samples(max_feat=max_features_val, max_d=max_depth_val, print_threshold=False)
+        max_samples(df, slr_rcp85, max_feat=max_features_val, max_d=max_depth_val, print_threshold=False)
         max_samples_val = int(input("Max samples: "))
         print("Iteration", counter, "Summary")
         print("\tMax features =", max_features_val)
         print("\tMax depth = ", max_depth_val)
+        print("\tMax samples =", max_samples_val)
+        stop = int(input("Enter 0 to stop"))
+        counter += 1
+
+
+def parameter_loop_min_samples_leaf():
+    df = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/RData_parameters_sample.csv")
+    slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85.csv")
+    stop = 1
+    counter = 1
+    min_samples_leaf_val = 1
+    max_samples_val = None
+    while stop != 0:
+        print("Iteration", counter)
+        max_features(df, slr_rcp85, min_samp_leaf=min_samples_leaf_val, max_samp=max_samples_val, print_threshold=False)
+        max_features_val = int(input("Max features: "))
+        min_samples_leaf(df, slr_rcp85, max_feat=max_features_val, max_samp=max_samples_val, print_threshold=False)
+        min_samples_leaf_val = int(input("Min samples leaf: "))
+        max_samples(df, slr_rcp85, max_feat=max_features_val, min_samp_leaf=min_samples_leaf_val, print_threshold=False)
+        max_samples_val = int(input("Max samples: "))
+        print("Iteration", counter, "Summary")
+        print("\tMax features =", max_features_val)
+        print("\tMin samples leaf = ", min_samples_leaf_val)
         print("\tMax samples =", max_samples_val)
         stop = int(input("Enter 0 to stop"))
         counter += 1
@@ -865,8 +890,10 @@ if __name__ == '__main__':
                                                     y_test, max_samp=MAX_SAMPLES, max_feat=MAX_FEATURES,
                                                     max_d=MAX_DEPTH)
     """
-    df = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/RData_parameters_sample.csv")
-    slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85.csv")
+    #df = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/RData_parameters_sample.csv")
+    #slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85.csv")
     #make_tree_and_export(df, slr_rcp85, ["2025", "2100"], "rcp85", "./forests/")
 
-    min_samples_leaf(df, slr_rcp85, max_feat=MAX_FEATURES, max_d=MAX_DEPTH, max_samp=MAX_SAMPLES)
+    #min_samples_leaf(df, slr_rcp85, max_feat=MAX_FEATURES, max_d=MAX_DEPTH, max_samp=MAX_SAMPLES)
+
+    parameter_loop_min_samples_leaf()
