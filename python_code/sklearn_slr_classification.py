@@ -185,7 +185,7 @@ def classify_data(df, print_threshold=False):
     return df_classify
 
 
-def make_tree_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, path):
+def make_tree_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, forest_path, accuracy_path):
     slr_classify = classify_data(slr_df)
     df_slr_classify = parameter_sample_df.join(slr_classify, how="outer")
     df_slr_classify = df_slr_classify.dropna()
@@ -193,11 +193,13 @@ def make_tree_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, pa
     for yr in yrs_to_output:
         forest, v_accuracy, t_accuracy = slr_forest(features, df_slr_classify, yr, max_feat=MAX_FEATURES,
                                                     max_d=MAX_DEPTH, max_samp=MAX_SAMPLES)
-
-        file_path = path + rcp_str + "_" + yr + ".joblib"
-        joblib.dump(forest, file_path, compress=3)
+        forest_file_path = forest_path + rcp_str + "_" + yr + ".joblib"
+        joblib.dump(forest, forest_file_path, compress=3)
         print(rcp_str, yr)
-        print("\t", f"Compressed Random Forest: {np.round(os.path.getsize(file_path) / 1024 / 1024, 2)} MB")
+        print("\t", f"Compressed Random Forest: {np.round(os.path.getsize(forest_file_path) / 1024 / 1024, 2)} MB")
+        accuracy_df = pd.DataFrame({"Validation Accuracy": [v_accuracy], "Training Accuracy": [t_accuracy]})
+        accuracy_file_path = accuracy_path + rcp_str + "_" + yr + "_accuracy.csv"
+        accuracy_df.to_csv(accuracy_file_path, index=False)
 
 
 def perform_splits(forest, feature_list, split_feature):
@@ -220,7 +222,7 @@ def perform_splits(forest, feature_list, split_feature):
     for list in split_list:
         if len(list) != 0:
             empty = False
-    if empty == True:
+    if empty:
         return None, None, None
     else:
         split_df, all = split_stats(split_list, split_feature)
@@ -664,61 +666,11 @@ if __name__ == '__main__':
     # slr_output()
     # Tgav_output()
     # slr_stacked_importances_plot(.05)
-    """
-    rcp26_2025 = pd.read_csv(
-        "C:/Users/hough/Documents/research/data/new_csv/SLR_splits/classification_forest/rcp26_2025_splits_d4.csv")
-    rcp26_2050 = pd.read_csv(
-        "C:/Users/hough/Documents/research/data/new_csv/SLR_splits/classification_forest/rcp26_2050_splits_d4.csv")
-    rcp26_2075 = pd.read_csv(
-        "C:/Users/hough/Documents/research/data/new_csv/SLR_splits/classification_forest/rcp26_2075_splits_d4.csv")
-    rcp26_2100 = pd.read_csv(
-        "C:/Users/hough/Documents/research/data/new_csv/SLR_splits/classification_forest/rcp26_2100_splits_d4.csv")
-    rcp85_2025 = pd.read_csv(
-        "C:/Users/hough/Documents/research/data/new_csv/SLR_splits/classification_forest/rcp85_2025_splits_d4.csv")
-    rcp85_2050 = pd.read_csv(
-        "C:/Users/hough/Documents/research/data/new_csv/SLR_splits/classification_forest/rcp85_2050_splits_d4.csv")
-    rcp85_2075 = pd.read_csv(
-        "C:/Users/hough/Documents/research/data/new_csv/SLR_splits/classification_forest/rcp85_2075_splits_d4.csv")
-    rcp85_2100 = pd.read_csv(
-        "C:/Users/hough/Documents/research/data/new_csv/SLR_splits/classification_forest/rcp85_2100_splits_d4.csv")
-    # Stemp_histograms(rcp26_2025, rcp26_2050, rcp26_2075, rcp26_2100, "RCP 2.6", first_only=True)
 
-    df = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/RData_parameters_sample.csv")
-    slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/slr_rcp85.csv")
-    years = ["2025", "2050", "2075", "2100"]
-    slr_threshold = slr_rcp85.quantile(q=.9)
-    print("SLR RCP8.5 Threshold:\n", slr_threshold)
-    row_list = []
-    for i in range(slr_rcp85.shape[0]):
-        row = []
-        for j in range(4):
-            if slr_rcp85.iloc[i, j] >= slr_threshold.iloc[j]:
-                row.append("high")
-            else:
-                row.append("low")
-        row_list.append(row)
-    slr_rcp85_classify = pd.DataFrame(row_list, columns=years)
-    df_slr_rcp85 = df.join(slr_rcp85_classify, how="outer")
-    df_slr_rcp85 = df_slr_rcp85.dropna()
-    features = df.columns.tolist()
-    yr = "2100"
-
-    # set up subsets
-    x = df_slr_rcp85[features]
-    y = df_slr_rcp85[yr]
-    x_train, x_rest, y_train, y_rest = train_test_split(x, y, test_size=0.4)  # train= 60%, validation + test= 40%
-    # split up rest of 40% into validation & test
-    x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest,
-                                                                  test_size=.5)  # validation= 20%, test= 20%
-    for i in range(4):
-        forest, v_accuracy, t_accuracy = slr_forest(features, x_train, x_test, x_validation, y_validation, y_train,
-                                                    y_test, max_samp=MAX_SAMPLES, max_feat=MAX_FEATURES,
-                                                    max_d=MAX_DEPTH)
-    """
     df = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/RData_parameters_sample.csv")
     slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85.csv")
-    #make_tree_and_export(df, slr_rcp85, ["2025", "2100"], "rcp85", "./forests/")
+    make_tree_and_export(df, slr_rcp85, ["2025", "2100"], "rcp85", "./forests/", "./forests/forest_accuracy/")
 
     #min_samples_leaf(df, slr_rcp85, max_feat=MAX_FEATURES, max_d=MAX_DEPTH, max_samp=MAX_SAMPLES)
 
-    max_depth(df, slr_rcp85, min_samp_leaf=4, max_feat=20, max_samp=2000)
+    #max_depth(df, slr_rcp85, min_samp_leaf=4, max_feat=20, max_samp=2000)
