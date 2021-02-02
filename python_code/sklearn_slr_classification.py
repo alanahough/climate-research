@@ -597,16 +597,17 @@ if __name__ == '__main__':
     # slr_stacked_importances_plot(.05)
 
     df = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/RData_parameters_sample.csv")
-    slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85.csv")
-    #make_tree_and_export(df, slr_rcp85, ["2025", "2100"], "rcp85", "./forests/", "./forests/forest_accuracy/")
+    slr_rcp26_5step = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp26_5yrstep.csv")
+    slr_rcp85_5step = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85_5yrstep.csv")
+    yrs_rcp26 = slr_rcp26_5step.columns.tolist()
+    yrs_rcp85 = slr_rcp85_5step.columns.tolist()
+    make_tree_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/", "./forests/forest_accuracy/")
 
     #min_samples_leaf(df, slr_rcp85, max_feat=MAX_FEATURES, max_d=MAX_DEPTH, max_samp=MAX_SAMPLES)
 
     #max_depth(df, slr_rcp85, min_samp_leaf=4, max_feat=20, max_samp=2000)
 
-    forest_2025 = joblib.load(
-        "C:/Users/hough/Documents/research/climate-research/python_code/forests/rcp85_2025.joblib")
-    forest_2100 = joblib.load(
-        "C:/Users/hough/Documents/research/climate-research/python_code/forests/rcp85_2100.joblib")
-    path = "C:/Users/hough/Documents/research/climate-research/data/new_csv/SLR_splits/classification_forest/"
-    tree_splits(df, "SLR", "RCP 8.5", [forest_2025, forest_2100], [2025, 2100], path)
+    #forest_2025 = joblib.load("./forests/rcp85_2025.joblib")
+    #forest_2100 = joblib.load("./forests/rcp85_2100.joblib")
+    #path = "C:/Users/hough/Documents/research/climate-research/data/new_csv/SLR_splits/classification_forest/"
+    #tree_splits(df, "SLR", "RCP 8.5", [forest_2025, forest_2100], [2025, 2100], path)
