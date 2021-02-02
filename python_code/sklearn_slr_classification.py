@@ -468,31 +468,20 @@ def feature_color_dict(params_df):
     return color_dict
 
 
-def slr_stacked_importances_plot(param_sample_df, slr_rcp26_5step, slr_rcp85_5step, importance_threshold):
-
-    years = slr_rcp85_5step.columns.tolist()
+def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_forest_list, years, importance_threshold):
     features = param_sample_df.columns.tolist()
     name = ["RCP2.6", "RCP8.5"]
-
-    slr_rcp26_classify = classify_data(slr_rcp26_5step)
-    slr_rcp85_classify = classify_data(slr_rcp85_5step)
-    df_slr_rcp26 = param_sample_df.join(slr_rcp26_classify, how="outer")
-    df_slr_rcp85 = param_sample_df.join(slr_rcp85_classify, how="outer")
-    dflist=[df_slr_rcp26, df_slr_rcp85]
+    forest_masterlist=[rcp26_forest_list, rcp85_forest_list]
 
     #set color for each feature
     color_dict = feature_color_dict(param_sample_df)
 
-    for i in range(len(dflist)):
-        responsedf = dflist[i]
-        responsedf = responsedf.dropna()
+    for i in range(len(forest_masterlist)):
+        forest_list = forest_masterlist[i]
         importances_info = {}
-        for j in range(len(years)):
-            yr = years[j]
+        for j in range(len(forest_list)):
+            forest = forest_list[j]
 
-            # make forest
-            forest, validation_acc, training_acc = slr_forest(features, responsedf, yr, max_d=MAX_DEPTH,
-                                                              max_feat=MAX_FEATURES, max_samples= MAX_SAMPLES)
             # stacked importances dictionary
             importances = forest.feature_importances_
             indices = np.argsort(importances)[::-1]
@@ -534,12 +523,13 @@ def slr_stacked_importances_plot(param_sample_df, slr_rcp26_5step, slr_rcp85_5st
                 pass
             else:
                 if bottom is None:
-                    plt.bar(x, importances_info[feature], label=feature, c=color)
+                    plt.bar(x, importances_info[feature], label=feature, color=color)
                     bottom = np.array(importances_info[feature])
                 else:
-                    plt.bar(x, importances_info[feature], bottom=bottom, label=feature, c=color)
+                    plt.bar(x, importances_info[feature], bottom=bottom, label=feature, color=color)
                     bottom += np.array(importances_info[feature])
-        plt.bar(x, importances_info["Other"], bottom=bottom, label="Other (< 5%)")
+        percent_label = "Other (< " + str(importance_threshold*100) + "%)"
+        plt.bar(x, importances_info["Other"], bottom=bottom, label=percent_label)
         plt.ylabel("Relative Importances")
         yrs_10=[]
         for yr in years:
@@ -591,23 +581,31 @@ def Stemp_histograms(df_2025, df_2050, df_2075, df_2100, rcp, first_only=False):
     plt.show()
 
 
+def load_forests(year_list, rcp):
+    forests = []
+    for yr in year_list:
+        path = "./forests/" + rcp + "_" + str(yr) + ".joblib"
+        forests.append(joblib.load(path))
+    return forests
+
+
 if __name__ == '__main__':
-    # slr_output()
-    # Tgav_output()
     # slr_stacked_importances_plot(.05)
 
+    # saving forests
     df = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/RData_parameters_sample.csv")
     slr_rcp26_5step = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp26_5yrstep.csv")
     slr_rcp85_5step = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85_5yrstep.csv")
     yrs_rcp26 = slr_rcp26_5step.columns.tolist()
     yrs_rcp85 = slr_rcp85_5step.columns.tolist()
-    make_tree_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
+    #make_tree_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
 
-    #min_samples_leaf(df, slr_rcp85, max_feat=MAX_FEATURES, max_d=MAX_DEPTH, max_samp=MAX_SAMPLES)
-
-    #max_depth(df, slr_rcp85, min_samp_leaf=4, max_feat=20, max_samp=2000)
-
+    # testing updated tree_splits function
     #forest_2025 = joblib.load("./forests/rcp85_2025.joblib")
     #forest_2100 = joblib.load("./forests/rcp85_2100.joblib")
     #path = "C:/Users/hough/Documents/research/climate-research/data/new_csv/SLR_splits/classification_forest/"
     #tree_splits(df, "SLR", "RCP 8.5", [forest_2025, forest_2100], [2025, 2100], path)
+
+    rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
+    rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
+    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, .05)
