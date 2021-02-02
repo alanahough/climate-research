@@ -197,7 +197,7 @@ def make_tree_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, fo
         forest_file_path = forest_path + rcp_str + "_" + yr + ".joblib"
         joblib.dump(forest, forest_file_path, compress=3)
         print(rcp_str, yr)
-        print("\t", f"Compressed Random Forest: {np.round(os.path.getsize(forest_file_path) / 1024 / 1024, 2)} MB")
+        print(f"Compressed Random Forest: {np.round(os.path.getsize(forest_file_path) / 1024 / 1024, 2)} MB")
         accuracy_df = pd.DataFrame({"Validation Accuracy": [v_accuracy], "Training Accuracy": [t_accuracy]})
         accuracy_file_path = accuracy_path + rcp_str + "_" + yr + "_accuracy.csv"
         accuracy_df.to_csv(accuracy_file_path, index=False)
@@ -601,7 +601,7 @@ if __name__ == '__main__':
     slr_rcp85_5step = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85_5yrstep.csv")
     yrs_rcp26 = slr_rcp26_5step.columns.tolist()
     yrs_rcp85 = slr_rcp85_5step.columns.tolist()
-    make_tree_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/", "./forests/forest_accuracy/")
+    make_tree_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
 
     #min_samples_leaf(df, slr_rcp85, max_feat=MAX_FEATURES, max_d=MAX_DEPTH, max_samp=MAX_SAMPLES)
 
