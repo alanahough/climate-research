@@ -75,6 +75,7 @@ def splits_table(forest, feature_names):
              split point -- the rows of the dataframe are the split names (p, l, lr, etc) and the columns are the
                             feature names
     """
+    features = feature_names.copy()
     dict_list=[]
     for i in range(len(forest.estimators_)):
         estimator = forest.estimators_[i]
@@ -84,7 +85,7 @@ def splits_table(forest, feature_names):
             if node == -2:
                 feature_new.append('leaf')
             else:
-                feature_new.append(feature_names[node])
+                feature_new.append(features[node])
         dict = {"p": feature_new[0]}
         split = "l"
         for i in range(1, len(feature_new)):
@@ -110,7 +111,7 @@ def splits_table(forest, feature_names):
              "rrlr", "rrlrl", "rrlrr", "rrr", "rrrl", "rrrll", "rrrlr", "rrrr", "rrrrl", "rrrrr"]
 
     row_list=[]
-    feature_names.append("leaf")
+    features.append("leaf")
 
     for node in nodes:
         feature_list = []
@@ -118,7 +119,7 @@ def splits_table(forest, feature_names):
             if node in dict_list[i]:
                 feature_list.append(dict_list[i][node])
         feature_sums = {}
-        for name in feature_names:
+        for name in features:
             feature_sums[name] = 0
         for f in feature_list:
             feature_sums[f] += 1
@@ -128,7 +129,7 @@ def splits_table(forest, feature_names):
             feature_fractions.append(feature_sums[f] / tot)
         row_list.append(feature_fractions)
 
-    df=pd.DataFrame(row_list, index=nodes, columns=feature_names)
+    df = pd.DataFrame(row_list, index=nodes, columns=features)
     return df
 
 
@@ -231,144 +232,72 @@ def perform_splits(forest, feature_list, split_feature):
         return split_df, all, first_only
 
 
-def tree_splits(param_sample_df, response):
-    slr_rcp26 = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/slr_rcp26.csv")
-    slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/slr_rcp85.csv")
-    Tgav_rcp26 = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/Tgav_rcp26.csv")
-    Tgav_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/data/new_csv/Tgav_rcp85.csv")
-
-    years = ["2025", "2050", "2075", "2100"]
-    name = ["RCP2.6", "RCP8.5"]
-
-    # classify data
-    slr_rcp26_classify = classify_data(slr_rcp26)
-    slr_rcp85_classify = classify_data(slr_rcp85)
-    Tgav_rcp26_classify = classify_data(Tgav_rcp26)
-    Tgav_rcp85_classify = classify_data(Tgav_rcp85)
-
-    # join sample parameter df and classified data df
-    df_slr_rcp26 = param_sample_df.join(slr_rcp26_classify, how="outer")
-    df_slr_rcp85 = param_sample_df.join(slr_rcp85_classify, how="outer")
-    df_Tgav_rcp26 = param_sample_df.join(Tgav_rcp26_classify, how="outer")
-    df_Tgav_rcp85 = param_sample_df.join(Tgav_rcp85_classify, how="outer")
-
-    if response == "SLR":
-        dflist = [df_slr_rcp26, df_slr_rcp85]
-        path = [[r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\rcp26_2025_splits_d4.csv',
-                 r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\rcp26_2050_splits_d4.csv',
-                 r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\rcp26_2075_splits_d4.csv',
-                 r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\rcp26_2100_splits_d4.csv'],
-                [r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\rcp85_2025_splits_d4.csv',
-                 r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\rcp85_2050_splits_d4.csv',
-                 r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\rcp85_2075_splits_d4.csv',
-                 r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\rcp85_2100_splits_d4.csv']]
-        table_path = [[r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\rcp26_2025_split_table_d4.csv',
-                       r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\rcp26_2050_split_table_d4.csv',
-                       r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\rcp26_2075_split_table_d4.csv',
-                       r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\rcp26_2100_split_table_d4.csv'],
-                      [r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\rcp85_2025_split_table_d4.csv',
-                       r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\rcp85_2050_split_table_d4.csv',
-                       r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\rcp85_2075_split_table_d4.csv',
-                       r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\rcp85_2100_split_table_d4.csv']]
-    elif response == "Tgav":
-        dflist = [df_Tgav_rcp26, df_Tgav_rcp85]
-        path = [[r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\rcp26_2025_splits_d4.csv',
-                 r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\rcp26_2050_splits_d4.csv',
-                 r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\rcp26_2075_splits_d4.csv',
-                 r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\rcp26_2100_splits_d4.csv'],
-                [r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\rcp85_2025_splits_d4.csv',
-                 r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\rcp85_2050_splits_d4.csv',
-                 r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\rcp85_2075_splits_d4.csv',
-                 r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\rcp85_2100_splits_d4.csv']]
-        table_path = [[r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\rcp26_2025_split_table_d4.csv',
-                       r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\rcp26_2050_split_table_d4.csv',
-                       r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\rcp26_2075_split_table_d4.csv',
-                       r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\rcp26_2100_split_table_d4.csv'],
-                      [r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\rcp85_2025_split_table_d4.csv',
-                       r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\rcp85_2050_split_table_d4.csv',
-                       r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\rcp85_2075_split_table_d4.csv',
-                       r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\rcp85_2100_split_table_d4.csv']]
+def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_path):
+    fig, axs = plt.subplots(1, len(year_list))
+    features = param_sample_df.columns.tolist()
     first_quartile_data = []
     all_quartile_data = []
+    rcp_no_space = rcp.replace(" ", "")
+    rcp_no_space_no_period = rcp_no_space.replace(".", "")
 
-    for i in range(len(dflist)):
-        responsedf = dflist[i]
-        responsedf = responsedf.dropna()
-        importances_info = []
-        fig, axs = plt.subplots(1, 4)
-        for j in range(len(years)):
-            features = param_sample_df.columns.tolist()
-            yr = years[j]
-            all_label = name[i] + yr + " all splits"
-            first_label = name[i] + yr + " first split"
-            all = (all_label,)
-            first = (first_label,)
-            forest, validation_acc, training_acc = slr_forest(features, responsedf, yr, max_feat=MAX_FEATURES,
-                                                              max_samp=MAX_SAMPLES, max_d=MAX_DEPTH)
-            split_df, all_quartiles, first_quartiles=perform_splits(forest, features,"S.temperature")
-            if isinstance(split_df, pd.DataFrame):
-                pass
-            else:
-                continue
+    for j in range(len(year_list)):
+        yr = str(year_list[j])
+        all_label = response + " " + yr + " all splits"
+        first_label = response + " " + yr + " first split"
+        all = (all_label,)
+        first = (first_label,)
+        forest = forests_list[j]
+        split_df, all_quartiles, first_quartiles=perform_splits(forest, features,"S.temperature")
+        if isinstance(split_df, pd.DataFrame):
+            pass
+        else:
+            continue
 
-            split_df.to_csv(path[i][j], index=False)
-            for n in range(len(all_quartiles)):
-                all += (all_quartiles[n],)
-                first += (first_quartiles[n],)
-            first_quartile_data.append(first)
-            all_quartile_data.append(all)
+        split_file_path = folder_path + rcp_no_space_no_period + "_" + yr + "_splits.csv"
+        split_df.to_csv(split_file_path, index=False)
+        for n in range(len(all_quartiles)):
+            all += (all_quartiles[n],)
+            first += (first_quartiles[n],)
+        first_quartile_data.append(first)
+        all_quartile_data.append(all)
 
-            table_df = splits_table(forest, features)
-            table_df.to_csv(table_path[i][j], index=True)
+        table_df = splits_table(forest, features)
+        split_table_file_path = folder_path + rcp_no_space_no_period + "_" + yr + "_split_table.csv"
+        table_df.to_csv(split_table_file_path, index=True)
 
-            # importances plot
-            importances = forest.feature_importances_
-            std = np.std([tree.feature_importances_ for tree in forest.estimators_],
-                         axis=0)
-            indices = np.argsort(importances)[::-1]
-            importances_list = []
-            std_list = []
-            features_list = []
-            for idx in indices:
-                if importances[idx] > .025:
-                    importances_list.append(importances[idx])
-                    std_list.append(std[idx])
-                    features_list.append(features[idx])
-            importances_info.append([importances_list, std_list, features_list])
-            axs[j].bar(range(len(importances_list)), importances_list, color="tab:blue",
+        # importances plot
+        importances = forest.feature_importances_
+        std = np.std([tree.feature_importances_ for tree in forest.estimators_], axis=0)
+        indices = np.argsort(importances)[::-1]
+        importances_list = []
+        std_list = []
+        features_list = []
+        for idx in indices:
+            if importances[idx] > .025:
+                importances_list.append(importances[idx])
+                std_list.append(std[idx])
+                features_list.append(features[idx])
+        axs[j].bar(range(len(importances_list)), importances_list, color="tab:blue",
                        yerr=std_list, align="center")
-            title = yr
-            axs[j].set_title(title)
-            axs[j].set_xticks(range(len(importances_list)))
-            axs[j].set_xticklabels(features_list, rotation=90)
-            axs[j].set_ylim(top=1.0)
-            axs[j].set_ylim(bottom= 0.0)
-        main_title = response + " " + name[i] + " Feature Importances"
-        fig.suptitle(main_title, fontsize=15)
-        fig.text(0.52, 0.04, 'Features', ha='center', fontsize=12)
-        fig.text(0.04, 0.5, 'Relative Importance', va='center', rotation='vertical', fontsize=12)
-        plt.show()
+        title = yr
+        axs[j].set_title(title)
+        axs[j].set_xticks(range(len(importances_list)))
+        axs[j].set_xticklabels(features_list, rotation=90)
+        axs[j].set_ylim(top=1.0)
+        axs[j].set_ylim(bottom= 0.0)
+    main_title = response + " " + rcp + " Feature Importances"
+    fig.suptitle(main_title, fontsize=15)
+    fig.text(0.52, 0.04, 'Features', ha='center', fontsize=12)
+    fig.text(0.04, 0.5, 'Relative Importance', va='center', rotation='vertical', fontsize=12)
+    plt.show()
 
     df_first_quartile = pd.DataFrame(first_quartile_data, columns=["Name", "0%", "25%", "50%", "75%", "100%", "Mean"])
+    first_file_path = folder_path + rcp_no_space_no_period + "_first_splits.csv"
+    df_first_quartile.to_csv(first_file_path, index=False)
+
     df_all_quartile = pd.DataFrame(all_quartile_data, columns=["Name", "0%", "25%", "50%", "75%", "100%", "Mean"])
-    return df_first_quartile, df_all_quartile
-
-
-def slr_output():
-    slr_first_depth4_quartile, slr_all_depth4_quartile = tree_splits("SLR")
-    slr_first_depth4_quartile.to_csv(r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\first_split_stats.csv',
-                                     index=False)
-    slr_all_depth4_quartile.to_csv(r'C:\Users\hough\Documents\research\data\new_csv\SLR_splits\classification_forest\all_split_stats.csv',
-                                   index=False)
-
-
-def Tgav_output():
-    Tgav_first_depth4_quartile, Tgav_all_depth4_quartile = tree_splits("Tgav")
-    Tgav_first_depth4_quartile.to_csv(
-        r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\first_split_stats.csv',
-        index=False)
-    Tgav_all_depth4_quartile.to_csv(r'C:\Users\hough\Documents\research\data\new_csv\Tgav_splits\classification_forest\all_split_stats.csv',
-                                    index=False)
+    all_file_path = folder_path + rcp_no_space_no_period + "_all_splits.csv"
+    df_all_quartile.to_csv(all_file_path, index=False)
 
 
 def max_features(param_samples_df, slr_df, max_d=None, min_samp_leaf=1, max_samp=None, print_threshold=True):
@@ -669,8 +598,15 @@ if __name__ == '__main__':
 
     df = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/RData_parameters_sample.csv")
     slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85.csv")
-    make_tree_and_export(df, slr_rcp85, ["2025", "2100"], "rcp85", "./forests/", "./forests/forest_accuracy/")
+    #make_tree_and_export(df, slr_rcp85, ["2025", "2100"], "rcp85", "./forests/", "./forests/forest_accuracy/")
 
     #min_samples_leaf(df, slr_rcp85, max_feat=MAX_FEATURES, max_d=MAX_DEPTH, max_samp=MAX_SAMPLES)
 
     #max_depth(df, slr_rcp85, min_samp_leaf=4, max_feat=20, max_samp=2000)
+
+    forest_2025 = joblib.load(
+        "C:/Users/hough/Documents/research/climate-research/python_code/forests/rcp85_2025.joblib")
+    forest_2100 = joblib.load(
+        "C:/Users/hough/Documents/research/climate-research/python_code/forests/rcp85_2100.joblib")
+    path = "C:/Users/hough/Documents/research/climate-research/data/new_csv/SLR_splits/classification_forest/"
+    tree_splits(df, "SLR", "RCP 8.5", [forest_2025, forest_2100], [2025, 2100], path)
