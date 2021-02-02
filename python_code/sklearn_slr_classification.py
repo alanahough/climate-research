@@ -51,10 +51,6 @@ def split_stats(split_list, split_feature):
                                      -- quantiles_list is a list of the calculated statistics of split_list.  The
                                         order of the list is [min, Q1, median, Q3, max, mean]
     """
-    #for i in range(0, len(split_list)):
-    #    print("\nEstimator", i, split_feature, "splits:")
-    #    for j in range(0, len(split_list[i])):
-    #        print("\t", split_list[i][j])
     splitdf = pd.DataFrame(split_list)
     split_array = splitdf.to_numpy()
     print("\nMean of", split_feature, "splits:", np.nanmean(split_array))
@@ -136,8 +132,16 @@ def splits_table(forest, feature_names):
     return df
 
 
-def slr_forest(feature_list, x_train, x_test, x_valid, y_valid, y_train, y_test, max_feat="auto", max_d=None,
-               min_samp_leaf=1, max_samp=None, print_forest= False):
+def slr_forest(feature_list, df, year, max_feat="auto", max_d=None, min_samp_leaf=1, max_samp=None,
+               print_forest= False):
+    # set up subsets
+    x = df[feature_list]
+    y = df[year]
+    x_train, x_rest, y_train, y_rest = train_test_split(x, y, test_size=0.4)  # train= 60%, validation + test= 40%
+    # split up rest of 40% into validation & test
+    x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest,
+                                                                  test_size=.5)  # validation= 20%, test= 20%
+
     # random forest creation
     forest = ensemble.RandomForestClassifier(n_estimators=1000, criterion="entropy", max_features=max_feat,
                                              max_depth=max_d, min_samples_leaf=min_samp_leaf, max_samples=max_samp)
@@ -151,8 +155,8 @@ def slr_forest(feature_list, x_train, x_test, x_valid, y_valid, y_train, y_test,
             print(text)
 
     # random forest validation
-    y_predicted = forest.predict(x_valid)
-    v_accuracy = metrics.accuracy_score(y_valid, y_predicted)
+    y_predicted = forest.predict(x_validation)
+    v_accuracy = metrics.accuracy_score(y_validation, y_predicted)
     print("\nValidation Accuracy =", v_accuracy)
 
     # random forest training
@@ -187,17 +191,8 @@ def make_tree_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, pa
     df_slr_classify = df_slr_classify.dropna()
     features = parameter_sample_df.columns.tolist()
     for yr in yrs_to_output:
-        # set up subsets
-        x = df_slr_classify[features]
-        y = df_slr_classify[yr]
-        x_train, x_rest, y_train, y_rest = train_test_split(x, y, test_size=0.4)  # train= 60%, validation + test= 40%
-        # split up rest of 40% into validation & test
-        x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest,
-                                                                      test_size=.5)  # validation= 20%, test= 20%
-
-        forest, v_accuracy, t_accuracy = slr_forest(features, x_train, x_test, x_validation, y_validation, y_train,
-                                                    y_test, max_feat=MAX_FEATURES, max_d=MAX_DEPTH,
-                                                    max_samp=MAX_SAMPLES)
+        forest, v_accuracy, t_accuracy = slr_forest(features, df_slr_classify, yr, max_feat=MAX_FEATURES,
+                                                    max_d=MAX_DEPTH, max_samp=MAX_SAMPLES)
 
         file_path = path + rcp_str + "_" + yr + ".joblib"
         joblib.dump(forest, file_path, compress=3)
@@ -302,21 +297,12 @@ def tree_splits(param_sample_df, response):
         for j in range(len(years)):
             features = param_sample_df.columns.tolist()
             yr = years[j]
-            # set up subsets
-            x = responsedf[features]
-            y = responsedf[yr]
-            x_train, x_rest, y_train, y_rest = train_test_split(x, y,
-                                                                test_size=0.4)  # train= 60%, validation + test= 40%
-            # split up rest of 40% into validation & test
-            x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest,
-                                                                          test_size=.5)  # validation= 20%, test= 20%
-
             all_label = name[i] + yr + " all splits"
             first_label = name[i] + yr + " first split"
             all = (all_label,)
             first = (first_label,)
-            forest, validation_acc, training_acc = slr_forest(features, x_train, x_test, x_validation, y_validation,
-                                                              y_train, y_test)
+            forest, validation_acc, training_acc = slr_forest(features, responsedf, yr, max_feat=MAX_FEATURES,
+                                                              max_samp=MAX_SAMPLES, max_d=MAX_DEPTH)
             split_df, all_quartiles, first_quartiles=perform_splits(forest, features,"S.temperature")
             if isinstance(split_df, pd.DataFrame):
                 pass
@@ -390,22 +376,13 @@ def max_features(param_samples_df, slr_df, max_d=None, min_samp_leaf=1, max_samp
     features = param_samples_df.columns.tolist()
     yr="2100"
 
-    # set up subsets
-    x = df_slr_rcp85[features]
-    y = df_slr_rcp85[yr]
-    x_train, x_rest, y_train, y_rest = train_test_split(x, y, test_size=0.4)  # train= 60%, validation + test= 40%
-    # split up rest of 40% into validation & test
-    x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest,
-                                                                  test_size=.5)  # validation= 20%, test= 20%
-
     max_list = ["sqrt", 10, 15, 20, 25, 30, 35]
     v_accuracy_list=[]
     t_accuracy_list=[]
     for max in max_list:
         print("\nmax_features =", max)
-        forest, v_accuracy, t_accuracy= slr_forest(features, x_train, x_test, x_validation, y_validation, y_train,
-                                                   y_test, max_feat=max, max_d=max_d, min_samp_leaf=min_samp_leaf,
-                                                   max_samp=max_samp)
+        forest, v_accuracy, t_accuracy= slr_forest(features, df_slr_rcp85, yr, max_feat=max, max_d=max_d,
+                                                   min_samp_leaf=min_samp_leaf, max_samp=max_samp)
         v_accuracy_list.append(v_accuracy)
         t_accuracy_list.append(t_accuracy)
     max_list[0] = math.sqrt(38)
@@ -427,22 +404,13 @@ def max_depth(param_samples_df, slr_df, max_feat="auto", min_samp_leaf=1, max_sa
     features = param_samples_df.columns.tolist()
     yr = "2100"
 
-    # set up subsets
-    x = df_slr_rcp85[features]
-    y = df_slr_rcp85[yr]
-    x_train, x_rest, y_train, y_rest = train_test_split(x, y, test_size=0.4)  # train= 60%, validation + test= 40%
-    # split up rest of 40% into validation & test
-    x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest,
-                                                                  test_size=.5)  # validation= 20%, test= 20%
-
     max_depth = [2, 3, 4, 5, 6, 7]
     v_accuracy_list=[]
     t_accuracy_list=[]
     for max in max_depth:
         print("\nmax_depth =", max)
-        forest, v_accuracy, t_accuracy= slr_forest(features, x_train, x_test, x_validation, y_validation, y_train,
-                                                   y_test, max_d=max, max_feat=max_feat, min_samp_leaf=min_samp_leaf,
-                                                   max_samp=max_samp)
+        forest, v_accuracy, t_accuracy = slr_forest(features, df_slr_rcp85, yr, max_feat=max_feat, max_d=max,
+                                                    min_samp_leaf=min_samp_leaf, max_samp=max_samp)
         v_accuracy_list.append(v_accuracy)
         t_accuracy_list.append(t_accuracy)
     plt.scatter(max_depth, v_accuracy_list, label="Validation Accuracy")
@@ -463,22 +431,13 @@ def min_samples_leaf(param_samples_df, slr_df, max_feat="auto", max_d=None, max_
     features = param_samples_df.columns.tolist()
     yr = "2100"
 
-    # set up subsets
-    x = df_slr_rcp85[features]
-    y = df_slr_rcp85[yr]
-    x_train, x_rest, y_train, y_rest = train_test_split(x, y, test_size=0.4)  # train= 60%, validation + test= 40%
-    # split up rest of 40% into validation & test
-    x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest,
-                                                                  test_size=.5)  # validation= 20%, test= 20%
-
     min_leaf = [1, 2, 4, 8, 12, 16, 20, 24, 28]
     v_accuracy_list=[]
     t_accuracy_list=[]
     for min in min_leaf:
         print("\nmin_samples_leaf =", min)
-        forest, v_accuracy, t_accuracy= slr_forest(features, x_train, x_test, x_validation, y_validation, y_train,
-                                                   y_test, min_samp_leaf=min, max_feat=max_feat, max_d=max_d,
-                                                   max_samp=max_samp)
+        forest, v_accuracy, t_accuracy = slr_forest(features, df_slr_rcp85, yr, max_feat=max_feat, max_d=max_d,
+                                                    min_samp_leaf=min, max_samp=max_samp)
         v_accuracy_list.append(v_accuracy)
         t_accuracy_list.append(t_accuracy)
     plt.scatter(min_leaf, v_accuracy_list, label="Validation Accuracy")
@@ -500,21 +459,13 @@ def max_samples(param_samples_df, slr_df, max_feat="auto", max_d=None, min_samp_
     features = param_samples_df.columns.tolist()
     yr = "2100"
 
-    # set up subsets
-    x = df_slr_rcp85[features]
-    y = df_slr_rcp85[yr]
-    x_train, x_rest, y_train, y_rest = train_test_split(x, y, test_size=0.4)  # train= 60%, validation + test= 40%
-    # split up rest of 40% into validation & test
-    x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest,
-                                                                  test_size=.5)  # validation= 20%, test= 20%
     max_samples = [1000, 2000, 3000, 4000, 5000, 6000]
     v_accuracy_list=[]
     t_accuracy_list=[]
     for max in max_samples:
         print("\nmax_samples =", max)
-        forest, v_accuracy, t_accuracy= slr_forest(features, x_train, x_test, x_validation, y_validation, y_train,
-                                                   y_test, max_samp=max, max_feat=max_feat, max_d=max_d,
-                                                   min_samp_leaf=min_samp_leaf)
+        forest, v_accuracy, t_accuracy = slr_forest(features, df_slr_rcp85, yr, max_feat=max_feat, max_d=max_d,
+                                                    min_samp_leaf=min_samp_leaf, max_samp=max)
         v_accuracy_list.append(v_accuracy)
         t_accuracy_list.append(t_accuracy)
     plt.scatter(max_samples, v_accuracy_list, label="Validation Accuracy")
@@ -607,18 +558,10 @@ def slr_stacked_importances_plot(param_sample_df, slr_rcp26_5step, slr_rcp85_5st
         importances_info = {}
         for j in range(len(years)):
             yr = years[j]
-            # set up subsets
-            x = responsedf[features]
-            y = responsedf[yr]
-            x_train, x_rest, y_train, y_rest = train_test_split(x, y,
-                                                                test_size=0.4)  # train= 60%, validation + test= 40%
-            # split up rest of 40% into validation & test
-            x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest,
-                                                                          test_size=.5)  # validation= 20%, test= 20%
-            # make forest -- max depth = 4, max features = 25
-            forest, validation_acc, training_acc = slr_forest(features, x_train, x_test, x_validation, y_validation,
-                                                              y_train, y_test, max_d=MAX_DEPTH, max_feat=MAX_FEATURES,
-                                                              max_samples= MAX_SAMPLES)
+
+            # make forest
+            forest, validation_acc, training_acc = slr_forest(features, responsedf, yr, max_d=MAX_DEPTH,
+                                                              max_feat=MAX_FEATURES, max_samples= MAX_SAMPLES)
             # stacked importances dictionary
             importances = forest.feature_importances_
             indices = np.argsort(importances)[::-1]
