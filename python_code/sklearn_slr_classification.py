@@ -2,7 +2,7 @@ from sklearn import tree, metrics, ensemble
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 import math
 import pylab
 import joblib
@@ -581,6 +581,63 @@ def Stemp_histograms(df_2025, df_2050, df_2075, df_2100, rcp, first_only=False):
     plt.show()
 
 
+def gridsearch(param_samples_df, slr_df, year):
+    slr_classify = classify_data(slr_df)
+    df_slr = param_samples_df.join(slr_classify, how="outer")
+    df_slr = df_slr.dropna()
+    features = param_samples_df.columns.tolist()
+    x = df_slr[features]
+    y = df_slr[year]
+    x_train, x_rest, y_train, y_rest = train_test_split(x, y, test_size=0.4)  # train= 60%, validation + test= 40%
+    # split up rest of 40% into validation & test
+    x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest,
+                                                                  test_size=.5)  # validation= 20%, test= 20%
+
+    param_grid_1 = {
+        'max_depth': [2, 4, 6, 8, 10],
+        'max_features': ["sqrt", 10, 15, 20, 25, 30, 35],
+        'max_samples': [1000, 2000, 3000, 4000, 4800],
+        'min_samples_leaf': [1, 15, 30, 45, 60, 75, 90, 105],
+        'min_samples_split': [15, 30, 45, 60, 75, 90, 105]
+    }   #took like 14.5 hours and I forgot to print the best params :))))))
+    param_grid_2 = {
+        'max_depth': [3, 4, 5, 6],
+        'max_features': ["sqrt", 10, 15, 20, 25, 30],
+        'max_samples': [1000, 2000, 3000, 4000],
+        'min_samples_leaf': [1, 20, 40, 60, 80, 100],
+        'min_samples_split': [2, 20, 40, 60, 80, 100]
+    }   #took around 4.5 hours -- {'max_depth': 6, 'max_features': 30, 'max_samples': 3000, 'min_samples_leaf': 1, 'min_samples_split': 20}
+    param_grid_3 = {
+        'max_depth': [4, 5, 6, 7],
+        'max_features': [20, 25, 30, 35],
+        'max_samples': [2000, 3000, 4000],
+        'min_samples_leaf': [1, 2, 4, 8, 12, 16],
+        'min_samples_split': [5, 10, 15, 20, 25, 30]
+    }   #took around 4 hours -- {'max_depth': 7, 'max_features': 35, 'max_samples': 4000, 'min_samples_leaf': 4, 'min_samples_split': 20}
+    param_grid_4 = {
+        'max_depth': [6, 7, 8, 9, 10],
+        'max_features': [25, 30, 32, 35, 38],
+        'max_samples': [3000, 3500, 4000, 4500, 4800],
+        'min_samples_leaf': [2, 4, 8],
+        'min_samples_split': [10, 15, 20, 25, 30]
+    }   #took around 7.5 hours -- {'max_depth': 10, 'max_features': 38, 'max_samples': 4800, 'min_samples_leaf': 8, 'min_samples_split': 15}
+    param_grid_5 = {
+        'max_depth': [7, 10, 13, 16, 19],
+        'max_features': [30, 32, 35, 38],
+        'max_samples': [3500, 4000, 4500, 4800],
+        'min_samples_leaf': [2, 4, 8, 10, 12],
+        'min_samples_split': [10, 15, 20, 25, 30]
+    }   #took around 11 hours -- {'max_depth': 13, 'max_features': 35, 'max_samples': 4500, 'min_samples_leaf': 2, 'min_samples_split': 10}
+
+    forest = ensemble.RandomForestClassifier()
+    grid_search = GridSearchCV(estimator=forest, param_grid=param_grid_5, cv=5, n_jobs=-1, verbose=1)
+    grid_search.fit(x_train, y_train)
+    print("BEST PARAMETERS:")
+    print(grid_search.best_params_)
+    df = pd.DataFrame(grid_search.best_params_, index=[0])
+    df.to_csv("./gridsearchcv_results/param_grid_5.csv", index=False)
+
+
 def load_forests(year_list, rcp):
     forests = []
     for yr in year_list:
@@ -606,6 +663,10 @@ if __name__ == '__main__':
     #path = "C:/Users/hough/Documents/research/climate-research/data/new_csv/SLR_splits/classification_forest/"
     #tree_splits(df, "SLR", "RCP 8.5", [forest_2025, forest_2100], [2025, 2100], path)
 
-    rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
-    rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, .05)
+    # stacked importances plot
+    #rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
+    #rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
+    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, .05)
+
+    #grid search
+    gridsearch(df, slr_rcp85_5step, "2100")
