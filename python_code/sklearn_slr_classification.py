@@ -628,14 +628,26 @@ def gridsearch(param_samples_df, slr_df, year):
         'min_samples_leaf': [2, 4, 8, 10, 12],
         'min_samples_split': [10, 15, 20, 25, 30]
     }   #took around 11 hours -- {'max_depth': 13, 'max_features': 35, 'max_samples': 4500, 'min_samples_leaf': 2, 'min_samples_split': 10}
+    param_grid_6 = {
+        'max_depth': [12, 13, 14],
+        'max_features': [35, 36, 37, 38],
+        'max_samples': [4000, 4500, 4800],
+        'min_samples_leaf': [2, 4, 6, 8],
+        'min_samples_split': [10, 13, 16, 20]
+    }   #took around 3 hours -- {'max_depth': 13, 'max_features': 38, 'max_samples': 4800, 'min_samples_leaf': 8, 'min_samples_split': 13}
+        # BEST PARAMETERS:
+        # {'max_depth': 14, 'max_features': 37, 'max_samples': 4500, 'min_samples_leaf': 4, 'min_samples_split': 10}
+        # Mean cross-validated score of the best_estimator:  0.9333333333333333
 
     forest = ensemble.RandomForestClassifier()
-    grid_search = GridSearchCV(estimator=forest, param_grid=param_grid_5, cv=5, n_jobs=-1, verbose=1)
+    grid_search = GridSearchCV(estimator=forest, param_grid=param_grid_6, cv=5, n_jobs=-1, verbose=1,
+                               scoring="accuracy")
     grid_search.fit(x_train, y_train)
     print("BEST PARAMETERS:")
     print(grid_search.best_params_)
+    print("Mean cross-validated score of the best_estimator: ", grid_search.best_score_)
     df = pd.DataFrame(grid_search.best_params_, index=[0])
-    df.to_csv("./gridsearchcv_results/param_grid_5.csv", index=False)
+    df.to_csv("./gridsearchcv_results/param_grid_6.csv", index=False)
 
 
 def load_forests(year_list, rcp):
