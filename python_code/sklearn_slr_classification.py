@@ -588,10 +588,15 @@ def gridsearch(param_samples_df, slr_df, year):
     features = param_samples_df.columns.tolist()
     x = df_slr[features]
     y = df_slr[year]
-    x_train, x_rest, y_train, y_rest = train_test_split(x, y, test_size=0.4)  # train= 60%, validation + test= 40%
+
+    # 60% training, 20% validation, 20% testing
+    #x_train, x_rest, y_train, y_rest = train_test_split(x, y, test_size=0.4)  # train= 60%, validation + test= 40%
     # split up rest of 40% into validation & test
-    x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest,
-                                                                  test_size=.5)  # validation= 20%, test= 20%
+    #x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest,
+    #                                                              test_size=.5)  # validation= 20%, test= 20%
+
+    # 80% training, 20% testing
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
 
     param_grid_1 = {
         'max_depth': [2, 4, 6, 8, 10],
@@ -639,15 +644,24 @@ def gridsearch(param_samples_df, slr_df, year):
         # {'max_depth': 14, 'max_features': 37, 'max_samples': 4500, 'min_samples_leaf': 4, 'min_samples_split': 10}
         # Mean cross-validated score of the best_estimator:  0.9333333333333333
 
+    n_estimators_param_grid = {
+        'n_estimators': range(100, 1001, 100),
+        'max_depth': [14],
+        'max_features': [37],
+        'max_samples': [4500],
+        'min_samples_leaf': [4],
+        'min_samples_split': [10]
+    }   # 'n_estimators': 700, Mean cross-validated score of the best_estimator:  0.9373750000000001
+
     forest = ensemble.RandomForestClassifier()
-    grid_search = GridSearchCV(estimator=forest, param_grid=param_grid_6, cv=5, n_jobs=-1, verbose=1,
+    grid_search = GridSearchCV(estimator=forest, param_grid=n_estimators_param_grid, cv=5, n_jobs=-1, verbose=1,
                                scoring="accuracy")
     grid_search.fit(x_train, y_train)
     print("BEST PARAMETERS:")
     print(grid_search.best_params_)
     print("Mean cross-validated score of the best_estimator: ", grid_search.best_score_)
     df = pd.DataFrame(grid_search.best_params_, index=[0])
-    df.to_csv("./gridsearchcv_results/param_grid_6.csv", index=False)
+    df.to_csv("./gridsearchcv_results/n_estimators_param_grid.csv", index=False)
 
 
 def load_forests(year_list, rcp):
