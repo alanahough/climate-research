@@ -652,6 +652,7 @@ def gridsearch(param_samples_df, slr_df, year):
         'min_samples_leaf': [4],
         'min_samples_split': [10]
     }   # 'n_estimators': 700, Mean cross-validated score of the best_estimator:  0.9373750000000001
+        # n_estimators:300, Mean cross-validated score of the best_estimator:  0.936875
 
     forest = ensemble.RandomForestClassifier()
     grid_search = GridSearchCV(estimator=forest, param_grid=n_estimators_param_grid, cv=5, n_jobs=-1, verbose=1,
@@ -662,6 +663,9 @@ def gridsearch(param_samples_df, slr_df, year):
     print("Mean cross-validated score of the best_estimator: ", grid_search.best_score_)
     df = pd.DataFrame(grid_search.best_params_, index=[0])
     df.to_csv("./gridsearchcv_results/n_estimators_param_grid.csv", index=False)
+    print(grid_search.cv_results_)
+    df = pd.DataFrame(grid_search.cv_results_)
+    df.to_csv("./gridsearchcv_results/n_estimators_cv_results.csv", index=False)
 
 
 def load_forests(year_list, rcp):
