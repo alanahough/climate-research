@@ -221,7 +221,7 @@ def make_forest_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, 
     :param parameter_sample_df: dataframe of the input feature values
     :param slr_df: dataframe of the output year values
     :param yrs_to_output: list of the years as strings to create and export forests for
-    :param rcp_str: RCP name as a string (ex: "rcp85")
+    :param rcp_str: RCP name as a string with no spaces (ex: "rcp85")
     :param forest_path: path of the folder to save the forests into (ex: "./forests/")
     :param accuracy_path: path of the folder to save the accuracy CSV files into (ex: "./forests/forest_accuracy/")
     :return: None
@@ -272,6 +272,21 @@ def perform_splits(forest, feature_list, split_feature):
 
 
 def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_path):
+    """
+    Runs the perform_splits() function and runs the splits_table() function for each forest, and creates a plot of the
+    feature importances of each forest in the same pop-up.  The S.temperature split values are saved into a separate
+    CSV for each forest, the split breakdown from the splits_table() function are saved into a separate CSV for each
+    forest, the statistics of all the S.temperature splits for each forest/year are saved into one CSV, and the
+    statistics of the first split value of the S.temeprature splits for each forest/year are saved into one CSV.
+    :param param_sample_df: dataframe of the input feature values
+    :param response: "SLR" or "Tgav"
+    :param rcp: RCP name as a string (ex: "RCP 8.5")
+    :param forests_list: a list of already fit forests for this function to be perfomred on
+    :param year_list: list of the years (as integers) that correspond to years of the forests in forest_list
+    :param folder_path: path to the folder where the CSV files will be saved
+    :return: None
+    """
+    # tree_splits(df, "SLR", "RCP 8.5", [forest_2025, forest_2100], [2025, 2100], path)
     fig, axs = plt.subplots(1, len(year_list))
     features = param_sample_df.columns.tolist()
     first_quartile_data = []
