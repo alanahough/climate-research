@@ -355,6 +355,18 @@ def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_
 
 
 def max_features(param_samples_df, slr_df, max_d=None, min_samp_leaf=1, max_samp=None, print_threshold=True):
+    """
+    Create forests with using different max_features values and plot the training and validation accuracies vs the
+    max_feature values
+    :param param_samples_df: dataframe of the input feature values
+    :param slr_df: dataframe of the output year values
+    :param max_d: the maximum depth of the tree as an integer -- default = None
+    :param min_samp_leaf: the minimum integer number of samples required to be in a leaf node -- default = 1
+    :param max_samp: the integer number of samples to draw from the training data to train each tree (since the forest
+    will be bootstrapped) -- default = None which means all of the training samples will be used to train each tree
+    :param print_threshold: boolean that controls whether the 90th percentile value of each year should be printed
+    :return: None
+    """
     slr_rcp85_classify = classify_data(slr_df, print_threshold=print_threshold)
     df_slr_rcp85 = param_samples_df.join(slr_rcp85_classify, how="outer")
     df_slr_rcp85 = df_slr_rcp85.dropna()
@@ -383,6 +395,19 @@ def max_features(param_samples_df, slr_df, max_d=None, min_samp_leaf=1, max_samp
 
 
 def max_depth(param_samples_df, slr_df, max_feat="auto", min_samp_leaf=1, max_samp=None, print_threshold=True):
+    """
+    Create forests with using different max_depth values and plot the training and validation accuracies vs the
+    max_depth values
+    :param param_samples_df: dataframe of the input feature values
+    :param slr_df: dataframe of the output year values
+    :param max_feat: integer number of features to consider when determining the best split -- default = "auto" which
+    takes the square root of the total number of features
+    :param min_samp_leaf: the minimum integer number of samples required to be in a leaf node -- default = 1
+    :param max_samp: the integer number of samples to draw from the training data to train each tree (since the forest
+    will be bootstrapped) -- default = None which means all of the training samples will be used to train each tree
+    :param print_threshold: boolean that controls whether the 90th percentile value of each year should be printed
+    :return: None
+    """
     slr_rcp85_classify = classify_data(slr_df, print_threshold=print_threshold)
     df_slr_rcp85 = param_samples_df.join(slr_rcp85_classify, how="outer")
     df_slr_rcp85 = df_slr_rcp85.dropna()
@@ -410,6 +435,19 @@ def max_depth(param_samples_df, slr_df, max_feat="auto", min_samp_leaf=1, max_sa
 
 
 def min_samples_leaf(param_samples_df, slr_df, max_feat="auto", max_d=None, max_samp=None, print_threshold=True):
+    """
+    Create forests with using different min_samples_leaf values and plot the training and validation accuracies vs the
+    min_samples_leaf values
+    :param param_samples_df: dataframe of the input feature values
+    :param slr_df: dataframe of the output year values
+    :param max_feat:  integer number of features to consider when determining the best split -- default = "auto" which
+    takes the square root of the total number of features
+    :param max_d: the maximum depth of the tree as an integer -- default = None
+    :param max_samp: the integer number of samples to draw from the training data to train each tree (since the forest
+    will be bootstrapped) -- default = None which means all of the training samples will be used to train each tree
+    :param print_threshold: boolean that controls whether the 90th percentile value of each year should be printed
+    :return: None
+    """
     slr_rcp85_classify = classify_data(slr_df, print_threshold=print_threshold)
     df_slr_rcp85 = param_samples_df.join(slr_rcp85_classify, how="outer")
     df_slr_rcp85 = df_slr_rcp85.dropna()
@@ -438,6 +476,18 @@ def min_samples_leaf(param_samples_df, slr_df, max_feat="auto", max_d=None, max_
 
 
 def max_samples(param_samples_df, slr_df, max_feat="auto", max_d=None, min_samp_leaf=1, print_threshold=True):
+    """
+    Create forests with using different max_samples values and plot the training and validation accuracies vs the
+    max_samples values
+    :param param_samples_df: dataframe of the input feature values
+    :param slr_df: dataframe of the output year values
+    :param max_feat: integer number of features to consider when determining the best split -- default = "auto" which
+    takes the square root of the total number of features
+    :param max_d: the maximum depth of the tree as an integer -- default = None
+    :param min_samp_leaf: the minimum integer number of samples required to be in a leaf node -- default = 1
+    :param print_threshold: boolean that controls whether the 90th percentile value of each year should be printed
+    :return: None
+    """
     slr_rcp85_classify = classify_data(slr_df, print_threshold=print_threshold)
     df_slr_rcp85 = param_samples_df.join(slr_rcp85_classify, how="outer")
     df_slr_rcp85 = df_slr_rcp85.dropna()
