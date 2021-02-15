@@ -515,20 +515,25 @@ def max_samples(param_samples_df, slr_df, max_feat="auto", max_d=None, min_samp_
     plt.show()
 
 
-def parameter_loop_max_features():
-    df = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/RData_parameters_sample.csv")
-    slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85.csv")
+def parameter_loop_max_features(param_samples_df, slr_df):
+    """
+    Loops through running the max_features(), max_depth(), and max_samples() functions by using the user-defined values
+    of the parameters based on the previous iteration in the loop.
+    :param param_samples_df: dataframe of the input feature values
+    :param slr_df: dataframe of the output year values
+    :return: None
+    """
     stop = 1
     counter = 1
     max_depth_val = None
     max_samples_val = None
     while stop != 0:
         print("Iteration", counter)
-        max_features(df, slr_rcp85, max_d=max_depth_val, max_samp=max_samples_val, print_threshold=False)
+        max_features(param_samples_df, slr_df, max_d=max_depth_val, max_samp=max_samples_val, print_threshold=False)
         max_features_val = int(input("Max features: "))
-        max_depth(df, slr_rcp85, max_feat=max_features_val, max_samp=max_samples_val, print_threshold=False)
+        max_depth(param_samples_df, slr_df, max_feat=max_features_val, max_samp=max_samples_val, print_threshold=False)
         max_depth_val = int(input("Max depth: "))
-        max_samples(df, slr_rcp85, max_feat=max_features_val, max_d=max_depth_val, print_threshold=False)
+        max_samples(param_samples_df, slr_df, max_feat=max_features_val, max_d=max_depth_val, print_threshold=False)
         max_samples_val = int(input("Max samples: "))
         print("Iteration", counter, "Summary")
         print("\tMax features =", max_features_val)
@@ -538,20 +543,25 @@ def parameter_loop_max_features():
         counter += 1
 
 
-def parameter_loop_min_samples_leaf():
-    df = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/RData_parameters_sample.csv")
-    slr_rcp85 = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85.csv")
+def parameter_loop_min_samples_leaf(param_samples_df, slr_df):
+    """
+    Loops through running the max_features(), min_samples_leaf(), and max_samples() functions by using the user-defined
+    values of the parameters based on the previous iteration in the loop.
+    :param param_samples_df: dataframe of the input feature values
+    :param slr_df: dataframe of the output year values
+    :return: None
+    """
     stop = 1
     counter = 1
     min_samples_leaf_val = 1
     max_samples_val = None
     while stop != 0:
         print("Iteration", counter)
-        max_features(df, slr_rcp85, min_samp_leaf=min_samples_leaf_val, max_samp=max_samples_val, print_threshold=False)
+        max_features(param_samples_df, slr_df, min_samp_leaf=min_samples_leaf_val, max_samp=max_samples_val, print_threshold=False)
         max_features_val = int(input("Max features: "))
-        min_samples_leaf(df, slr_rcp85, max_feat=max_features_val, max_samp=max_samples_val, print_threshold=False)
+        min_samples_leaf(param_samples_df, slr_df, max_feat=max_features_val, max_samp=max_samples_val, print_threshold=False)
         min_samples_leaf_val = int(input("Min samples leaf: "))
-        max_samples(df, slr_rcp85, max_feat=max_features_val, min_samp_leaf=min_samples_leaf_val, print_threshold=False)
+        max_samples(param_samples_df, slr_df, max_feat=max_features_val, min_samp_leaf=min_samples_leaf_val, print_threshold=False)
         max_samples_val = int(input("Max samples: "))
         print("Iteration", counter, "Summary")
         print("\tMax features =", max_features_val)
