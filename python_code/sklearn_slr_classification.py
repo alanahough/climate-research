@@ -133,8 +133,28 @@ def splits_table(forest, feature_names):
     return df
 
 
-def slr_forest(feature_list, df, year, max_feat="auto", max_d=None, min_samp_leaf=1, max_samp=None,
-               print_forest= False):
+def slr_forest(feature_list, df, year, max_feat="auto", max_d=None, min_samp_leaf=1, max_samp=None, n_estimators=100,
+               min_samples_split=2, print_forest=False):
+    """
+    Creates a forest using the desired parameters and fits the forest with 60% of the data in df
+    :param feature_list: list of the input column names as strings
+    :param df: dataframe that contains both the input data and the output data, NOT already split into training,
+    validation, and testing subsets
+    :param year: string of the year to use as the output data
+    :param max_feat: integer number of features to consider when determining the best split -- default = "auto" which
+    takes the square root of the total number of features
+    :param max_d: the maximum depth of the tree as an integer -- default = None
+    :param min_samp_leaf: the minimum integer number of samples required to be in a leaf node -- default = 1
+    :param max_samp: the integer number of samples to draw from the training data to train each tree (since the forest
+    will be bootstrapped) -- default = None which means all of the training samples will be used to train each tree
+    :param n_estimators: the number of trees in the forest as an integer -- default = 100
+    :param min_samples_split: the minimum integer number of samples required in a node to be able to split --
+    default = 2
+    :param print_forest: boolean that controls whether the trees in the forest should be printed out in text form
+    :return: forest, v_accuracy, t_accuracy -- forest is the forest that was created and fit with the data
+                                            -- v_accuracy is the validation accuracy as a decimal value
+                                            -- t_accuracy is the training accuracy as a decimal value
+    """
     # set up subsets
     x = df[feature_list]
     y = df[year]
@@ -144,8 +164,9 @@ def slr_forest(feature_list, df, year, max_feat="auto", max_d=None, min_samp_lea
                                                                   test_size=.5)  # validation= 20%, test= 20%
 
     # random forest creation
-    forest = ensemble.RandomForestClassifier(n_estimators=1000, criterion="entropy", max_features=max_feat,
-                                             max_depth=max_d, min_samples_leaf=min_samp_leaf, max_samples=max_samp)
+    forest = ensemble.RandomForestClassifier(n_estimators=n_estimators, criterion="entropy", max_features=max_feat,
+                                             max_depth=max_d, min_samples_leaf=min_samp_leaf, max_samples=max_samp,
+                                             min_samples_split=min_samples_split)
     forest = forest.fit(x_train, y_train)
 
     # print random forest
@@ -169,6 +190,13 @@ def slr_forest(feature_list, df, year, max_feat="auto", max_d=None, min_samp_lea
 
 
 def classify_data(df, print_threshold=False):
+    """
+    Takes a dataframe of sea-level rise values for various years and classifies the values as "low" or "high"
+    depending on if the value is above or below the 90th percentile of the data for each year
+    :param df: dataframe of the output sea-level rise values, where the columns are years
+    :param print_threshold: boolean that controls whether the 90th percentile value of each year should be printed
+    :return: df_classify -- a dataframe where all of the values are either "low" or "high"
+    """
     years = df.columns.tolist()
     threshold = df.quantile(q=.9)
     if print_threshold is True:
@@ -186,7 +214,18 @@ def classify_data(df, print_threshold=False):
     return df_classify
 
 
-def make_tree_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, forest_path, accuracy_path):
+def make_forest_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, forest_path, accuracy_path):
+    """
+    Creates forests for the given years, saves each forest as a file, and saves the validation and training accuracy
+    of each forest in a CSV file
+    :param parameter_sample_df: dataframe of the input feature values
+    :param slr_df: dataframe of the output year values
+    :param yrs_to_output: list of the years as strings to create and export forests for
+    :param rcp_str: RCP name as a string (ex: "rcp85")
+    :param forest_path: path of the folder to save the forests into (ex: "./forests/")
+    :param accuracy_path: path of the folder to save the accuracy CSV files into (ex: "./forests/forest_accuracy/")
+    :return: None
+    """
     slr_classify = classify_data(slr_df)
     df_slr_classify = parameter_sample_df.join(slr_classify, how="outer")
     df_slr_classify = df_slr_classify.dropna()
@@ -663,7 +702,6 @@ def gridsearch(param_samples_df, slr_df, year):
     print("Mean cross-validated score of the best_estimator: ", grid_search.best_score_)
     df = pd.DataFrame(grid_search.best_params_, index=[0])
     df.to_csv("./gridsearchcv_results/n_estimators_param_grid.csv", index=False)
-    print(grid_search.cv_results_)
     df = pd.DataFrame(grid_search.cv_results_)
     df.to_csv("./gridsearchcv_results/n_estimators_cv_results.csv", index=False)
 
@@ -685,7 +723,7 @@ if __name__ == '__main__':
     slr_rcp85_5step = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85_5yrstep.csv")
     yrs_rcp26 = slr_rcp26_5step.columns.tolist()
     yrs_rcp85 = slr_rcp85_5step.columns.tolist()
-    #make_tree_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
+    #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
 
     # testing updated tree_splits function
     #forest_2025 = joblib.load("./forests/rcp85_2025.joblib")
