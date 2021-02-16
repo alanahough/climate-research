@@ -286,7 +286,6 @@ def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_
     :param folder_path: path to the folder where the CSV files will be saved
     :return: None
     """
-    # tree_splits(df, "SLR", "RCP 8.5", [forest_2025, forest_2100], [2025, 2100], path)
     fig, axs = plt.subplots(1, len(year_list))
     features = param_sample_df.columns.tolist()
     first_quartile_data = []
@@ -824,9 +823,9 @@ if __name__ == '__main__':
     # slr_stacked_importances_plot(.05)
 
     # saving forests
-    df = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/RData_parameters_sample.csv")
-    slr_rcp26_5step = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp26_5yrstep.csv")
-    slr_rcp85_5step = pd.read_csv("C:/Users/hough/Documents/research/climate-research/data/new_csv/slr_rcp85_5yrstep.csv")
+    df = pd.read_csv("../data/new_csv/RData_parameters_sample.csv")
+    slr_rcp26_5step = pd.read_csv("../data/new_csv/slr_rcp26_5yrstep.csv")
+    slr_rcp85_5step = pd.read_csv("../data/new_csv/slr_rcp85_5yrstep.csv")
     yrs_rcp26 = slr_rcp26_5step.columns.tolist()
     yrs_rcp85 = slr_rcp85_5step.columns.tolist()
     #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
@@ -834,13 +833,23 @@ if __name__ == '__main__':
     # testing updated tree_splits function
     #forest_2025 = joblib.load("./forests/rcp85_2025.joblib")
     #forest_2100 = joblib.load("./forests/rcp85_2100.joblib")
-    #path = "C:/Users/hough/Documents/research/climate-research/data/new_csv/SLR_splits/classification_forest/"
+    #path = "../data/new_csv/SLR_splits/classification_forest/"
     #tree_splits(df, "SLR", "RCP 8.5", [forest_2025, forest_2100], [2025, 2100], path)
 
     # stacked importances plot
-    rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
-    rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, .05)
+    #rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
+    #rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
+    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, .05)
 
     #grid search
     #gridsearch(df, slr_rcp85_5step, "2100")
+
+    # making S.temp split csv's and making S.temp box plots
+    list_10_yrs = []
+    for yr in range(2020, 2151, 10):
+        list_10_yrs.append(yr)
+    rcp26_forest_list_10yrs = load_forests(list_10_yrs, "rcp26")
+    rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
+    path = "../data/new_csv/SLR_splits/classification_forest/"
+    #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list_10yrs, list_10_yrs, path)
+    #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list_10yrs, list_10_yrs, path)
