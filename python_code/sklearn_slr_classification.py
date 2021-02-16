@@ -736,6 +736,36 @@ def Stemp_histograms(df_2025, df_2050, df_2075, df_2100, rcp, first_only=False):
     plt.show()
 
 
+def Stemp_boxplots(split_df_list, year_list, rcp, first_only=False, show_outliers=False):
+    """
+    Creates a plot of boxplots of the S.temperature splits in the forests for the years in year_list.
+    :param split_df_list: list containing dataframes of the S.temperature split values for each forest
+    :param year_list: list of the years (string or int) for the dataframes in split_df_list
+    :param rcp: RCP name as a string (ex: "RCP 8.5")
+    :param first_only: boolean that controls whether to only plot the values of the first S.temperture split in
+    the trees
+    :param show_outliers: boolean that controls whether to show outliers on the plot
+    :return: None
+    """
+    split_list = []
+    if first_only is True:
+        split_str = "(First Split Only)"
+        for df in split_df_list:
+            split_list.append(df["0"].dropna().values.tolist())
+    else:
+        split_str = ""
+        for df in split_df_list:
+            split_list.append(df.dropna().stack().tolist())
+    fig, ax = plt.subplots()
+    ax.boxplot(split_list, showfliers=show_outliers, patch_artist=True, medianprops=dict(color="black"),
+               flierprops=dict(markeredgecolor='silver'), labels=[str(yr) for yr in year_list])
+    title = "SLR " + rcp + " Boxplots of S.temperature Split Values " + split_str
+    plt.ylabel("S.temperature Split Value")
+    plt.xlabel("Year")
+    plt.title(title, fontsize=15)
+    plt.show()
+
+
 def gridsearch(param_samples_df, slr_df, year):
     """
     Perform a gridsearch of the parameters used to create the forests, saves the best parameters to a CSV, and saves
@@ -878,3 +908,10 @@ if __name__ == '__main__':
     path = "../data/new_csv/SLR_splits/classification_forest/"
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list_10yrs, list_10_yrs, path)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list_10yrs, list_10_yrs, path)
+    rcp = "RCP26"
+    split_df_list = []
+    for i in range(2020, 2151, 10):
+        file_path = path + rcp + "_" + str(i) + "_splits.csv"
+        df = pd.read_csv(file_path)
+        split_df_list.append(df)
+    Stemp_boxplots(split_df_list, list_10_yrs, "RCP 2.6", first_only=False, show_outliers=False)
