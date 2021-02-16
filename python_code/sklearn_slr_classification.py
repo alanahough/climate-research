@@ -736,9 +736,10 @@ def Stemp_histograms(df_2025, df_2050, df_2075, df_2100, rcp, first_only=False):
     plt.show()
 
 
-def Stemp_boxplots(split_df_list, year_list, rcp, first_only=False, show_outliers=False):
+def Stemp_boxplots(year_list, rcp, first_only=False, show_outliers=False):
     """
-    Creates a plot of boxplots of the S.temperature splits in the forests for the years in year_list.
+    Opens the saved CSV files of the S.temperature splits for each year in the year_list and creates a plot of
+    boxplots of the S.temperature splits
     :param split_df_list: list containing dataframes of the S.temperature split values for each forest
     :param year_list: list of the years (string or int) for the dataframes in split_df_list
     :param rcp: RCP name as a string (ex: "RCP 8.5")
@@ -747,6 +748,14 @@ def Stemp_boxplots(split_df_list, year_list, rcp, first_only=False, show_outlier
     :param show_outliers: boolean that controls whether to show outliers on the plot
     :return: None
     """
+    rcp_no_space = rcp.replace(" ", "")
+    rcp_no_space_no_period = rcp_no_space.replace(".", "")
+    split_df_list = []
+    for yr in year_list:
+        file_path = path + rcp_no_space_no_period + "_" + str(yr) + "_splits.csv"
+        df = pd.read_csv(file_path)
+        split_df_list.append(df)
+
     split_list = []
     if first_only is True:
         split_str = "(First Split Only)"
@@ -908,10 +917,4 @@ if __name__ == '__main__':
     path = "../data/new_csv/SLR_splits/classification_forest/"
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list_10yrs, list_10_yrs, path)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list_10yrs, list_10_yrs, path)
-    rcp = "RCP26"
-    split_df_list = []
-    for i in range(2020, 2151, 10):
-        file_path = path + rcp + "_" + str(i) + "_splits.csv"
-        df = pd.read_csv(file_path)
-        split_df_list.append(df)
-    Stemp_boxplots(split_df_list, list_10_yrs, "RCP 2.6", first_only=False, show_outliers=False)
+    Stemp_boxplots(list_10_yrs, "RCP 2.6", first_only=False, show_outliers=True)
