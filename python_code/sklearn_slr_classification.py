@@ -557,11 +557,14 @@ def parameter_loop_min_samples_leaf(param_samples_df, slr_df):
     max_samples_val = None
     while stop != 0:
         print("Iteration", counter)
-        max_features(param_samples_df, slr_df, min_samp_leaf=min_samples_leaf_val, max_samp=max_samples_val, print_threshold=False)
+        max_features(param_samples_df, slr_df, min_samp_leaf=min_samples_leaf_val, max_samp=max_samples_val,
+                     print_threshold=False)
         max_features_val = int(input("Max features: "))
-        min_samples_leaf(param_samples_df, slr_df, max_feat=max_features_val, max_samp=max_samples_val, print_threshold=False)
+        min_samples_leaf(param_samples_df, slr_df, max_feat=max_features_val, max_samp=max_samples_val,
+                         print_threshold=False)
         min_samples_leaf_val = int(input("Min samples leaf: "))
-        max_samples(param_samples_df, slr_df, max_feat=max_features_val, min_samp_leaf=min_samples_leaf_val, print_threshold=False)
+        max_samples(param_samples_df, slr_df, max_feat=max_features_val, min_samp_leaf=min_samples_leaf_val,
+                    print_threshold=False)
         max_samples_val = int(input("Max samples: "))
         print("Iteration", counter, "Summary")
         print("\tMax features =", max_features_val)
@@ -571,24 +574,37 @@ def parameter_loop_min_samples_leaf(param_samples_df, slr_df):
         counter += 1
 
 
-def feature_color_dict(params_df):
-    features = params_df.columns.tolist()
-    features.append("Other")
-    color_map = pylab.get_cmap('gist_rainbow')
+def feature_color_dict(features_list):
+    """
+    Assigns each feature in the features_list a color and stores it in a dictionary
+    :param features_list: list of feature names to associate colors with
+    :return: color_dict -- dictionary where the keys are the features and the values are the colors
+    """
+    #color_map = pylab.get_cmap('RdYlBu')
+    color_map = pylab.get_cmap('tab20b')
     color_dict = {}
-    for i in range(len(features)):
-        color = color_map(i/len(features))
-        color_dict[features[i]] = color
+    for i in range(len(features_list)):
+        color = color_map(i/len(features_list))
+        color_dict[features_list[i]] = color
     return color_dict
 
 
 def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_forest_list, years, importance_threshold):
+    """
+    Create a stacked histogram of the feature importances over time for each RCP
+    :param param_sample_df: dataframe of the input feature values
+    :param rcp26_forest_list: a list of already fit forests created from RCP 2.6 data
+    :param rcp85_forest_list: a list of already fit forests created from RCP 8.5 data
+    :param years: list of the years (as strings) that correspond to years of the forests in rcp26_forest_list and
+    rcp85_forest_list
+    :param importance_threshold: decimal value where every feature whose feature importance is under this threshold
+    will be added into the "Other" category on the plot
+    :return: None
+    """
     features = param_sample_df.columns.tolist()
     name = ["RCP2.6", "RCP8.5"]
     forest_masterlist=[rcp26_forest_list, rcp85_forest_list]
-
-    #set color for each feature
-    color_dict = feature_color_dict(param_sample_df)
+    importances_info_list = []
 
     for i in range(len(forest_masterlist)):
         forest_list = forest_masterlist[i]
@@ -627,7 +643,20 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
                 for f in importances_info:
                     if len(importances_info[f]) < (j + 1):
                         importances_info[f].append(0)
+        importances_info_list.append(importances_info)
 
+    # set color for each feature
+    features_on_plot = []
+    for importances_info in importances_info_list:
+        for feature in importances_info:
+            if feature not in features_on_plot:
+                features_on_plot.append(feature)
+    color_dict = feature_color_dict(features_on_plot)
+
+    # plotting
+    fig, axs = plt.subplots(2, 1)
+    for i in range(len(importances_info_list)):
+        importances_info = importances_info_list[i]
         # stacked importances plot
         x = np.arange(len(years))
         bottom = None
@@ -637,26 +666,29 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
                 pass
             else:
                 if bottom is None:
-                    plt.bar(x, importances_info[feature], label=feature, color=color)
+                    axs[i].bar(x, importances_info[feature], label=feature, color=color)
                     bottom = np.array(importances_info[feature])
                 else:
-                    plt.bar(x, importances_info[feature], bottom=bottom, label=feature, color=color)
+                    axs[i].bar(x, importances_info[feature], bottom=bottom, label=feature, color=color)
                     bottom += np.array(importances_info[feature])
         percent_label = "Other (< " + str(importance_threshold*100) + "%)"
-        plt.bar(x, importances_info["Other"], bottom=bottom, label=percent_label)
-        plt.ylabel("Relative Importances")
+        axs[i].bar(x, importances_info["Other"], bottom=bottom, label=percent_label)
+        axs[i].set_ylabel("Relative Importances")
         yrs_10=[]
         for yr in years:
             if int(yr) % 10 == 0:
                 yrs_10.append(yr)
             else:
                 yrs_10.append("")
-        plt.xticks(x, yrs_10)
-        plt.xlabel('Year')
+        axs[i].set_xticks(x)
+        axs[i].set_xticklabels(yrs_10)
+        axs[i].set_xlabel('Year')
         title = "SLR " + name[i] + " Feature Importances"
-        plt.title(title, fontsize=14)
-        plt.legend(bbox_to_anchor=(1.05, 1))
-        plt.show()
+        axs[i].set_title(title, fontsize=14)
+    handles, labels = plt.gca().get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))
+    plt.figlegend(by_label.values(), by_label.keys(), bbox_to_anchor=(.98, .62))
+    plt.show()
 
 
 def Stemp_histograms(df_2025, df_2050, df_2075, df_2100, rcp, first_only=False):
@@ -807,9 +839,9 @@ if __name__ == '__main__':
     #tree_splits(df, "SLR", "RCP 8.5", [forest_2025, forest_2100], [2025, 2100], path)
 
     # stacked importances plot
-    #rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
-    #rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, .05)
+    rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
+    rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
+    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, .05)
 
     #grid search
-    gridsearch(df, slr_rcp85_5step, "2100")
+    #gridsearch(df, slr_rcp85_5step, "2100")
