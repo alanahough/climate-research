@@ -690,6 +690,17 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
 
 
 def Stemp_histograms(df_2025, df_2050, df_2075, df_2100, rcp, first_only=False):
+    """
+    Creates a plot of the histogram of the S.temperature splits in the forests for 2025, 2050, 2075, and 2100.
+    :param df_2025: dataframe of the S.temperature splits for the year 2025
+    :param df_2050: dataframe of the S.temperature splits for the year 2050
+    :param df_2075: dataframe of the S.temperature splits for the year 2075
+    :param df_2100: dataframe of the S.temperature splits for the year 2100
+    :param rcp: RCP name as a string (ex: "RCP 8.5")
+    :param first_only: boolean that controls whether to only plot the values of the first S.temperture split in
+    the trees
+    :return: None
+    """
     if first_only is True:
         list_2025 = df_2025["0"].values.tolist()
         list_2050 = df_2050["0"].values.tolist()
@@ -726,6 +737,14 @@ def Stemp_histograms(df_2025, df_2050, df_2075, df_2100, rcp, first_only=False):
 
 
 def gridsearch(param_samples_df, slr_df, year):
+    """
+    Perform a gridsearch of the parameters used to create the forests, saves the best parameters to a CSV, and saves
+    the cross validation information/result to another CSV.
+    :param param_samples_df: dataframe of the input feature values
+    :param slr_df: dataframe of the output year values
+    :param year: string of the year for the data to use when making the forests in the gridsearch
+    :return: None
+    """
     slr_classify = classify_data(slr_df)
     df_slr = param_samples_df.join(slr_classify, how="outer")
     df_slr = df_slr.dropna()
@@ -811,10 +830,16 @@ def gridsearch(param_samples_df, slr_df, year):
     df.to_csv("./gridsearchcv_results/n_estimators_cv_results.csv", index=False)
 
 
-def load_forests(year_list, rcp):
+def load_forests(year_list, rcp_str):
+    """
+    Loads forests from a saved forest file into a list.
+    :param year_list: list of years (string or int) to load forests for
+    :param rcp_str: RCP name as a string with no spaces (ex: "rcp85")
+    :return: a list of the loaded forests
+    """
     forests = []
     for yr in year_list:
-        path = "./forests/" + rcp + "_" + str(yr) + ".joblib"
+        path = "./forests/" + rcp_str + "_" + str(yr) + ".joblib"
         forests.append(joblib.load(path))
     return forests
 
