@@ -580,8 +580,7 @@ def feature_color_dict(features_list):
     :param features_list: list of feature names to associate colors with
     :return: color_dict -- dictionary where the keys are the features and the values are the colors
     """
-    #color_map = pylab.get_cmap('RdYlBu')
-    color_map = pylab.get_cmap('tab20b')
+    color_map = pylab.get_cmap('terrain')
     color_dict = {}
     for i in range(len(features_list)):
         color = color_map(i/len(features_list))
