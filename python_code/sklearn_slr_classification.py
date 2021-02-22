@@ -752,7 +752,8 @@ def Stemp_boxplots(year_list, rcp, first_only=False, show_outliers=False):
     rcp_no_space_no_period = rcp_no_space.replace(".", "")
     split_df_list = []
     for yr in year_list:
-        file_path = path + rcp_no_space_no_period + "_" + str(yr) + "_splits.csv"
+        file_path = "../data/new_csv/SLR_splits/classification_forest/" + rcp_no_space_no_period + "_" + str(yr) \
+                    + "_splits.csv"
         df = pd.read_csv(file_path)
         split_df_list.append(df)
 
@@ -772,6 +773,7 @@ def Stemp_boxplots(year_list, rcp, first_only=False, show_outliers=False):
     plt.ylabel("S.temperature Split Value")
     plt.xlabel("Year")
     plt.title(title, fontsize=15)
+    plt.grid(b=True, axis='y', color='gray')
     plt.show()
 
 
@@ -912,9 +914,27 @@ if __name__ == '__main__':
     list_10_yrs = []
     for yr in range(2020, 2151, 10):
         list_10_yrs.append(yr)
-    rcp26_forest_list_10yrs = load_forests(list_10_yrs, "rcp26")
-    rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
-    path = "../data/new_csv/SLR_splits/classification_forest/"
+    #rcp26_forest_list_10yrs = load_forests(list_10_yrs, "rcp26")
+    #rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
+    #path = "../data/new_csv/SLR_splits/classification_forest/"
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list_10yrs, list_10_yrs, path)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list_10yrs, list_10_yrs, path)
-    Stemp_boxplots(list_10_yrs, "RCP 2.6", first_only=False, show_outliers=True)
+    Stemp_boxplots(list_10_yrs, "RCP 8.5", first_only=False, show_outliers=True)
+
+
+    # compare accuracies for max_features = sqrt and max_features = 38
+    #slr_classify = classify_data(slr_rcp85_5step)
+    #df_slr_classify = df.join(slr_classify, how="outer")
+    #df_slr_classify = df_slr_classify.dropna()
+    #features = df.columns.tolist()
+    #yrs = ["2025", "2050", "2075", "2100", "2125", "2150"]
+    #max_feat = ["sqrt", 38]
+    #accuracies = []
+    #for yr in yrs:
+    #    for feature_val in max_feat:
+    #        forest, v_accuracy, t_accuracy = slr_forest(features, df_slr_classify, yr, max_feat=feature_val,
+    #                                                max_d=14, min_samp_leaf=4, min_samples_split=8, n_estimators=500)
+    #        label = yr + ", max_features = " + str(feature_val)
+    #        accuracies.append((label, t_accuracy, v_accuracy))
+    #comparison_df = pd.DataFrame(accuracies, columns=["", "Training Accuracy", "Validation Accuracy"])
+    #comparison_df.to_csv("../data/new_csv/max_features_comparison_accuracies.csv", index=False)
