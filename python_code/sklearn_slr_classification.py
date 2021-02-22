@@ -689,43 +689,48 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
     plt.show()
 
 
-def Stemp_histograms(df_2025, df_2050, df_2075, df_2100, rcp, first_only=False):
+def Stemp_histograms(year_list, rcp, first_only=False):
     """
-    Creates a plot of the histogram of the S.temperature splits in the forests for 2025, 2050, 2075, and 2100.
-    :param df_2025: dataframe of the S.temperature splits for the year 2025
-    :param df_2050: dataframe of the S.temperature splits for the year 2050
-    :param df_2075: dataframe of the S.temperature splits for the year 2075
-    :param df_2100: dataframe of the S.temperature splits for the year 2100
+    Opens the saved CSV files of the S.temperature splits for each year in the year_list and creates histograms of
+    the S.temperature splits in each tree for each year
+    :param year_list: list of the years (string or int) for the dataframes in split_df_list
     :param rcp: RCP name as a string (ex: "RCP 8.5")
     :param first_only: boolean that controls whether to only plot the values of the first S.temperture split in
     the trees
     :return: None
     """
-    if first_only is True:
-        list_2025 = df_2025["0"].values.tolist()
-        list_2050 = df_2050["0"].values.tolist()
-        list_2075 = df_2075["0"].values.tolist()
-        list_2100 = df_2100["0"].values.tolist()
-    else:
-        list_2025 = df_2025.stack().tolist()
-        list_2050 = df_2050.stack().tolist()
-        list_2075 = df_2075.stack().tolist()
-        list_2100 = df_2100.stack().tolist()
-    df_dict={"2025": list_2025, "2050": list_2050, "2075": list_2075, "2100": list_2100}
+    rcp_no_space = rcp.replace(" ", "")
+    rcp_no_space_no_period = rcp_no_space.replace(".", "")
+    split_df_list = []
+    for yr in year_list:
+        file_path = "../data/new_csv/SLR_splits/classification_forest/" + rcp_no_space_no_period + "_" + str(yr) \
+                    + "_splits.csv"
+        df = pd.read_csv(file_path)
+        split_df_list.append(df)
 
-    fig, axs = plt.subplots(1, 4)
+    split_list = []
+    if first_only is True:
+        for df in split_df_list:
+            split_list.append(df["0"].dropna().values.tolist())
+    else:
+        for df in split_df_list:
+            split_list.append(df.stack().tolist())
+
+    fig, axs = plt.subplots(1, len(year_list))
     i = 0
     bin_seq=np.arange(0, 10, step=.5)
-    for yr in df_dict:
-        axs[i].hist(df_dict[yr], bins=bin_seq, edgecolor='white')
+    for i in range(len(split_list)):
+        data = split_list[i]
+        yr = year_list[i]
+        axs[i].hist(data, bins=bin_seq, edgecolor='white')
         axs[i].set_title(yr)
         if first_only is True:
-            axs[i].set_ylim(top=450)
+            axs[i].set_ylim(top=500)
         else:
-            axs[i].set_ylim(top=3250)
+            axs[i].set_ylim(top=1000)
         axs[i].set_ylim(bottom=0)
-        axs[i].set_xlim(right=9.5)
-        axs[i].set_xlim(left=1.5)
+        axs[i].set_xlim(right=10)
+        axs[i].set_xlim(left=1)
         i += 1
     main_title = "SLR " + rcp + " Histogram of S.temperature Split Values"
     if first_only is True:
@@ -742,7 +747,7 @@ def Stemp_max_split_histogram(year_list, rcp):
     the highest S.temperature split in each tree for each year
     :param year_list: list of the years (string or int) for the dataframes in split_df_list
     :param rcp: RCP name as a string (ex: "RCP 8.5")
-    :return:
+    :return: None
     """
     rcp_no_space = rcp.replace(" ", "")
     rcp_no_space_no_period = rcp_no_space.replace(".", "")
@@ -974,4 +979,5 @@ if __name__ == '__main__':
     #comparison_df = pd.DataFrame(accuracies, columns=["", "Training Accuracy", "Validation Accuracy"])
     #comparison_df.to_csv("../data/new_csv/max_features_comparison_accuracies.csv", index=False)
 
-    Stemp_max_split_histogram([2020, 2050, 2070, 2100, 2120, 2150], "RCP 8.5")
+    #Stemp_max_split_histogram([2020, 2050, 2070, 2100, 2120, 2150], "RCP 8.5")
+    Stemp_histograms([2020, 2050, 2070, 2100, 2120, 2150], "RCP 8.5", first_only=True)
