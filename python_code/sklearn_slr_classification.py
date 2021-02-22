@@ -736,11 +736,46 @@ def Stemp_histograms(df_2025, df_2050, df_2075, df_2100, rcp, first_only=False):
     plt.show()
 
 
+def Stemp_max_split_histogram(year_list, rcp):
+    """
+    Opens the saved CSV files of the S.temperature splits for each year in the year_list and creates histograms of
+    the highest S.temperature split in each tree for each year
+    :param year_list: list of the years (string or int) for the dataframes in split_df_list
+    :param rcp: RCP name as a string (ex: "RCP 8.5")
+    :return:
+    """
+    rcp_no_space = rcp.replace(" ", "")
+    rcp_no_space_no_period = rcp_no_space.replace(".", "")
+    df_dict={}
+    for yr in year_list:
+        file_path = "../data/new_csv/SLR_splits/classification_forest/" + rcp_no_space_no_period + "_" + str(yr) \
+                    + "_splits.csv"
+        df = pd.read_csv(file_path)
+        max_list = df.max(axis=1).tolist()
+        df_dict[str(yr)] = max_list
+
+    fig, axs = plt.subplots(1, len(year_list))
+    i = 0
+    bin_seq = np.arange(0, 10, step=.5)
+    for yr in df_dict:
+        axs[i].hist(df_dict[yr], bins=bin_seq, edgecolor='white')
+        axs[i].set_title(yr)
+        axs[i].set_ylim(bottom=0)
+        axs[i].set_ylim(top=200)
+        axs[i].set_xlim(right=10)
+        axs[i].set_xlim(left=1)
+        i += 1
+    main_title = "SLR " + rcp + " Histogram of Highest S.temperature Split Values of each Tree"
+    fig.suptitle(main_title)
+    fig.text(0.52, 0.04, 'S.temperature Split', ha='center')
+    fig.text(0.04, 0.5, 'Frequency', va='center', rotation='vertical')
+    plt.show()
+
+
 def Stemp_boxplots(year_list, rcp, first_only=False, show_outliers=False):
     """
     Opens the saved CSV files of the S.temperature splits for each year in the year_list and creates a plot of
     boxplots of the S.temperature splits
-    :param split_df_list: list containing dataframes of the S.temperature split values for each forest
     :param year_list: list of the years (string or int) for the dataframes in split_df_list
     :param rcp: RCP name as a string (ex: "RCP 8.5")
     :param first_only: boolean that controls whether to only plot the values of the first S.temperture split in
@@ -919,7 +954,7 @@ if __name__ == '__main__':
     #path = "../data/new_csv/SLR_splits/classification_forest/"
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list_10yrs, list_10_yrs, path)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list_10yrs, list_10_yrs, path)
-    Stemp_boxplots(list_10_yrs, "RCP 8.5", first_only=False, show_outliers=True)
+    #Stemp_boxplots(list_10_yrs, "RCP 8.5", first_only=False, show_outliers=True)
 
 
     # compare accuracies for max_features = sqrt and max_features = 38
@@ -938,3 +973,5 @@ if __name__ == '__main__':
     #        accuracies.append((label, t_accuracy, v_accuracy))
     #comparison_df = pd.DataFrame(accuracies, columns=["", "Training Accuracy", "Validation Accuracy"])
     #comparison_df.to_csv("../data/new_csv/max_features_comparison_accuracies.csv", index=False)
+
+    Stemp_max_split_histogram([2020, 2050, 2070, 2100, 2120, 2150], "RCP 8.5")
