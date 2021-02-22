@@ -777,7 +777,7 @@ def Stemp_max_split_histogram(year_list, rcp):
     plt.show()
 
 
-def Stemp_boxplots(year_list, rcp, first_only=False, show_outliers=False):
+def Stemp_boxplots(year_list, rcp, first_only=False, show_outliers=True):
     """
     Opens the saved CSV files of the S.temperature splits for each year in the year_list and creates a plot of
     boxplots of the S.temperature splits
@@ -810,6 +810,28 @@ def Stemp_boxplots(year_list, rcp, first_only=False, show_outliers=False):
     ax.boxplot(split_list, showfliers=show_outliers, patch_artist=True, medianprops=dict(color="black"),
                flierprops=dict(markeredgecolor='silver'), labels=[str(yr) for yr in year_list])
     title = "SLR " + rcp + " Boxplots of S.temperature Split Values " + split_str
+    plt.ylabel("S.temperature Split Value")
+    plt.xlabel("Year")
+    plt.title(title, fontsize=15)
+    plt.grid(b=True, axis='y', color='gray')
+    plt.show()
+
+
+def Stemp_max_split_boxplots(year_list, rcp, show_outliers=True):
+    rcp_no_space = rcp.replace(" ", "")
+    rcp_no_space_no_period = rcp_no_space.replace(".", "")
+    split_lists=[]
+    for yr in year_list:
+        file_path = "../data/new_csv/SLR_splits/classification_forest/" + rcp_no_space_no_period + "_" + str(yr) \
+                    + "_splits.csv"
+        df = pd.read_csv(file_path)
+        max_list = df.max(axis=1).dropna().tolist()
+        split_lists.append(max_list)
+
+    fig, ax = plt.subplots()
+    ax.boxplot(split_lists, showfliers=show_outliers, patch_artist=True, medianprops=dict(color="black"),
+               flierprops=dict(markeredgecolor='silver'), labels=[str(yr) for yr in year_list])
+    title = "SLR " + rcp + " Boxplots of Highest S.temperature Split Values of each Tree"
     plt.ylabel("S.temperature Split Value")
     plt.xlabel("Year")
     plt.title(title, fontsize=15)
@@ -959,7 +981,7 @@ if __name__ == '__main__':
     #path = "../data/new_csv/SLR_splits/classification_forest/"
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list_10yrs, list_10_yrs, path)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list_10yrs, list_10_yrs, path)
-    Stemp_boxplots(list_10_yrs, "RCP 2.6", first_only=False, show_outliers=True)
+    #Stemp_boxplots(list_10_yrs, "RCP 2.6", first_only=False, show_outliers=True)
 
 
     # compare accuracies for max_features = sqrt and max_features = 38
@@ -981,3 +1003,4 @@ if __name__ == '__main__':
 
     #Stemp_max_split_histogram([2020, 2050, 2070, 2100, 2120, 2150], "RCP 8.5")
     #Stemp_histograms([2020, 2050, 2070, 2100, 2120, 2150], "RCP 8.5", first_only=True)
+    Stemp_max_split_boxplots(list_10_yrs, "RCP 2.6")
