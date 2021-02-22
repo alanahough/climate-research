@@ -805,7 +805,7 @@ def Stemp_boxplots(year_list, rcp, first_only=False, show_outliers=False):
     else:
         split_str = ""
         for df in split_df_list:
-            split_list.append(df.dropna().stack().tolist())
+            split_list.append(df.stack().tolist())
     fig, ax = plt.subplots()
     ax.boxplot(split_list, showfliers=show_outliers, patch_artist=True, medianprops=dict(color="black"),
                flierprops=dict(markeredgecolor='silver'), labels=[str(yr) for yr in year_list])
@@ -959,7 +959,7 @@ if __name__ == '__main__':
     #path = "../data/new_csv/SLR_splits/classification_forest/"
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list_10yrs, list_10_yrs, path)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list_10yrs, list_10_yrs, path)
-    #Stemp_boxplots(list_10_yrs, "RCP 8.5", first_only=False, show_outliers=True)
+    Stemp_boxplots(list_10_yrs, "RCP 2.6", first_only=False, show_outliers=True)
 
 
     # compare accuracies for max_features = sqrt and max_features = 38
@@ -980,4 +980,4 @@ if __name__ == '__main__':
     #comparison_df.to_csv("../data/new_csv/max_features_comparison_accuracies.csv", index=False)
 
     #Stemp_max_split_histogram([2020, 2050, 2070, 2100, 2120, 2150], "RCP 8.5")
-    Stemp_histograms([2020, 2050, 2070, 2100, 2120, 2150], "RCP 8.5", first_only=True)
+    #Stemp_histograms([2020, 2050, 2070, 2100, 2120, 2150], "RCP 8.5", first_only=True)
