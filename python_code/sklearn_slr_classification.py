@@ -818,6 +818,14 @@ def Stemp_boxplots(year_list, rcp, first_only=False, show_outliers=True):
 
 
 def Stemp_max_split_boxplots(year_list, rcp, show_outliers=True):
+    """
+    Opens the saved CSV files of the S.temperature splits for each year in the year_list and creates boxplots of
+    the highest S.temperature split in each tree for each year
+    :param year_list: list of the years (string or int) for the dataframes in split_df_list
+    :param rcp: RCP name as a string (ex: "RCP 8.5")
+    :param show_outliers: boolean that controls whether to show outliers on the plot
+    :return: None
+    """
     rcp_no_space = rcp.replace(" ", "")
     rcp_no_space_no_period = rcp_no_space.replace(".", "")
     split_lists=[]
