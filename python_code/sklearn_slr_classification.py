@@ -723,15 +723,15 @@ def Stemp_histograms(year_list, rcp, first_only=False):
     for i in range(len(split_list)):
         data = split_list[i]
         yr = year_list[i]
-        axs[i].hist(data, bins=bin_seq, edgecolor='white')
-        axs[i].set_title(yr)
+        axs[0, i].hist(data, bins=bin_seq, edgecolor='white')
+        axs[0, i].set_title(yr)
         if first_only is True:
-            axs[i].set_ylim(top=500)
+            axs[0, i].set_ylim(top=500)
         else:
-            axs[i].set_ylim(top=1000)
-        axs[i].set_ylim(bottom=0)
-        axs[i].set_xlim(right=10)
-        axs[i].set_xlim(left=1)
+            axs[0, i].set_ylim(top=1000)
+        axs[0, i].set_ylim(bottom=0)
+        axs[0, i].set_xlim(right=10)
+        axs[0, i].set_xlim(left=1)
         i += 1
     main_title = "SLR " + rcp + " Histogram of S.temperature Split Values"
     if first_only is True:
@@ -1016,6 +1016,6 @@ if __name__ == '__main__':
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, path)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, path)
 
-    Stemp_max_split_histogram([2150], "RCP 8.5")
-    #Stemp_histograms([2020, 2050, 2070, 2100, 2120, 2150], "RCP 8.5", first_only=True)
+    #Stemp_max_split_histogram([2150], "RCP 8.5")
+    Stemp_histograms([2020, 2050, 2075], "RCP 8.5", first_only=True)
     #Stemp_max_split_boxplots(list_10_yrs, "RCP 2.6")
