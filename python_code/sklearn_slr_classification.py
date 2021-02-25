@@ -1010,12 +1010,12 @@ if __name__ == '__main__':
     #comparison_df = pd.DataFrame(accuracies, columns=["", "Training Accuracy", "Validation Accuracy"])
     #comparison_df.to_csv("../data/new_csv/max_features_comparison_accuracies.csv", index=False)
 
-    rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
-    rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    path = "../data/new_csv/SLR_splits/classification_forest/"
-    tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, path)
-    tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, path)
+    #rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
+    #rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
+    #path = "../data/new_csv/SLR_splits/classification_forest/"
+    #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, path)
+    #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, path)
 
-    Stemp_max_split_histogram([2025, 2050, 2075], "RCP 8.5")
+    Stemp_max_split_histogram([2150], "RCP 8.5")
     #Stemp_histograms([2020, 2050, 2070, 2100, 2120, 2150], "RCP 8.5", first_only=True)
     #Stemp_max_split_boxplots(list_10_yrs, "RCP 2.6")
