@@ -315,9 +315,9 @@ def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_
         first_quartile_data.append(first)
         all_quartile_data.append(all)
 
-        table_df = splits_table(forest, features)
-        split_table_file_path = folder_path + rcp_no_space_no_period + "_" + yr + "_split_table.csv"
-        table_df.to_csv(split_table_file_path, index=True)
+       # table_df = splits_table(forest, features)
+       # split_table_file_path = folder_path + rcp_no_space_no_period + "_" + yr + "_split_table.csv"
+       # table_df.to_csv(split_table_file_path, index=True)
 
         # importances plot
         importances = forest.feature_importances_
@@ -717,7 +717,7 @@ def Stemp_histograms(year_list, rcp, first_only=False):
         for df in split_df_list:
             split_list.append(df.stack().tolist())
 
-    fig, axs = plt.subplots(1, len(year_list))
+    fig, axs = plt.subplots(1, len(year_list), squeeze=False)
     i = 0
     bin_seq=np.arange(0, 10, step=.5)
     for i in range(len(split_list)):
@@ -760,16 +760,16 @@ def Stemp_max_split_histogram(year_list, rcp):
         max_list = df.max(axis=1).tolist()
         df_dict[str(yr)] = max_list
 
-    fig, axs = plt.subplots(1, len(year_list))
+    fig, axs = plt.subplots(1, len(year_list), squeeze=False)
     i = 0
     bin_seq = np.arange(0, 10, step=.5)
     for yr in df_dict:
-        axs[i].hist(df_dict[yr], bins=bin_seq, edgecolor='white')
-        axs[i].set_title(yr)
-        axs[i].set_ylim(bottom=0)
-        axs[i].set_ylim(top=200)
-        axs[i].set_xlim(right=10)
-        axs[i].set_xlim(left=1)
+        axs[0, i].hist(df_dict[yr], bins=bin_seq, edgecolor='white')
+        axs[0, i].set_title(yr)
+        axs[0, i].set_ylim(bottom=0)
+        axs[0, i].set_ylim(top=200)
+        axs[0, i].set_xlim(right=10)
+        axs[0, i].set_xlim(left=1)
         i += 1
     main_title = "SLR " + rcp + " Histogram of Highest S.temperature Split Values of each Tree"
     fig.suptitle(main_title)
@@ -965,7 +965,7 @@ if __name__ == '__main__':
     slr_rcp85_5step = pd.read_csv("../data/new_csv/slr_rcp85_5yrstep.csv")
     yrs_rcp26 = slr_rcp26_5step.columns.tolist()
     yrs_rcp85 = slr_rcp85_5step.columns.tolist()
-    make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
+    #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
 
     # testing updated tree_splits function
     #forest_2025 = joblib.load("./forests/rcp85_2025.joblib")
@@ -1010,6 +1010,12 @@ if __name__ == '__main__':
     #comparison_df = pd.DataFrame(accuracies, columns=["", "Training Accuracy", "Validation Accuracy"])
     #comparison_df.to_csv("../data/new_csv/max_features_comparison_accuracies.csv", index=False)
 
-    #Stemp_max_split_histogram([2020, 2050, 2070, 2100, 2120, 2150], "RCP 8.5")
+    rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
+    rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
+    path = "../data/new_csv/SLR_splits/classification_forest/"
+    tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, path)
+    tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, path)
+
+    Stemp_max_split_histogram([2025, 2050, 2075], "RCP 8.5")
     #Stemp_histograms([2020, 2050, 2070, 2100, 2120, 2150], "RCP 8.5", first_only=True)
     #Stemp_max_split_boxplots(list_10_yrs, "RCP 2.6")
