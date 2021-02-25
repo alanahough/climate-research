@@ -9,9 +9,11 @@ import joblib
 import os
 
 
-MAX_DEPTH = 5
-MAX_FEATURES = 20
-MAX_SAMPLES = 2000
+MAX_DEPTH = 14
+MAX_FEATURES = "sqrt"
+MIN_SAMPLES_LEAF = 4
+MIN_SAMPLES_SPLIT = 8
+N_ESTIMATORS = 500
 
 def find_forest_splits(forest, feature_names, feature, firstsplit=False):
     """
@@ -133,7 +135,7 @@ def splits_table(forest, feature_names):
     return df
 
 
-def slr_forest(feature_list, df, year, max_feat="auto", max_d=None, min_samp_leaf=1, max_samp=None, n_estimators=100,
+def slr_forest(feature_list, df, year, max_feat="auto", max_d=None, min_samp_leaf=1, n_estimators=100,
                min_samples_split=2, print_forest=False):
     """
     Creates a forest using the desired parameters and fits the forest with 60% of the data in df
@@ -145,8 +147,6 @@ def slr_forest(feature_list, df, year, max_feat="auto", max_d=None, min_samp_lea
     takes the square root of the total number of features
     :param max_d: the maximum depth of the tree as an integer -- default = None
     :param min_samp_leaf: the minimum integer number of samples required to be in a leaf node -- default = 1
-    :param max_samp: the integer number of samples to draw from the training data to train each tree (since the forest
-    will be bootstrapped) -- default = None which means all of the training samples will be used to train each tree
     :param n_estimators: the number of trees in the forest as an integer -- default = 100
     :param min_samples_split: the minimum integer number of samples required in a node to be able to split --
     default = 2
@@ -165,7 +165,7 @@ def slr_forest(feature_list, df, year, max_feat="auto", max_d=None, min_samp_lea
 
     # random forest creation
     forest = ensemble.RandomForestClassifier(n_estimators=n_estimators, criterion="entropy", max_features=max_feat,
-                                             max_depth=max_d, min_samples_leaf=min_samp_leaf, max_samples=max_samp,
+                                             max_depth=max_d, min_samples_leaf=min_samp_leaf,
                                              min_samples_split=min_samples_split)
     forest = forest.fit(x_train, y_train)
 
@@ -231,11 +231,12 @@ def make_forest_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, 
     df_slr_classify = df_slr_classify.dropna()
     features = parameter_sample_df.columns.tolist()
     for yr in yrs_to_output:
+        print("\n", rcp_str, yr)
         forest, v_accuracy, t_accuracy = slr_forest(features, df_slr_classify, yr, max_feat=MAX_FEATURES,
-                                                    max_d=MAX_DEPTH, max_samp=MAX_SAMPLES)
+                                                    max_d=MAX_DEPTH, min_samp_leaf=MIN_SAMPLES_LEAF,
+                                                    min_samples_split= MIN_SAMPLES_SPLIT, n_estimators=N_ESTIMATORS)
         forest_file_path = forest_path + rcp_str + "_" + yr + ".joblib"
         joblib.dump(forest, forest_file_path, compress=3)
-        print(rcp_str, yr)
         print(f"Compressed Random Forest: {np.round(os.path.getsize(forest_file_path) / 1024 / 1024, 2)} MB")
         accuracy_df = pd.DataFrame({"Validation Accuracy": [v_accuracy], "Training Accuracy": [t_accuracy]})
         accuracy_file_path = accuracy_path + rcp_str + "_" + yr + "_accuracy.csv"
@@ -964,7 +965,7 @@ if __name__ == '__main__':
     slr_rcp85_5step = pd.read_csv("../data/new_csv/slr_rcp85_5yrstep.csv")
     yrs_rcp26 = slr_rcp26_5step.columns.tolist()
     yrs_rcp85 = slr_rcp85_5step.columns.tolist()
-    #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
+    make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
 
     # testing updated tree_splits function
     #forest_2025 = joblib.load("./forests/rcp85_2025.joblib")
@@ -1011,4 +1012,4 @@ if __name__ == '__main__':
 
     #Stemp_max_split_histogram([2020, 2050, 2070, 2100, 2120, 2150], "RCP 8.5")
     #Stemp_histograms([2020, 2050, 2070, 2100, 2120, 2150], "RCP 8.5", first_only=True)
-    Stemp_max_split_boxplots(list_10_yrs, "RCP 2.6")
+    #Stemp_max_split_boxplots(list_10_yrs, "RCP 2.6")
