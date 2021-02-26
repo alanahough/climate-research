@@ -13,7 +13,8 @@ MAX_DEPTH = 14
 MAX_FEATURES = "sqrt"
 MIN_SAMPLES_LEAF = 4
 MIN_SAMPLES_SPLIT = 8
-N_ESTIMATORS = 500
+#N_ESTIMATORS = 500
+N_ESTIMATORS = 2000
 
 
 def find_forest_splits(forest, feature_names, feature, firstsplit=False):
@@ -1014,11 +1015,45 @@ if __name__ == '__main__':
     #make_forest_and_export(df, slr_rcp85_5step, ["2100"], "rcp85", "./forests/", "./forests/forest_accuracy/")
     #rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     #rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    #rcp85_2100 = load_forests([2100], "rcp85")
-    #path = "../data/new_csv/SLR_splits/classification_forest/"
+    rcp85_2100 = load_forests([2100], "rcp85")
+    path = "../data/new_csv/SLR_splits/classification_forest/"
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, path)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_2100, ["2100"], path)
 
-    Stemp_max_split_histogram([2100], "RCP 8.5")
+    features = df.columns.tolist()
+
+    lambda_split_list = find_forest_splits(rcp85_2100[0], features, 'lambda_dais.slr_brick', firstsplit=False)
+    lambda_split_file_path = path + "lambda_dais_splits/RCP85_2100_splits.csv"
+    lambda_split_df = pd.DataFrame(lambda_split_list)
+    lambda_split_df.to_csv(lambda_split_file_path, index=False)
+    lambda_max_list = lambda_split_df.max(axis=1).tolist()
+
+    tcrit_split_list = find_forest_splits(rcp85_2100[0], features, 'Tcrit_dais.slr_brick', firstsplit=False)
+    tcrit_split_file_path = path + "Tcrit_dais_splits/RCP85_2100_splits.csv"
+    tcrit_split_df = pd.DataFrame(tcrit_split_list)
+    tcrit_split_df.to_csv(tcrit_split_file_path, index=False)
+    tcrit_max_list = tcrit_split_df.max(axis=1).tolist()
+
+    file_path = "../data/new_csv/SLR_splits/classification_forest/RCP85_2100_splits.csv"
+    stemp_split_df = pd.read_csv(file_path)
+    stemp_max_list = stemp_split_df.max(axis=1).dropna().tolist()
+    median = np.median(stemp_max_list)
+    print(median)
+    colors = np.where(stemp_max_list >= median, 'blue', 'red')
+
+    plt.scatter(stemp_max_list, lambda_max_list, c=colors)
+    plt.xlabel("Highest S.temperature Split per Tree")
+    plt.ylabel("Highest lambda_dais.slr_brick Split per Tree")
+    plt.title("Highest S.temperature Split per Tree vs\nHighest lambda_dais.slr_brick Split per Tree")
+    plt.show()
+
+    plt.scatter(stemp_max_list, tcrit_max_list, c=colors)
+    plt.xlabel("Highest S.temperature Split per Tree")
+    plt.ylabel("Highest Tcrit_dais.slr_brick Split per Tree")
+    plt.title("Highest S.temperature Split per Tree vs\nHighest Tcrit_dais.slr_brick Split per Tree")
+    plt.show()
+
+
+    #Stemp_max_split_histogram([2100], "RCP 8.5")
     #Stemp_histograms([2020, 2050, 2075], "RCP 8.5", first_only=True)
     #Stemp_max_split_boxplots([2100], "RCP 8.5")
