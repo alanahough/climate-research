@@ -15,6 +15,7 @@ MIN_SAMPLES_LEAF = 4
 MIN_SAMPLES_SPLIT = 8
 N_ESTIMATORS = 500
 
+
 def find_forest_splits(forest, feature_names, feature, firstsplit=False):
     """
     Determines the split values from all the trees in the forest for the splits of a specific feature.
@@ -287,7 +288,7 @@ def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_
     :param folder_path: path to the folder where the CSV files will be saved
     :return: None
     """
-    fig, axs = plt.subplots(1, len(year_list))
+    fig, axs = plt.subplots(1, len(year_list), squeeze=False)
     features = param_sample_df.columns.tolist()
     first_quartile_data = []
     all_quartile_data = []
@@ -331,14 +332,14 @@ def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_
                 importances_list.append(importances[idx])
                 std_list.append(std[idx])
                 features_list.append(features[idx])
-        axs[j].bar(range(len(importances_list)), importances_list, color="tab:blue",
+        axs[0, j].bar(range(len(importances_list)), importances_list, color="tab:blue",
                        yerr=std_list, align="center")
         title = yr
-        axs[j].set_title(title)
-        axs[j].set_xticks(range(len(importances_list)))
-        axs[j].set_xticklabels(features_list, rotation=90)
-        axs[j].set_ylim(top=1.0)
-        axs[j].set_ylim(bottom= 0.0)
+        axs[0, j].set_title(title)
+        axs[0, j].set_xticks(range(len(importances_list)))
+        axs[0, j].set_xticklabels(features_list, rotation=90)
+        axs[0, j].set_ylim(top=1.0)
+        axs[0, j].set_ylim(bottom= 0.0)
     main_title = response + " " + rcp + " Feature Importances"
     fig.suptitle(main_title, fontsize=15)
     fig.text(0.52, 0.04, 'Features', ha='center', fontsize=12)
@@ -1010,12 +1011,14 @@ if __name__ == '__main__':
     #comparison_df = pd.DataFrame(accuracies, columns=["", "Training Accuracy", "Validation Accuracy"])
     #comparison_df.to_csv("../data/new_csv/max_features_comparison_accuracies.csv", index=False)
 
+    #make_forest_and_export(df, slr_rcp85_5step, ["2100"], "rcp85", "./forests/", "./forests/forest_accuracy/")
     #rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     #rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
+    #rcp85_2100 = load_forests([2100], "rcp85")
     #path = "../data/new_csv/SLR_splits/classification_forest/"
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, path)
-    #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, path)
+    #tree_splits(df, "SLR", "RCP 8.5", rcp85_2100, ["2100"], path)
 
-    #Stemp_max_split_histogram([2150], "RCP 8.5")
-    Stemp_histograms([2020, 2050, 2075], "RCP 8.5", first_only=True)
-    #Stemp_max_split_boxplots(list_10_yrs, "RCP 2.6")
+    Stemp_max_split_histogram([2100], "RCP 8.5")
+    #Stemp_histograms([2020, 2050, 2075], "RCP 8.5", first_only=True)
+    #Stemp_max_split_boxplots([2100], "RCP 8.5")
