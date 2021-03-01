@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import train_test_split, GridSearchCV
-import math
 import pylab
 import joblib
 import os
@@ -356,225 +355,6 @@ def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_
     df_all_quartile.to_csv(all_file_path, index=False)
 
 
-def max_features(param_samples_df, slr_df, max_d=None, min_samp_leaf=1, max_samp=None, print_threshold=True):
-    """
-    Create forests with using different max_features values and plot the training and validation accuracies vs the
-    max_feature values
-    :param param_samples_df: dataframe of the input feature values
-    :param slr_df: dataframe of the output year values
-    :param max_d: the maximum depth of the tree as an integer -- default = None
-    :param min_samp_leaf: the minimum integer number of samples required to be in a leaf node -- default = 1
-    :param max_samp: the integer number of samples to draw from the training data to train each tree (since the forest
-    will be bootstrapped) -- default = None which means all of the training samples will be used to train each tree
-    :param print_threshold: boolean that controls whether the 90th percentile value of each year should be printed
-    :return: None
-    """
-    slr_rcp85_classify = classify_data(slr_df, print_threshold=print_threshold)
-    df_slr_rcp85 = param_samples_df.join(slr_rcp85_classify, how="outer")
-    df_slr_rcp85 = df_slr_rcp85.dropna()
-    features = param_samples_df.columns.tolist()
-    yr="2100"
-
-    max_list = ["sqrt", 10, 15, 20, 25, 30, 35]
-    v_accuracy_list=[]
-    t_accuracy_list=[]
-    for max in max_list:
-        print("\nmax_features =", max)
-        forest, v_accuracy, t_accuracy= slr_forest(features, df_slr_rcp85, yr, max_feat=max, max_d=max_d,
-                                                   min_samp_leaf=min_samp_leaf, max_samp=max_samp)
-        v_accuracy_list.append(v_accuracy)
-        t_accuracy_list.append(t_accuracy)
-    max_list[0] = math.sqrt(38)
-    plt.scatter(max_list, v_accuracy_list, label="Validation Accuracy")
-    plt.scatter(max_list, t_accuracy_list, label="Training Accuracy")
-    plt.legend()
-    plt.xlabel("max_features")
-    plt.ylabel("accuracy")
-    title = "Accuracy vs max_features for SLR RCP8.5 2100 \n(max_depth = " + str(max_d) + ", min_samples_leaf = " + \
-            str(min_samp_leaf) + ", max_samples = " + str(max_samp) + ")"
-    plt.title(title)
-    plt.show()
-
-
-def max_depth(param_samples_df, slr_df, max_feat="auto", min_samp_leaf=1, max_samp=None, print_threshold=True):
-    """
-    Create forests with using different max_depth values and plot the training and validation accuracies vs the
-    max_depth values
-    :param param_samples_df: dataframe of the input feature values
-    :param slr_df: dataframe of the output year values
-    :param max_feat: integer number of features to consider when determining the best split -- default = "auto" which
-    takes the square root of the total number of features
-    :param min_samp_leaf: the minimum integer number of samples required to be in a leaf node -- default = 1
-    :param max_samp: the integer number of samples to draw from the training data to train each tree (since the forest
-    will be bootstrapped) -- default = None which means all of the training samples will be used to train each tree
-    :param print_threshold: boolean that controls whether the 90th percentile value of each year should be printed
-    :return: None
-    """
-    slr_rcp85_classify = classify_data(slr_df, print_threshold=print_threshold)
-    df_slr_rcp85 = param_samples_df.join(slr_rcp85_classify, how="outer")
-    df_slr_rcp85 = df_slr_rcp85.dropna()
-    features = param_samples_df.columns.tolist()
-    yr = "2100"
-
-    max_depth = [2, 3, 4, 5, 6, 7]
-    v_accuracy_list=[]
-    t_accuracy_list=[]
-    for max in max_depth:
-        print("\nmax_depth =", max)
-        forest, v_accuracy, t_accuracy = slr_forest(features, df_slr_rcp85, yr, max_feat=max_feat, max_d=max,
-                                                    min_samp_leaf=min_samp_leaf, max_samp=max_samp)
-        v_accuracy_list.append(v_accuracy)
-        t_accuracy_list.append(t_accuracy)
-    plt.scatter(max_depth, v_accuracy_list, label="Validation Accuracy")
-    plt.scatter(max_depth, t_accuracy_list, label="Training Accuracy")
-    plt.legend()
-    plt.xlabel("max_depth")
-    plt.ylabel("accuracy")
-    title = "Accuracy vs max_depth for SLR RCP8.5 2100 \n(min_samples_leaf = " + str(min_samp_leaf) + \
-            ", max_features = " + str(max_feat) + ", max_samples = " + str(max_samp) + ")"
-    plt.title(title)
-    plt.show()
-
-
-def min_samples_leaf(param_samples_df, slr_df, max_feat="auto", max_d=None, max_samp=None, print_threshold=True):
-    """
-    Create forests with using different min_samples_leaf values and plot the training and validation accuracies vs the
-    min_samples_leaf values
-    :param param_samples_df: dataframe of the input feature values
-    :param slr_df: dataframe of the output year values
-    :param max_feat:  integer number of features to consider when determining the best split -- default = "auto" which
-    takes the square root of the total number of features
-    :param max_d: the maximum depth of the tree as an integer -- default = None
-    :param max_samp: the integer number of samples to draw from the training data to train each tree (since the forest
-    will be bootstrapped) -- default = None which means all of the training samples will be used to train each tree
-    :param print_threshold: boolean that controls whether the 90th percentile value of each year should be printed
-    :return: None
-    """
-    slr_rcp85_classify = classify_data(slr_df, print_threshold=print_threshold)
-    df_slr_rcp85 = param_samples_df.join(slr_rcp85_classify, how="outer")
-    df_slr_rcp85 = df_slr_rcp85.dropna()
-    features = param_samples_df.columns.tolist()
-    yr = "2100"
-
-    min_leaf = [1, 2, 4, 8, 12, 16, 20, 24, 28]
-    v_accuracy_list=[]
-    t_accuracy_list=[]
-    for min in min_leaf:
-        print("\nmin_samples_leaf =", min)
-        forest, v_accuracy, t_accuracy = slr_forest(features, df_slr_rcp85, yr, max_feat=max_feat, max_d=max_d,
-                                                    min_samp_leaf=min, max_samp=max_samp)
-        v_accuracy_list.append(v_accuracy)
-        t_accuracy_list.append(t_accuracy)
-    plt.scatter(min_leaf, v_accuracy_list, label="Validation Accuracy")
-    plt.scatter(min_leaf, t_accuracy_list, label="Training Accuracy")
-    plt.legend()
-    plt.xticks(min_leaf)
-    plt.xlabel("min_samples_leaf")
-    plt.ylabel("accuracy")
-    title = "Accuracy vs min_samples_leaf for SLR RCP8.5 2100 \n(max_depth = " + str(max_d) + ", max_features = " + \
-            str(max_feat) + ", max_samples = " + str(max_samp) + ")"
-    plt.title(title)
-    plt.show()
-
-
-def max_samples(param_samples_df, slr_df, max_feat="auto", max_d=None, min_samp_leaf=1, print_threshold=True):
-    """
-    Create forests with using different max_samples values and plot the training and validation accuracies vs the
-    max_samples values
-    :param param_samples_df: dataframe of the input feature values
-    :param slr_df: dataframe of the output year values
-    :param max_feat: integer number of features to consider when determining the best split -- default = "auto" which
-    takes the square root of the total number of features
-    :param max_d: the maximum depth of the tree as an integer -- default = None
-    :param min_samp_leaf: the minimum integer number of samples required to be in a leaf node -- default = 1
-    :param print_threshold: boolean that controls whether the 90th percentile value of each year should be printed
-    :return: None
-    """
-    slr_rcp85_classify = classify_data(slr_df, print_threshold=print_threshold)
-    df_slr_rcp85 = param_samples_df.join(slr_rcp85_classify, how="outer")
-    df_slr_rcp85 = df_slr_rcp85.dropna()
-    features = param_samples_df.columns.tolist()
-    yr = "2100"
-
-    max_samples = [1000, 2000, 3000, 4000, 5000, 6000]
-    v_accuracy_list=[]
-    t_accuracy_list=[]
-    for max in max_samples:
-        print("\nmax_samples =", max)
-        forest, v_accuracy, t_accuracy = slr_forest(features, df_slr_rcp85, yr, max_feat=max_feat, max_d=max_d,
-                                                    min_samp_leaf=min_samp_leaf, max_samp=max)
-        v_accuracy_list.append(v_accuracy)
-        t_accuracy_list.append(t_accuracy)
-    plt.scatter(max_samples, v_accuracy_list, label="Validation Accuracy")
-    plt.scatter(max_samples, t_accuracy_list, label="Training Accuracy")
-    plt.legend()
-    plt.xticks(max_samples)
-    plt.xlabel("max_samples")
-    plt.ylabel("accuracy")
-    title = "Accuracy vs max_samples for SLR RCP8.5 2100 \n(max_depth = " + str(max_d) + ", min_samples_leaf = " + \
-            str(min_samp_leaf) + ", max_features = " + str(max_feat) + ")"
-    plt.title(title)
-    plt.show()
-
-
-def parameter_loop_max_features(param_samples_df, slr_df):
-    """
-    Loops through running the max_features(), max_depth(), and max_samples() functions by using the user-defined values
-    of the parameters based on the previous iteration in the loop.
-    :param param_samples_df: dataframe of the input feature values
-    :param slr_df: dataframe of the output year values
-    :return: None
-    """
-    stop = 1
-    counter = 1
-    max_depth_val = None
-    max_samples_val = None
-    while stop != 0:
-        print("Iteration", counter)
-        max_features(param_samples_df, slr_df, max_d=max_depth_val, max_samp=max_samples_val, print_threshold=False)
-        max_features_val = int(input("Max features: "))
-        max_depth(param_samples_df, slr_df, max_feat=max_features_val, max_samp=max_samples_val, print_threshold=False)
-        max_depth_val = int(input("Max depth: "))
-        max_samples(param_samples_df, slr_df, max_feat=max_features_val, max_d=max_depth_val, print_threshold=False)
-        max_samples_val = int(input("Max samples: "))
-        print("Iteration", counter, "Summary")
-        print("\tMax features =", max_features_val)
-        print("\tMax depth = ", max_depth_val)
-        print("\tMax samples =", max_samples_val)
-        stop = int(input("Enter 0 to stop"))
-        counter += 1
-
-
-def parameter_loop_min_samples_leaf(param_samples_df, slr_df):
-    """
-    Loops through running the max_features(), min_samples_leaf(), and max_samples() functions by using the user-defined
-    values of the parameters based on the previous iteration in the loop.
-    :param param_samples_df: dataframe of the input feature values
-    :param slr_df: dataframe of the output year values
-    :return: None
-    """
-    stop = 1
-    counter = 1
-    min_samples_leaf_val = 1
-    max_samples_val = None
-    while stop != 0:
-        print("Iteration", counter)
-        max_features(param_samples_df, slr_df, min_samp_leaf=min_samples_leaf_val, max_samp=max_samples_val,
-                     print_threshold=False)
-        max_features_val = int(input("Max features: "))
-        min_samples_leaf(param_samples_df, slr_df, max_feat=max_features_val, max_samp=max_samples_val,
-                         print_threshold=False)
-        min_samples_leaf_val = int(input("Min samples leaf: "))
-        max_samples(param_samples_df, slr_df, max_feat=max_features_val, min_samp_leaf=min_samples_leaf_val,
-                    print_threshold=False)
-        max_samples_val = int(input("Max samples: "))
-        print("Iteration", counter, "Summary")
-        print("\tMax features =", max_features_val)
-        print("\tMin samples leaf = ", min_samples_leaf_val)
-        print("\tMax samples =", max_samples_val)
-        stop = int(input("Enter 0 to stop"))
-        counter += 1
-
 
 def feature_color_dict(features_list):
     """
@@ -888,35 +668,40 @@ def gridsearch(param_samples_df, slr_df, year):
         'max_samples': [1000, 2000, 3000, 4000],
         'min_samples_leaf': [1, 20, 40, 60, 80, 100],
         'min_samples_split': [2, 20, 40, 60, 80, 100]
-    }   #took around 4.5 hours -- {'max_depth': 6, 'max_features': 30, 'max_samples': 3000, 'min_samples_leaf': 1, 'min_samples_split': 20}
+    }   #took around 4.5 hours -- {'max_depth': 6, 'max_features': 30, 'max_samples': 3000, 'min_samples_leaf': 1,
+    # 'min_samples_split': 20}
     param_grid_3 = {
         'max_depth': [4, 5, 6, 7],
         'max_features': [20, 25, 30, 35],
         'max_samples': [2000, 3000, 4000],
         'min_samples_leaf': [1, 2, 4, 8, 12, 16],
         'min_samples_split': [5, 10, 15, 20, 25, 30]
-    }   #took around 4 hours -- {'max_depth': 7, 'max_features': 35, 'max_samples': 4000, 'min_samples_leaf': 4, 'min_samples_split': 20}
+    }   #took around 4 hours -- {'max_depth': 7, 'max_features': 35, 'max_samples': 4000, 'min_samples_leaf': 4,
+    # 'min_samples_split': 20}
     param_grid_4 = {
         'max_depth': [6, 7, 8, 9, 10],
         'max_features': [25, 30, 32, 35, 38],
         'max_samples': [3000, 3500, 4000, 4500, 4800],
         'min_samples_leaf': [2, 4, 8],
         'min_samples_split': [10, 15, 20, 25, 30]
-    }   #took around 7.5 hours -- {'max_depth': 10, 'max_features': 38, 'max_samples': 4800, 'min_samples_leaf': 8, 'min_samples_split': 15}
+    }   #took around 7.5 hours -- {'max_depth': 10, 'max_features': 38, 'max_samples': 4800, 'min_samples_leaf': 8,
+    # 'min_samples_split': 15}
     param_grid_5 = {
         'max_depth': [7, 10, 13, 16, 19],
         'max_features': [30, 32, 35, 38],
         'max_samples': [3500, 4000, 4500, 4800],
         'min_samples_leaf': [2, 4, 8, 10, 12],
         'min_samples_split': [10, 15, 20, 25, 30]
-    }   #took around 11 hours -- {'max_depth': 13, 'max_features': 35, 'max_samples': 4500, 'min_samples_leaf': 2, 'min_samples_split': 10}
+    }   #took around 11 hours -- {'max_depth': 13, 'max_features': 35, 'max_samples': 4500, 'min_samples_leaf': 2,
+    # 'min_samples_split': 10}
     param_grid_6 = {
         'max_depth': [12, 13, 14],
         'max_features': [35, 36, 37, 38],
         'max_samples': [4000, 4500, 4800],
         'min_samples_leaf': [2, 4, 6, 8],
         'min_samples_split': [10, 13, 16, 20]
-    }   #took around 3 hours -- {'max_depth': 13, 'max_features': 38, 'max_samples': 4800, 'min_samples_leaf': 8, 'min_samples_split': 13}
+    }   #took around 3 hours -- {'max_depth': 13, 'max_features': 38, 'max_samples': 4800, 'min_samples_leaf': 8,
+    # 'min_samples_split': 13}
         # BEST PARAMETERS:
         # {'max_depth': 14, 'max_features': 37, 'max_samples': 4500, 'min_samples_leaf': 4, 'min_samples_split': 10}
         # Mean cross-validated score of the best_estimator:  0.9333333333333333
@@ -938,10 +723,10 @@ def gridsearch(param_samples_df, slr_df, year):
     print("BEST PARAMETERS:")
     print(grid_search.best_params_)
     print("Mean cross-validated score of the best_estimator: ", grid_search.best_score_)
-    df = pd.DataFrame(grid_search.best_params_, index=[0])
-    df.to_csv("./gridsearchcv_results/n_estimators_param_grid.csv", index=False)
-    df = pd.DataFrame(grid_search.cv_results_)
-    df.to_csv("./gridsearchcv_results/n_estimators_cv_results.csv", index=False)
+    best_params_df = pd.DataFrame(grid_search.best_params_, index=[0])
+    best_params_df.to_csv("./gridsearchcv_results/n_estimators_param_grid.csv", index=False)
+    score_df = pd.DataFrame(grid_search.cv_results_)
+    score_df.to_csv("./gridsearchcv_results/n_estimators_cv_results.csv", index=False)
 
 
 def load_forests(year_list, rcp_str):
