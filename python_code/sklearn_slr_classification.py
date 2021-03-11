@@ -12,8 +12,7 @@ MAX_DEPTH = 14
 MAX_FEATURES = "sqrt"
 MIN_SAMPLES_LEAF = 4
 MIN_SAMPLES_SPLIT = 8
-#N_ESTIMATORS = 500
-N_ESTIMATORS = 2000
+N_ESTIMATORS = 500
 
 
 def find_forest_splits(forest, feature_names, feature, firstsplit=False):
@@ -452,7 +451,7 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
                 else:
                     axs[i].bar(x, importances_info[feature], bottom=bottom, label=feature, color=color)
                     bottom += np.array(importances_info[feature])
-        percent_label = "Other (< " + str(importance_threshold*100) + "%)"
+        percent_label = "Other (< " + str(importance_threshold*100) + " %)"
         axs[i].bar(x, importances_info["Other"], bottom=bottom, label=percent_label)
         axs[i].set_ylabel("Relative Importances")
         yrs_10=[]
@@ -464,7 +463,11 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
         axs[i].set_xticks(x)
         axs[i].set_xticklabels(yrs_10)
         axs[i].set_xlabel('Year')
-        title = "SLR " + name[i] + " Feature Importances"
+        if i == 0:
+            title_label = "(a)"
+        else:
+            title_label = "(b)"
+        title = title_label + " SLR " + name[i] + " Feature Importances"
         axs[i].set_title(title, fontsize=14)
     handles, labels = plt.gca().get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
@@ -744,101 +747,21 @@ def load_forests(year_list, rcp_str):
 
 
 if __name__ == '__main__':
-    # slr_stacked_importances_plot(.05)
-
     # saving forests
     df = pd.read_csv("../data/new_csv/RData_parameters_sample.csv")
     slr_rcp26_5step = pd.read_csv("../data/new_csv/slr_rcp26_5yrstep.csv")
     slr_rcp85_5step = pd.read_csv("../data/new_csv/slr_rcp85_5yrstep.csv")
     yrs_rcp26 = slr_rcp26_5step.columns.tolist()
     yrs_rcp85 = slr_rcp85_5step.columns.tolist()
-    #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
+    make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/", "./forests/forest_accuracy/")
+    make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
 
-    # testing updated tree_splits function
-    #forest_2025 = joblib.load("./forests/rcp85_2025.joblib")
-    #forest_2100 = joblib.load("./forests/rcp85_2100.joblib")
-    #path = "../data/new_csv/SLR_splits/classification_forest/"
-    #tree_splits(df, "SLR", "RCP 8.5", [forest_2025, forest_2100], [2025, 2100], path)
-
-    # stacked importances plot
-    #rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
-    #rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, .05)
-
-    #grid search
-    #gridsearch(df, slr_rcp85_5step, "2100")
-
-    # making S.temp split csv's and making S.temp box plots
+    # making S.temp split csv's
     list_10_yrs = []
     for yr in range(2020, 2151, 10):
         list_10_yrs.append(yr)
-    #rcp26_forest_list_10yrs = load_forests(list_10_yrs, "rcp26")
-    #rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
-    #path = "../data/new_csv/SLR_splits/classification_forest/"
-    #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list_10yrs, list_10_yrs, path)
-    #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list_10yrs, list_10_yrs, path)
-    #Stemp_boxplots(list_10_yrs, "RCP 2.6", first_only=False, show_outliers=True)
-
-
-    # compare accuracies for max_features = sqrt and max_features = 38
-    #slr_classify = classify_data(slr_rcp85_5step)
-    #df_slr_classify = df.join(slr_classify, how="outer")
-    #df_slr_classify = df_slr_classify.dropna()
-    #features = df.columns.tolist()
-    #yrs = ["2025", "2050", "2075", "2100", "2125", "2150"]
-    #max_feat = ["sqrt", 38]
-    #accuracies = []
-    #for yr in yrs:
-    #    for feature_val in max_feat:
-    #        forest, v_accuracy, t_accuracy = slr_forest(features, df_slr_classify, yr, max_feat=feature_val,
-    #                                                max_d=14, min_samp_leaf=4, min_samples_split=8, n_estimators=500)
-    #        label = yr + ", max_features = " + str(feature_val)
-    #        accuracies.append((label, t_accuracy, v_accuracy))
-    #comparison_df = pd.DataFrame(accuracies, columns=["", "Training Accuracy", "Validation Accuracy"])
-    #comparison_df.to_csv("../data/new_csv/max_features_comparison_accuracies.csv", index=False)
-
-    #make_forest_and_export(df, slr_rcp85_5step, ["2100"], "rcp85", "./forests/", "./forests/forest_accuracy/")
-    #rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
-    #rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    rcp85_2100 = load_forests([2100], "rcp85")
+    rcp26_forest_list_10yrs = load_forests(list_10_yrs, "rcp26")
+    rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
     path = "../data/new_csv/SLR_splits/classification_forest/"
-    #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, path)
-    #tree_splits(df, "SLR", "RCP 8.5", rcp85_2100, ["2100"], path)
-
-    features = df.columns.tolist()
-
-    lambda_split_list = find_forest_splits(rcp85_2100[0], features, 'lambda_dais.slr_brick', firstsplit=False)
-    lambda_split_file_path = path + "lambda_dais_splits/RCP85_2100_splits.csv"
-    lambda_split_df = pd.DataFrame(lambda_split_list)
-    lambda_split_df.to_csv(lambda_split_file_path, index=False)
-    lambda_max_list = lambda_split_df.max(axis=1).tolist()
-
-    tcrit_split_list = find_forest_splits(rcp85_2100[0], features, 'Tcrit_dais.slr_brick', firstsplit=False)
-    tcrit_split_file_path = path + "Tcrit_dais_splits/RCP85_2100_splits.csv"
-    tcrit_split_df = pd.DataFrame(tcrit_split_list)
-    tcrit_split_df.to_csv(tcrit_split_file_path, index=False)
-    tcrit_max_list = tcrit_split_df.max(axis=1).tolist()
-
-    file_path = "../data/new_csv/SLR_splits/classification_forest/RCP85_2100_splits.csv"
-    stemp_split_df = pd.read_csv(file_path)
-    stemp_max_list = stemp_split_df.max(axis=1).dropna().tolist()
-    median = np.median(stemp_max_list)
-    print(median)
-    colors = np.where(stemp_max_list >= median, 'blue', 'red')
-
-    plt.scatter(stemp_max_list, lambda_max_list, c=colors)
-    plt.xlabel("Highest S.temperature Split per Tree")
-    plt.ylabel("Highest lambda_dais.slr_brick Split per Tree")
-    plt.title("Highest S.temperature Split per Tree vs\nHighest lambda_dais.slr_brick Split per Tree")
-    plt.show()
-
-    plt.scatter(stemp_max_list, tcrit_max_list, c=colors)
-    plt.xlabel("Highest S.temperature Split per Tree")
-    plt.ylabel("Highest Tcrit_dais.slr_brick Split per Tree")
-    plt.title("Highest S.temperature Split per Tree vs\nHighest Tcrit_dais.slr_brick Split per Tree")
-    plt.show()
-
-
-    #Stemp_max_split_histogram([2100], "RCP 8.5")
-    #Stemp_histograms([2020, 2050, 2075], "RCP 8.5", first_only=True)
-    #Stemp_max_split_boxplots([2100], "RCP 8.5")
+    tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list_10yrs, list_10_yrs, path)
+    tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list_10yrs, list_10_yrs, path)

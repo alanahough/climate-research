@@ -2,9 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2eacbc1e-7f36-4fd3-bb55-26d6df032da4" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../data/new_csv/SLR_splits/classification_forest/RCP26_all_splits.csv" beforeDir="false" afterPath="$PROJECT_DIR$/../data/new_csv/SLR_splits/classification_forest/RCP26_all_splits.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../data/new_csv/SLR_splits/classification_forest/RCP26_first_splits.csv" beforeDir="false" afterPath="$PROJECT_DIR$/../data/new_csv/SLR_splits/classification_forest/RCP26_first_splits.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../data/new_csv/SLR_splits/classification_forest/RCP85_2100_splits.csv" beforeDir="false" afterPath="$PROJECT_DIR$/../data/new_csv/SLR_splits/classification_forest/RCP85_2100_splits.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../data/new_csv/SLR_splits/classification_forest/RCP85_all_splits.csv" beforeDir="false" afterPath="$PROJECT_DIR$/../data/new_csv/SLR_splits/classification_forest/RCP85_all_splits.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../data/new_csv/SLR_splits/classification_forest/RCP85_first_splits.csv" beforeDir="false" afterPath="$PROJECT_DIR$/../data/new_csv/SLR_splits/classification_forest/RCP85_first_splits.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../plots/s.temp_split_vals/SLR RCP26 Boxplot of Highest S.temp Split Values with outliers.png" beforeDir="false" afterPath="$PROJECT_DIR$/../plots/s.temp_split_vals/SLR RCP26 Boxplot of Highest S.temp Split Values with outliers.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../plots/s.temp_split_vals/SLR RCP85 Boxplot of Highest S.temp Split Values with outliers.png" beforeDir="false" afterPath="$PROJECT_DIR$/../plots/s.temp_split_vals/SLR RCP85 Boxplot of Highest S.temp Split Values with outliers.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/forests/forest_accuracy/rcp85_2100_accuracy.csv" beforeDir="false" afterPath="$PROJECT_DIR$/forests/forest_accuracy/rcp85_2100_accuracy.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/forests/rcp85_2100.joblib" beforeDir="false" afterPath="$PROJECT_DIR$/forests/rcp85_2100.joblib" afterDir="false" />
@@ -27,10 +31,12 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="ProjectId" id="1gmyXZcHAcxedNATSAXDxbc7GU9" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../spring 2021/DSCI-633/assignments/assignment4" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../spring 2021/DSCI-633/assignments/assignment5" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors" />
   </component>
