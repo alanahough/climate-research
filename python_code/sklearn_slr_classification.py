@@ -569,6 +569,56 @@ def Stemp_max_split_histogram(year_list, rcp):
     plt.show()
 
 
+def all_Stemp_max_split_histograms(year_list):
+    """
+    Opens the saved CSV files of the S.temperature splits for each year in the year_list for both RCPs and creates
+    density histograms of the highest S.temperature split in each tree for each year.  The left plots are RCP 2.6 and
+    the right plots are RCP 8.5
+    :param year_list: list of the years (string or int) for the dataframes in split_df_list
+    :return: None
+    """
+    rcp26_split_dict = {}
+    rcp85_split_dict = {}
+    for yr in year_list:
+        rcp_26_file_path = "../data/new_csv/SLR_splits/classification_forest/RCP26_" + str(yr) + "_splits.csv"
+        rcp26_df = pd.read_csv(rcp_26_file_path)
+        rcp26_max_list = rcp26_df.max(axis=1).dropna().tolist()
+        rcp26_split_dict[str(yr)] = rcp26_max_list
+
+        rcp_85_file_path = "../data/new_csv/SLR_splits/classification_forest/RCP85_" + str(yr) + "_splits.csv"
+        rcp85_df = pd.read_csv(rcp_85_file_path)
+        rcp85_max_list = rcp85_df.max(axis=1).dropna().tolist()
+        rcp85_split_dict[str(yr)] = rcp85_max_list
+    all_split_lists = [rcp26_split_dict, rcp85_split_dict]
+
+    fig, axs = plt.subplots(len(year_list), 2, squeeze=False)
+    i = 0
+    label_counter = 0
+    labels = ["(a)", "(b)", "(c)", "(d)", "(e)", "(f)", "(g)", '(h)', '(i)', '(j)', '(k)', '(l)']
+    bin_seq = np.arange(0, 10, step=.5)
+    for yr in year_list:
+        for j in range(2):
+            axs[i, j].hist(all_split_lists[j][str(yr)], bins=bin_seq, edgecolor='white', density=True)
+            axs[i, j].set_ylim(bottom=0)
+            axs[i, j].set_ylim(top=1)
+            axs[i, j].set_xlim(right=10)
+            axs[i, j].set_xlim(left=3)
+            axs[i, j].set_xlabel('S.temperature Split')
+            axs[i, j].set_ylabel('Density')
+            label = labels[label_counter]
+            if j == 0:
+                title = label + " RCP 2.6 " + str(yr)
+                axs[i, j].set_title(title)
+            elif j == 1:
+                title = label + " RCP 8.5 " + str(yr)
+                axs[i, j].set_title(title)
+            label_counter += 1
+        i += 1
+    main_title = "SLR Histograms of Highest S.temperature Split Values of each Tree"
+    fig.suptitle(main_title)
+    plt.show()
+
+
 def Stemp_boxplots(year_list, rcp, first_only=False, show_outliers=True):
     """
     Opens the saved CSV files of the S.temperature splits for each year in the year_list and creates a plot of
@@ -815,4 +865,5 @@ if __name__ == '__main__':
     rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
     #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26)
-    all_Stemp_max_split_boxplots(list_10_yrs)
+    #all_Stemp_max_split_boxplots(list_10_yrs)
+    all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
