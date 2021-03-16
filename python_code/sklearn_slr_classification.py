@@ -369,7 +369,8 @@ def feature_color_dict(features_list):
     return color_dict
 
 
-def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_forest_list, years, importance_threshold):
+def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_forest_list, years,
+                                 importance_threshold = .05):
     """
     Create a stacked histogram of the feature importances over time for each RCP
     :param param_sample_df: dataframe of the input feature values
@@ -435,6 +436,8 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
 
     # plotting
     fig, axs = plt.subplots(2, 1)
+    handles = []
+    labels = []
     for i in range(len(importances_info_list)):
         importances_info = importances_info_list[i]
         # stacked importances plot
@@ -469,7 +472,10 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
             title_label = "(b)"
         title = title_label + " SLR " + name[i] + " Feature Importances"
         axs[i].set_title(title, fontsize=14)
-    handles, labels = plt.gca().get_legend_handles_labels()
+        legend_details = axs[i].get_legend_handles_labels()
+        handles += legend_details[0]
+        labels += legend_details[1]
+        print(name[i], labels, sep="\t")
     by_label = dict(zip(labels, handles))
     plt.figlegend(by_label.values(), by_label.keys(), bbox_to_anchor=(.98, .62))
     plt.show()
@@ -753,8 +759,8 @@ if __name__ == '__main__':
     slr_rcp85_5step = pd.read_csv("../data/new_csv/slr_rcp85_5yrstep.csv")
     yrs_rcp26 = slr_rcp26_5step.columns.tolist()
     yrs_rcp85 = slr_rcp85_5step.columns.tolist()
-    make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/", "./forests/forest_accuracy/")
-    make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
+    #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/", "./forests/forest_accuracy/")
+    #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
 
     # making S.temp split csv's
     list_10_yrs = []
@@ -762,6 +768,10 @@ if __name__ == '__main__':
         list_10_yrs.append(yr)
     rcp26_forest_list_10yrs = load_forests(list_10_yrs, "rcp26")
     rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
-    path = "../data/new_csv/SLR_splits/classification_forest/"
-    tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list_10yrs, list_10_yrs, path)
-    tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list_10yrs, list_10_yrs, path)
+    #path = "../data/new_csv/SLR_splits/classification_forest/"
+    #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list_10yrs, list_10_yrs, path)
+    #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list_10yrs, list_10_yrs, path)
+
+    rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
+    rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
+    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26)
