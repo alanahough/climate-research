@@ -639,6 +639,46 @@ def Stemp_max_split_boxplots(year_list, rcp, show_outliers=True):
     plt.show()
 
 
+def all_Stemp_max_split_boxplots(year_list, show_outliers=True):
+    """
+    Opens the saved CSV files of the S.temperature splits for each year in the year_list for both RCPs and creates
+    boxplots of the highest S.temperature split in each tree for each year.  The top panel of the plot is RCP 2.6 and
+    the bottom panel is RCP 8.5
+    :param year_list: list of the years (string or int) for the dataframes in split_df_list
+    :param show_outliers: boolean that controls whether to show outliers on the plot
+    :return: None
+    """
+    rcp26_split_lists = []
+    rcp85_split_lists = []
+    for yr in year_list:
+        rcp_26_file_path = "../data/new_csv/SLR_splits/classification_forest/RCP26_" + str(yr) + "_splits.csv"
+        rcp26_df = pd.read_csv(rcp_26_file_path)
+        rcp26_max_list = rcp26_df.max(axis=1).dropna().tolist()
+        rcp26_split_lists.append(rcp26_max_list)
+
+        rcp_85_file_path = "../data/new_csv/SLR_splits/classification_forest/RCP85_" + str(yr) + "_splits.csv"
+        rcp85_df = pd.read_csv(rcp_85_file_path)
+        rcp85_max_list = rcp85_df.max(axis=1).dropna().tolist()
+        rcp85_split_lists.append(rcp85_max_list)
+    all_split_lists = [rcp26_split_lists, rcp85_split_lists]
+
+    fig, axs = plt.subplots(2, 1)
+    for i in range(2):
+        axs[i].boxplot(all_split_lists[i], showfliers=show_outliers, patch_artist=True, medianprops=dict(color="black"),
+                   flierprops=dict(markeredgecolor='silver'), labels=[str(yr) for yr in year_list])
+        if i == 0:
+            title = "(a) SLR RCP 2.6 Boxplots of Highest S.temperature Split Values of each Tree"
+        elif i == 1:
+            title = "(b) SLR RCP 8.5 Boxplots of Highest S.temperature Split Values of each Tree"
+        axs[i].set_ylabel("S.temperature Split Value")
+        axs[i].set_xlabel("Year")
+        axs[i].set_title(title, fontsize=14)
+        axs[i].grid(b=True, axis='y', color='gray')
+        axs[i].set_ylim(top=10)
+        axs[i].set_ylim(bottom=1.5)
+    plt.show()
+
+
 def gridsearch(param_samples_df, slr_df, year):
     """
     Perform a gridsearch of the parameters used to create the forests, saves the best parameters to a CSV, and saves
@@ -774,4 +814,5 @@ if __name__ == '__main__':
 
     rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26)
+    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26)
+    all_Stemp_max_split_boxplots(list_10_yrs)
