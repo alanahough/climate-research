@@ -608,12 +608,12 @@ def all_Stemp_max_split_histograms(year_list):
             axs[i, j].set_title(title, loc='left', y=.75)
             label_counter += 1
         i += 1
-    main_title = "SLR Histograms of Maximum ECS Split Values (deg C) of each Tree"
+    main_title = "SLR Histograms of Maximum ECS Split Values ($^\circ$C) of each Tree"
     fig.suptitle(main_title)
     fig.text(.39, .94, "RCP 2.6", fontsize='large', ha='center')
     fig.text(.61, .94, "RCP 8.5", fontsize='large', ha='center')
-    fig.text(0.39, 0.015, 'Maximum ECS Split (deg C)', ha='center')
-    fig.text(0.61, 0.015, 'Maximum ECS Split (deg C)', ha='center')
+    fig.text(0.39, 0.015, 'Maximum ECS Split ($^\circ$C)', ha='center')
+    fig.text(0.61, 0.015, 'Maximum ECS Split ($^\circ$C)', ha='center')
     fig.text(0.28, 0.5, 'Density', va='center', rotation='vertical')
     plt.subplots_adjust(left=.3, right=.7, wspace=.2, hspace=.3, top=.935, bottom=.055)
     plt.show()
