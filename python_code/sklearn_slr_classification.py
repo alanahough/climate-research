@@ -15,6 +15,70 @@ MIN_SAMPLES_SPLIT = 8
 N_ESTIMATORS = 500
 
 
+def get_previous_splits(forest, feature_names, rcp, year, folder_path):
+    """
+    Finds the splits that occurred leading up to the S.temperature split with the highest split value.  The previous
+    splits for each estimator in the forest are collected and exported into a CSV.  The rows indices are the estimators
+    and the columns are the depth in the estimator where the split occurred.
+    :param forest: a forest that has already been fit with training data
+    :param feature_names: list of all the feature names from the parameter sample dataframe used to fit the forest
+    :param rcp: RCP name as a string (ex: "RCP 8.5")
+    :param year: the year of the data used to make the forest
+    :param folder_path: path to the folder where the CSV file will be saved
+    :return:
+    """
+    features = feature_names.copy()
+    all_prev_splits_list = []
+    for i in range(len(forest.estimators_)):
+        estimator = forest.estimators_[i]
+        tree_feature = estimator.tree_.feature
+        feature_new = []
+        for node in tree_feature:
+            if node == -2:
+                feature_new.append('leaf')
+            else:
+                feature_new.append(features[node])
+        dict = {"p": (feature_new[0], estimator.tree_.threshold[0])}
+        split = "l"
+        for i in range(1, len(feature_new)):
+            dict[split] = (feature_new[i], estimator.tree_.threshold[i])
+            if i == len(feature_new) - 1:
+                break
+            if feature_new[i] != 'leaf':
+                split += "l"
+            elif feature_new[i] == 'leaf' and feature_new[i - 1] == 'leaf':
+                split = split[:-2] + 'r'
+            else:
+                split = split[:-1] + "r"
+
+            while split in dict:
+                split = split[:-2] + 'r'
+
+        max_Stemp = (None, 0)   # (node id, Stemp split value)
+        for node_id in dict:
+            if dict[node_id][0] == "S.temperature" and dict[node_id][1] > max_Stemp[1]:
+                max_Stemp = (node_id, dict[node_id][1])
+
+        prev_split = max_Stemp[0][:-1]
+        prev_splits_list = []
+        while len(prev_split) > 0:
+            prev_splits_list.append(dict[prev_split])
+            prev_split = prev_split[:-1]
+        prev_splits_list.append(dict["p"])
+        prev_splits_list.reverse()
+        all_prev_splits_list.append(prev_splits_list)
+
+    index = pd.MultiIndex.from_tuples(all_prev_splits_list)
+    prev_split_df = index.to_frame(index=False)
+    prev_split_df.index.name = "Estimator"
+    prev_split_df.columns = ["Depth %s" % i for i in range(len(prev_split_df.columns))]
+
+    rcp_no_space = rcp.replace(" ", "")
+    rcp_no_space_no_period = rcp_no_space.replace(".", "")
+    file_path = folder_path + rcp_no_space_no_period + "_" + str(year) + "_splits_before_Stemp_max_split.csv"
+    prev_split_df.to_csv(file_path)
+
+
 def find_forest_splits(forest, feature_names, feature, firstsplit=False):
     """
     Determines the split values from all the trees in the forest for the splits of a specific feature.
@@ -105,14 +169,25 @@ def splits_table(forest, feature_names):
                 split = split[:-2] + 'r'
         dict_list.append(dict)
 
-    # for trees w/ max depth = 5
-    nodes = ["p", "l", "ll", "lll", "llll", "lllll", "llllr", "lllr", "lllrl", "lllrr", "llr", "llrl", "llrll", "llrlr",
-             "llrr", "llrrl", "llrrr", "lr", "lrl", "lrll", "lrlll", "lrllr", "lrlr", "lrlrl", "lrlrr", "lrr", "lrrl",
-             "lrrll", "lrrlr", "lrrr", "lrrrl", "lrrrr", "r", "rl", "rll", "rlll", "rllll", "rlllr", "rllr", "rllrl",
-             "rllrr", "rlr", "rlrl", "rlrll", "rlrlr", "rlrr", "rlrrl", "rlrrr", "rr", "rrl", "rrll", "rrlll", "rrllr",
-             "rrlr", "rrlrl", "rrlrr", "rrr", "rrrl", "rrrll", "rrrlr", "rrrr", "rrrrl", "rrrrr"]
+    # node list
+    nodes = ["p"]
+    split = "l"
+    last_split = "r" * MAX_DEPTH
+    while True:
+        nodes.append(split)
+        if split == last_split:
+            break
+        if len(split) < MAX_DEPTH:
+            split += "l"
+        elif len(split) == MAX_DEPTH and len(nodes[-2]) == MAX_DEPTH:
+            split = split[:-2] + "r"
+        else:
+            split = split[:-1] + "r"
 
-    row_list=[]
+        while split in nodes:
+            split = split[:-2] + "r"
+
+    row_list = []
     features.append("leaf")
 
     for node in nodes:
@@ -858,7 +933,7 @@ if __name__ == '__main__':
         list_10_yrs.append(yr)
     rcp26_forest_list_10yrs = load_forests(list_10_yrs, "rcp26")
     rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
-    #path = "../data/new_csv/SLR_splits/classification_forest/"
+    path = "../data/new_csv/SLR_splits/classification_forest/"
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list_10yrs, list_10_yrs, path)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list_10yrs, list_10_yrs, path)
 
@@ -866,4 +941,8 @@ if __name__ == '__main__':
     rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
     #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26)
     #all_Stemp_max_split_boxplots(list_10_yrs)
-    all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
+    #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
+
+    forest_rcp85_2020 = rcp85_forest_list_10yrs[0]
+    features = df.columns.tolist()
+    get_previous_splits(forest_rcp85_2020, features, "RCP 8.5", 2020, path)
