@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 import pylab
 import joblib
 import os
+from collections import Counter
 
 
 MAX_DEPTH = 14
@@ -29,6 +30,7 @@ def get_previous_splits(forest, feature_names, rcp, year, folder_path):
     """
     features = feature_names.copy()
     all_prev_splits_list = []
+    all_prev_split_features = []
     for i in range(len(forest.estimators_)):
         estimator = forest.estimators_[i]
         tree_feature = estimator.tree_.feature
@@ -63,6 +65,7 @@ def get_previous_splits(forest, feature_names, rcp, year, folder_path):
         prev_splits_list = []
         while len(prev_split) > 0:
             prev_splits_list.append(dict[prev_split])
+            all_prev_split_features.append(dict[prev_split][0])
             prev_split = prev_split[:-1]
         prev_splits_list.append(dict["p"])
         prev_splits_list.reverse()
@@ -77,6 +80,16 @@ def get_previous_splits(forest, feature_names, rcp, year, folder_path):
     rcp_no_space_no_period = rcp_no_space.replace(".", "")
     file_path = folder_path + rcp_no_space_no_period + "_" + str(year) + "_splits_before_Stemp_max_split.csv"
     prev_split_df.to_csv(file_path)
+
+    prev_split_feature_summary = Counter(all_prev_split_features)
+    tot_splits = sum(prev_split_feature_summary.values())
+    for feature in prev_split_feature_summary:
+        prev_split_feature_summary[feature] /= tot_splits
+
+    prev_feature_summary_df = pd.DataFrame(prev_split_feature_summary, index=[0])
+    file_path = folder_path + rcp_no_space_no_period + "_" + str(year) + "_splits_before_Stemp_max_split_summary.csv"
+    prev_feature_summary_df.to_csv(file_path, index=False)
+
 
 
 def find_forest_splits(forest, feature_names, feature, firstsplit=False):
