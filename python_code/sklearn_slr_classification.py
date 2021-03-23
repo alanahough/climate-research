@@ -452,8 +452,9 @@ def feature_color_dict(features_list):
     """
     color_map = pylab.get_cmap('terrain')
     color_dict = {}
-    for i in range(len(features_list)):
-        color = color_map(i/len(features_list))
+    color_dict[features_list[0]] = "black"
+    for i in range(1, len(features_list)):
+        color = color_map((i - 1) / (len(features_list) - 1))
         color_dict[features_list[i]] = color
     return color_dict
 
@@ -525,6 +526,23 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
                 features_on_plot.append(feature)
     color_dict = feature_color_dict(features_on_plot)
 
+    # set up alternating hatching
+    len_plot_features_even = len(features_on_plot) % 2 == 0     # length doesn't include "other" category
+    hatch_dict = {}
+    idx = 0
+    for feature in color_dict:
+        if len_plot_features_even:
+            if idx % 2 == 0:
+                hatch_dict[feature] = "//"
+            else:
+                hatch_dict[feature] = ""
+        else:
+            if idx % 2 == 1:
+                hatch_dict[feature] = "//"
+            else:
+                hatch_dict[feature] = ""
+        idx += 1
+
     # plotting
     fig, axs = plt.subplots(2, 1)
     handles = []
@@ -540,12 +558,13 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
             else:
                 color = color_dict[feature]
                 if bottom is None:
-                    axs[i].bar(x, importances_info[feature], label=feature, color=color)
+                    axs[i].bar(x, importances_info[feature], label=feature, color=color, hatch=hatch_dict[feature])
                     bottom = np.array(importances_info[feature])
                 else:
-                    axs[i].bar(x, importances_info[feature], bottom=bottom, label=feature, color=color)
+                    axs[i].bar(x, importances_info[feature], bottom=bottom, label=feature, color=color,
+                               hatch=hatch_dict[feature])
                     bottom += np.array(importances_info[feature])
-        percent_label = "Other (< " + str(importance_threshold*100) + " %)"
+        percent_label = "Other (< " + str(round(importance_threshold*100, 1)) + " %)"
         axs[i].bar(x, importances_info["Other"], bottom=bottom, label=percent_label, color='white',
                    hatch='//')
         axs[i].set_ylabel("Relative Importances", fontsize=14)
@@ -962,8 +981,8 @@ if __name__ == '__main__':
 
     rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.02)
-    all_Stemp_max_split_boxplots(list_10_yrs)
+    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.03)
+    #all_Stemp_max_split_boxplots(list_10_yrs)
     #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
     #forest_rcp85_2020 = rcp85_forest_list_10yrs[0]
