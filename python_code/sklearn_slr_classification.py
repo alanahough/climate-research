@@ -7,6 +7,7 @@ import pylab
 import joblib
 import os
 from collections import Counter
+import matplotlib.ticker as mticker
 
 
 MAX_DEPTH = 14
@@ -458,7 +459,7 @@ def feature_color_dict(features_list):
 
 
 def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_forest_list, years,
-                                 importance_threshold = .05):
+                                 importance_threshold=.05):
     """
     Create a stacked histogram of the feature importances over time for each RCP
     :param param_sample_df: dataframe of the input feature values
@@ -518,7 +519,9 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
     features_on_plot = []
     for importances_info in importances_info_list:
         for feature in importances_info:
-            if feature not in features_on_plot:
+            if feature == "Other":
+                pass
+            elif feature not in features_on_plot:
                 features_on_plot.append(feature)
     color_dict = feature_color_dict(features_on_plot)
 
@@ -532,10 +535,10 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
         x = np.arange(len(years))
         bottom = None
         for feature in importances_info:
-            color = color_dict[feature]
             if feature == "Other":
                 pass
             else:
+                color = color_dict[feature]
                 if bottom is None:
                     axs[i].bar(x, importances_info[feature], label=feature, color=color)
                     bottom = np.array(importances_info[feature])
@@ -543,8 +546,12 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
                     axs[i].bar(x, importances_info[feature], bottom=bottom, label=feature, color=color)
                     bottom += np.array(importances_info[feature])
         percent_label = "Other (< " + str(importance_threshold*100) + " %)"
-        axs[i].bar(x, importances_info["Other"], bottom=bottom, label=percent_label)
-        axs[i].set_ylabel("Relative Importances")
+        axs[i].bar(x, importances_info["Other"], bottom=bottom, label=percent_label, color='white',
+                   hatch='//')
+        axs[i].set_ylabel("Relative Importances", fontsize=14)
+        ticks_loc = axs[i].get_yticks().tolist()
+        axs[i].yaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
+        axs[i].set_yticklabels(["{:.1f}".format(x) for x in ticks_loc], fontsize=12)
         yrs_10=[]
         for yr in years:
             if int(yr) % 10 == 0:
@@ -552,20 +559,22 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
             else:
                 yrs_10.append("")
         axs[i].set_xticks(x)
-        axs[i].set_xticklabels(yrs_10)
-        axs[i].set_xlabel('Year')
+        axs[i].set_xticklabels(yrs_10, fontsize=12)
+        axs[i].set_xlabel('Year', fontsize=14)
         if i == 0:
             title_label = "(a)"
         else:
             title_label = "(b)"
         title = title_label + " SLR " + name[i] + " Feature Importances"
-        axs[i].set_title(title, fontsize=14)
+        axs[i].set_title(title, fontsize=18)
         legend_details = axs[i].get_legend_handles_labels()
         handles += legend_details[0]
         labels += legend_details[1]
-        print(name[i], labels, sep="\t")
     by_label = dict(zip(labels, handles))
+    other = by_label.pop(percent_label)
+    by_label[percent_label] = other
     plt.figlegend(by_label.values(), by_label.keys(), bbox_to_anchor=(.98, .62))
+    plt.subplots_adjust(left=.105, right=.825, top=.96, bottom=.065, hspace=.258)
     plt.show()
 
 
@@ -805,15 +814,16 @@ def all_Stemp_max_split_boxplots(year_list, show_outliers=True):
         axs[i].boxplot(all_split_lists[i], showfliers=show_outliers, patch_artist=True, medianprops=dict(color="black"),
                    flierprops=dict(markeredgecolor='silver'), labels=[str(yr) for yr in year_list])
         if i == 0:
-            title = "(a) SLR RCP 2.6 Boxplots of Highest S.temperature Split Values of each Tree"
+            title = "(a) SLR RCP 2.6 Boxplots of Maximum ECS Split Values ($^\circ$C) of each Tree"
         elif i == 1:
-            title = "(b) SLR RCP 8.5 Boxplots of Highest S.temperature Split Values of each Tree"
-        axs[i].set_ylabel("S.temperature Split Value")
+            title = "(b) SLR RCP 8.5 Boxplots of Maximum ECS Split Values ($^\circ$C) of each Tree"
+        axs[i].set_ylabel("Maximum ECS Split ($^\circ$C)")
         axs[i].set_xlabel("Year")
         axs[i].set_title(title, fontsize=14)
         axs[i].grid(b=True, axis='y', color='gray')
         axs[i].set_ylim(top=10)
         axs[i].set_ylim(bottom=1.5)
+    plt.subplots_adjust(left=.25, right=.75, hspace=.24, top=.97, bottom=.055)
     plt.show()
 
 
@@ -952,10 +962,10 @@ if __name__ == '__main__':
 
     rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26)
-    #all_Stemp_max_split_boxplots(list_10_yrs)
+    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.02)
+    all_Stemp_max_split_boxplots(list_10_yrs)
     #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
-    forest_rcp85_2020 = rcp85_forest_list_10yrs[0]
-    features = df.columns.tolist()
-    get_previous_splits(forest_rcp85_2020, features, "RCP 8.5", 2020, path)
+    #forest_rcp85_2020 = rcp85_forest_list_10yrs[0]
+    #features = df.columns.tolist()
+    #get_previous_splits(forest_rcp85_2020, features, "RCP 8.5", 2020, path)
