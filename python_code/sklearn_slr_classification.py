@@ -533,12 +533,12 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
     for feature in color_dict:
         if len_plot_features_even:
             if idx % 2 == 0:
-                hatch_dict[feature] = "//"
+                hatch_dict[feature] = ".."
             else:
                 hatch_dict[feature] = ""
         else:
             if idx % 2 == 1:
-                hatch_dict[feature] = "//"
+                hatch_dict[feature] = ".."
             else:
                 hatch_dict[feature] = ""
         idx += 1
@@ -981,7 +981,7 @@ if __name__ == '__main__':
 
     rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.03)
+    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
     #all_Stemp_max_split_boxplots(list_10_yrs)
     #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
