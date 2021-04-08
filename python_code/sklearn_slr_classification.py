@@ -846,15 +846,19 @@ def all_Stemp_max_split_boxplots(year_list, show_outliers=True):
     plt.show()
 
 
-def gridsearch(param_samples_df, slr_df, year):
+def gridsearch(param_samples_df, slr_df, year, rcp, folder_path):
     """
     Perform a gridsearch of the parameters used to create the forests, saves the best parameters to a CSV, and saves
     the cross validation information/result to another CSV.
     :param param_samples_df: dataframe of the input feature values
     :param slr_df: dataframe of the output year values
     :param year: string of the year for the data to use when making the forests in the gridsearch
+    :param rcp: RCP name as a string (ex: "RCP 8.5")
+    :param folder_path: path to the folder where the CSV files will be saved
     :return: None
     """
+    rcp_no_space = rcp.replace(" ", "")
+    rcp_no_space_no_period = rcp_no_space.replace(".", "")
     slr_classify = classify_data(slr_df)
     df_slr = param_samples_df.join(slr_classify, how="outer")
     df_slr = df_slr.dropna()
@@ -870,6 +874,14 @@ def gridsearch(param_samples_df, slr_df, year):
 
     # 80% training, 20% testing
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
+    x_train_file_path = folder_path + rcp_no_space_no_period + "_" + str(year) + "_Xtrain.csv"
+    x_train.to_csv(x_train_file_path, index=False)
+    y_train_file_path = folder_path + rcp_no_space_no_period + "_" + str(year) + "_ytrain.csv"
+    y_train.to_csv(y_train_file_path, index=False)
+    x_test_file_path = folder_path + rcp_no_space_no_period + "_" + str(year) + "_Xtest.csv"
+    x_test.to_csv(x_test_file_path, index=False)
+    y_test_file_path = folder_path + rcp_no_space_no_period + "_" + str(year) + "_ytest.csv"
+    y_test.to_csv(y_test_file_path, index=False)
 
     param_grid_1 = {
         'max_depth': [2, 4, 6, 8, 10],
@@ -932,8 +944,17 @@ def gridsearch(param_samples_df, slr_df, year):
     }   # 'n_estimators': 700, Mean cross-validated score of the best_estimator:  0.9373750000000001
         # n_estimators:300, Mean cross-validated score of the best_estimator:  0.936875
 
+    test_subset_output_param_grid = {
+        'n_estimators': [100],
+        'max_depth': [2, 3],
+        'max_features': ["sqrt", 10],
+        'max_samples': [4500],
+        'min_samples_leaf': [4],
+        'min_samples_split': [10]
+    }
+
     forest = ensemble.RandomForestClassifier()
-    grid_search = GridSearchCV(estimator=forest, param_grid=n_estimators_param_grid, cv=5, n_jobs=-1, verbose=1,
+    grid_search = GridSearchCV(estimator=forest, param_grid=test_subset_output_param_grid, cv=5, n_jobs=-1, verbose=1,
                                scoring="accuracy")
     grid_search.fit(x_train, y_train)
     print("BEST PARAMETERS:")
@@ -981,10 +1002,16 @@ if __name__ == '__main__':
 
     rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
+    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
     #all_Stemp_max_split_boxplots(list_10_yrs)
     #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
     #forest_rcp85_2020 = rcp85_forest_list_10yrs[0]
-    #features = df.columns.tolist()
+    features = df.columns.tolist()
     #get_previous_splits(forest_rcp85_2020, features, "RCP 8.5", 2020, path)
+
+
+    # grid search -- rcp 2.6 df is slr_rcp26_5step
+    # to change RCP -- change slr_rcp85_5step param and "RCP 8.5" string param
+    # to change year -- change "2100"
+    gridsearch(df, slr_rcp85_5step, "2100", "RCP 8.5", "../data/new_csv/")
