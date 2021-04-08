@@ -3,6 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="2eacbc1e-7f36-4fd3-bb55-26d6df032da4" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gridsearchcv_results/n_estimators_cv_results.csv" beforeDir="false" afterPath="$PROJECT_DIR$/gridsearchcv_results/n_estimators_cv_results.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gridsearchcv_results/n_estimators_param_grid.csv" beforeDir="false" afterPath="$PROJECT_DIR$/gridsearchcv_results/n_estimators_param_grid.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sklearn_slr_classification.py" beforeDir="false" afterPath="$PROJECT_DIR$/sklearn_slr_classification.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -28,7 +30,7 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../spring 2021/DSCI-633/assignments/assignment8" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../spring 2021/DSCI-633/assignments/assignment9" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors" />
   </component>

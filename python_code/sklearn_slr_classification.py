@@ -866,12 +866,6 @@ def gridsearch(param_samples_df, slr_df, year, rcp, folder_path):
     x = df_slr[features]
     y = df_slr[year]
 
-    # 60% training, 20% validation, 20% testing
-    #x_train, x_rest, y_train, y_rest = train_test_split(x, y, test_size=0.4)  # train= 60%, validation + test= 40%
-    # split up rest of 40% into validation & test
-    #x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest,
-    #                                                              test_size=.5)  # validation= 20%, test= 20%
-
     # 80% training, 20% testing
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
     x_train_file_path = folder_path + rcp_no_space_no_period + "_" + str(year) + "_Xtrain.csv"
@@ -954,6 +948,7 @@ def gridsearch(param_samples_df, slr_df, year, rcp, folder_path):
     }
 
     forest = ensemble.RandomForestClassifier()
+    # ****CHANGE PARAM_GRID****
     grid_search = GridSearchCV(estimator=forest, param_grid=test_subset_output_param_grid, cv=5, n_jobs=-1, verbose=1,
                                scoring="accuracy")
     grid_search.fit(x_train, y_train)
@@ -961,8 +956,10 @@ def gridsearch(param_samples_df, slr_df, year, rcp, folder_path):
     print(grid_search.best_params_)
     print("Mean cross-validated score of the best_estimator: ", grid_search.best_score_)
     best_params_df = pd.DataFrame(grid_search.best_params_, index=[0])
+    # ****CHANGE FILE NAME WHEN CHANGE PARAM_GRID****
     best_params_df.to_csv("./gridsearchcv_results/n_estimators_param_grid.csv", index=False)
     score_df = pd.DataFrame(grid_search.cv_results_)
+    # ****CHANGE FILE NAME WHEN CHANGE PARAM_GRID****
     score_df.to_csv("./gridsearchcv_results/n_estimators_cv_results.csv", index=False)
 
 
