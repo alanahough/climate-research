@@ -16,6 +16,45 @@ MIN_SAMPLES_LEAF = 4
 MIN_SAMPLES_SPLIT = 8
 N_ESTIMATORS = 500
 
+PARAMETER_DICT = {'S.temperature': "ECS",
+                  'diff.temperature': r"$\kappa_{DOECLIM}$",
+                 'alpha.temperature': r"$\alpha_{DOECLIM}$",
+                 'beta0_gsic.slr_brick': r"$\beta_0$",
+                 'V0_gsic.slr_brick': r"$V_{0, GSIC}$",
+                 'n_gsic.slr_brick': r"$n$",
+                 'Gs0_gsic.slr_brick': r"$G_{s, 0}$",
+                 'a_tee.slr_brick': r"$\alpha_{TE}$",
+                 'a_simple.slr_brick': r"$a_{SIMPLE}$",
+                 'b_simple.slr_brick': r"$b_{SIMPLE}$",
+                 'alpha_simple.slr_brick': r"$\alpha_{SIMPLE}$",
+                 'beta_simple.slr_brick': r"$\beta_{SIMPLE}$",
+                 'V0_simple.slr_brick': r"$V_{0, SIMPLE}$",
+                 'offset.Tgav_obs': r"$T_0$",
+                 'sigma.Tgav_obs': r"$\sigma_T$",
+                 'rho.Tgav_obs': r"$\rho_T$",
+                 'sigma.slr_gsic_obs': r"$\sigma_{GSIC}$",
+                 'rho.slr_gsic_obs': r"$\rho_{GSIC}$",
+                 'sigma.slr_gis_obs': r"$\sigma_{GIS}$",
+                 'rho.slr_gis_obs': r"$\rho_{GIS}$",
+                 'a_anto.slr_brick': r"$a_{ANTO}$",
+                 'b_anto.slr_brick': r"$b_{ANTO}$",
+                 'gamma_dais.slr_brick': r"$\gamma$",
+                 'alpha_dais.slr_brick': r"$\alpha_{DAIS}$",
+                 'mu_dais.slr_brick': r"$\mu$",
+                 'nu_dais.slr_brick': r"$\nu$",
+                 'P0_dais.slr_brick': r"$P_0$",
+                 'kappa_dais.slr_brick': r"$\kappa_{DAIS}$",
+                 'f0_dais.slr_brick': r"$f_0$",
+                 'h0_dais.slr_brick': r"$h_0$",
+                 'c_dais.slr_brick': r"$C$",
+                 'b0_dais.slr_brick': r"$b_0$",
+                 'slope_dais.slr_brick': r"$slope$",
+                 'lambda_dais.slr_brick': r"$\lambda$",
+                 'Tcrit_dais.slr_brick': r"$T_{crit}$",
+                 'offset.ocheat_obs': r"$H_0$",
+                 'sigma.ocheat_obs': r"$\sigma_H$",
+                 'rho.ocheat_obs': r"$\rho_H$"}
+
 
 def get_previous_splits(forest, feature_names, rcp, year, folder_path):
     """
@@ -558,10 +597,11 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
             else:
                 color = color_dict[feature]
                 if bottom is None:
-                    axs[i].bar(x, importances_info[feature], label=feature, color=color, hatch=hatch_dict[feature])
+                    axs[i].bar(x, importances_info[feature], label=PARAMETER_DICT[feature], color=color,
+                               hatch=hatch_dict[feature])
                     bottom = np.array(importances_info[feature])
                 else:
-                    axs[i].bar(x, importances_info[feature], bottom=bottom, label=feature, color=color,
+                    axs[i].bar(x, importances_info[feature], bottom=bottom, label=PARAMETER_DICT[feature], color=color,
                                hatch=hatch_dict[feature])
                     bottom += np.array(importances_info[feature])
         percent_label = "Other (< " + str(round(importance_threshold*100, 1)) + " %)"
@@ -999,7 +1039,7 @@ if __name__ == '__main__':
 
     rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
+    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.05)
     #all_Stemp_max_split_boxplots(list_10_yrs)
     #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
@@ -1011,4 +1051,4 @@ if __name__ == '__main__':
     # grid search -- rcp 2.6 df is slr_rcp26_5step
     # to change RCP -- change slr_rcp85_5step param and "RCP 8.5" string param
     # to change year -- change "2100"
-    gridsearch(df, slr_rcp85_5step, "2100", "RCP 8.5", "../data/new_csv/")
+    #gridsearch(df, slr_rcp85_5step, "2100", "RCP 8.5", "../data/new_csv/")
