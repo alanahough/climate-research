@@ -632,7 +632,7 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
     by_label = dict(zip(labels, handles))
     other = by_label.pop(percent_label)
     by_label[percent_label] = other
-    plt.figlegend(by_label.values(), by_label.keys(), bbox_to_anchor=(.98, .62))
+    plt.figlegend(by_label.values(), by_label.keys(), bbox_to_anchor=(.99, .75), fontsize=14)
     plt.subplots_adjust(left=.105, right=.825, top=.96, bottom=.065, hspace=.258)
     plt.show()
 
