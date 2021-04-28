@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+from collections import Counter
 
 if __name__ == '__main__':
     rcp26_2050 = pd.read_csv("gridsearchcv_results/cvResults_param_grid_tw_rcp26-2050.csv")
@@ -123,4 +124,49 @@ if __name__ == '__main__':
     plt.title("Mean cross-validation accuracy vs n_estimators")
     plt.legend(bbox_to_anchor=(.995, 1.02))
     plt.subplots_adjust(right=.81)
+    plt.show()
+
+    # histogram max_depth
+    max_depth_list = [x[0] for x in rcp26_2050_top20[["param_max_depth"]].values.tolist()]
+    max_depth_list += [x[0] for x in rcp26_2075_top20[["param_max_depth"]].values.tolist()]
+    max_depth_list += [x[0] for x in rcp26_2100_top20[["param_max_depth"]].values.tolist()]
+    max_depth_list += [x[0] for x in rcp85_2050_top20[["param_max_depth"]].values.tolist()]
+    max_depth_list += [x[0] for x in rcp85_2075_top20[["param_max_depth"]].values.tolist()]
+    max_depth_list += [x[0] for x in rcp85_2100_top20[["param_max_depth"]].values.tolist()]
+    max_depth_counter = Counter(max_depth_list)
+    print(max_depth_counter)
+    plt.bar(list(max_depth_counter.keys()), list(max_depth_counter.values()))
+    plt.xlabel("max_depth")
+    plt.ylabel("frequency")
+    plt.title("Histogram of max_depth")
+    plt.show()
+
+    # histogram min_samples_split
+    min_samples_split_list = [x[0] for x in rcp26_2050_top20[["param_min_samples_split"]].values.tolist()]
+    min_samples_split_list += [x[0] for x in rcp26_2075_top20[["param_min_samples_split"]].values.tolist()]
+    min_samples_split_list += [x[0] for x in rcp26_2100_top20[["param_min_samples_split"]].values.tolist()]
+    min_samples_split_list += [x[0] for x in rcp85_2050_top20[["param_min_samples_split"]].values.tolist()]
+    min_samples_split_list += [x[0] for x in rcp85_2075_top20[["param_min_samples_split"]].values.tolist()]
+    min_samples_split_list += [x[0] for x in rcp85_2100_top20[["param_min_samples_split"]].values.tolist()]
+    min_samples_split_counter = Counter(min_samples_split_list)
+    print(min_samples_split_counter)
+    plt.bar(list(min_samples_split_counter.keys()), list(min_samples_split_counter.values()))
+    plt.xlabel("min_samples_split")
+    plt.ylabel("frequency")
+    plt.title("Histogram of min_samples_split")
+    plt.show()
+
+    # histogram n_estimators
+    n_estimators_list = [x[0] for x in rcp26_2050_top20[["param_n_estimators"]].values.tolist()]
+    n_estimators_list += [x[0] for x in rcp26_2075_top20[["param_n_estimators"]].values.tolist()]
+    n_estimators_list += [x[0] for x in rcp26_2100_top20[["param_n_estimators"]].values.tolist()]
+    n_estimators_list += [x[0] for x in rcp85_2050_top20[["param_n_estimators"]].values.tolist()]
+    n_estimators_list += [x[0] for x in rcp85_2075_top20[["param_n_estimators"]].values.tolist()]
+    n_estimators_list += [x[0] for x in rcp85_2100_top20[["param_n_estimators"]].values.tolist()]
+    n_estimators_counter = Counter(n_estimators_list)
+    print(n_estimators_counter)
+    plt.bar(list(n_estimators_counter.keys()), list(n_estimators_counter.values()), width=50)
+    plt.xlabel("n_estimators")
+    plt.ylabel("frequency")
+    plt.title("Histogram of n_estimators")
     plt.show()
