@@ -871,18 +871,19 @@ def all_Stemp_max_split_boxplots(year_list, show_outliers=True):
     fig, axs = plt.subplots(2, 1)
     for i in range(2):
         axs[i].boxplot(all_split_lists[i], showfliers=show_outliers, patch_artist=True, medianprops=dict(color="black"),
-                   flierprops=dict(markeredgecolor='silver'), labels=[str(yr) for yr in year_list])
+                   flierprops=dict(markeredgecolor='silver'))
         if i == 0:
-            title = "(a) SLR RCP 2.6 Boxplots of Maximum ECS Split Values ($^\circ$C) of each Tree"
+            axs[i].xaxis.set_visible(False)
         elif i == 1:
-            title = "(b) SLR RCP 8.5 Boxplots of Maximum ECS Split Values ($^\circ$C) of each Tree"
-        axs[i].set_ylabel("Maximum ECS Split ($^\circ$C)")
-        axs[i].set_xlabel("Year")
-        axs[i].set_title(title, fontsize=14)
+            axs[i].set_xlabel("Year", fontsize=14)
+            axs[i].set_xticklabels([str(yr) for yr in year_list], fontsize=12)
+        axs[i].set_ylabel("Maximum ECS Split ($^\circ$C)", fontsize=14)
         axs[i].grid(b=True, axis='y', color='gray')
         axs[i].set_ylim(top=10)
         axs[i].set_ylim(bottom=1.5)
-    plt.subplots_adjust(left=.25, right=.75, hspace=.24, top=.97, bottom=.055)
+    axs[0].text(.7, 2.1, "(a) RCP 2.6", fontsize=18)
+    axs[1].text(.7, 2.1, "(b) RCP 8.5", fontsize=18)
+    plt.subplots_adjust(left=.25, right=.75, hspace=.02, top=.97, bottom=.055)
     plt.show()
 
 
@@ -1039,8 +1040,8 @@ if __name__ == '__main__':
 
     rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
-    #all_Stemp_max_split_boxplots(list_10_yrs)
+    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
+    all_Stemp_max_split_boxplots(list_10_yrs)
     #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
     #forest_rcp85_2020 = rcp85_forest_list_10yrs[0]

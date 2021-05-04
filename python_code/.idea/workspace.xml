@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="2eacbc1e-7f36-4fd3-bb55-26d6df032da4" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gridsearch_tables.py" beforeDir="false" afterPath="$PROJECT_DIR$/gridsearch_tables.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sklearn_slr_classification.py" beforeDir="false" afterPath="$PROJECT_DIR$/sklearn_slr_classification.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -44,7 +44,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.gridsearch_tables">
+  <component name="RunManager" selected="Python.sklearn_slr_classification">
     <configuration name="gridsearch_plots" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="python_code" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -152,8 +152,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.gridsearch_tables" />
         <item itemvalue="Python.sklearn_slr_classification" />
+        <item itemvalue="Python.gridsearch_tables" />
         <item itemvalue="Python.gridsearch_plots" />
         <item itemvalue="Python.tree_nodes_dict" />
         <item itemvalue="Python.tree_splits_fixing" />
