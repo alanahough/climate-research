@@ -10,10 +10,10 @@ from collections import Counter
 import matplotlib.ticker as mticker
 
 
-MAX_DEPTH = 14
+MAX_DEPTH = 16
 MAX_FEATURES = "sqrt"
 MIN_SAMPLES_LEAF = 4
-MIN_SAMPLES_SPLIT = 8
+MIN_SAMPLES_SPLIT = 7
 N_ESTIMATORS = 500
 
 PARAMETER_DICT = {'S.temperature': "ECS",
@@ -471,7 +471,7 @@ def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_
     fig.suptitle(main_title, fontsize=15)
     fig.text(0.52, 0.04, 'Features', ha='center', fontsize=12)
     fig.text(0.04, 0.5, 'Relative Importance', va='center', rotation='vertical', fontsize=12)
-    plt.show()
+    #plt.show()
 
     df_first_quartile = pd.DataFrame(first_quartile_data, columns=["Name", "0%", "25%", "50%", "75%", "100%", "Mean"])
     first_file_path = folder_path + rcp_no_space_no_period + "_first_splits.csv"
@@ -1032,20 +1032,20 @@ if __name__ == '__main__':
     list_10_yrs = []
     for yr in range(2020, 2151, 10):
         list_10_yrs.append(yr)
-    rcp26_forest_list_10yrs = load_forests(list_10_yrs, "rcp26")
-    rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
-    path = "../data/new_csv/SLR_splits/classification_forest/"
+    #rcp26_forest_list_10yrs = load_forests(list_10_yrs, "rcp26")
+    #rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
+    #path = "../data/new_csv/SLR_splits/classification_forest/"
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list_10yrs, list_10_yrs, path)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list_10yrs, list_10_yrs, path)
 
     rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
+    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
     all_Stemp_max_split_boxplots(list_10_yrs)
-    #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
+    all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
     #forest_rcp85_2020 = rcp85_forest_list_10yrs[0]
-    features = df.columns.tolist()
+    #features = df.columns.tolist()
     #get_previous_splits(forest_rcp85_2020, features, "RCP 8.5", 2020, path)
 
 
