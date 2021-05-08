@@ -18,42 +18,57 @@ N_ESTIMATORS = 500
 
 PARAMETER_DICT = {'S.temperature': "ECS",
                   'diff.temperature': r"$\kappa_{DOECLIM}$",
-                 'alpha.temperature': r"$\alpha_{DOECLIM}$",
-                 'beta0_gsic.slr_brick': r"$\beta_0$",
-                 'V0_gsic.slr_brick': r"$V_{0, GSIC}$",
-                 'n_gsic.slr_brick': r"$n$",
-                 'Gs0_gsic.slr_brick': r"$G_{s, 0}$",
-                 'a_tee.slr_brick': r"$\alpha_{TE}$",
-                 'a_simple.slr_brick': r"$a_{SIMPLE}$",
-                 'b_simple.slr_brick': r"$b_{SIMPLE}$",
-                 'alpha_simple.slr_brick': r"$\alpha_{SIMPLE}$",
-                 'beta_simple.slr_brick': r"$\beta_{SIMPLE}$",
-                 'V0_simple.slr_brick': r"$V_{0, SIMPLE}$",
-                 'offset.Tgav_obs': r"$T_0$",
-                 'sigma.Tgav_obs': r"$\sigma_T$",
-                 'rho.Tgav_obs': r"$\rho_T$",
-                 'sigma.slr_gsic_obs': r"$\sigma_{GSIC}$",
-                 'rho.slr_gsic_obs': r"$\rho_{GSIC}$",
-                 'sigma.slr_gis_obs': r"$\sigma_{GIS}$",
-                 'rho.slr_gis_obs': r"$\rho_{GIS}$",
-                 'a_anto.slr_brick': r"$a_{ANTO}$",
-                 'b_anto.slr_brick': r"$b_{ANTO}$",
-                 'gamma_dais.slr_brick': r"$\gamma$",
-                 'alpha_dais.slr_brick': r"$\alpha_{DAIS}$",
-                 'mu_dais.slr_brick': r"$\mu$",
-                 'nu_dais.slr_brick': r"$\nu$",
-                 'P0_dais.slr_brick': r"$P_0$",
-                 'kappa_dais.slr_brick': r"$\kappa_{DAIS}$",
-                 'f0_dais.slr_brick': r"$f_0$",
-                 'h0_dais.slr_brick': r"$h_0$",
-                 'c_dais.slr_brick': r"$C$",
-                 'b0_dais.slr_brick': r"$b_0$",
-                 'slope_dais.slr_brick': r"$slope$",
-                 'lambda_dais.slr_brick': r"$\lambda$",
-                 'Tcrit_dais.slr_brick': r"$T_{crit}$",
-                 'offset.ocheat_obs': r"$H_0$",
-                 'sigma.ocheat_obs': r"$\sigma_H$",
-                 'rho.ocheat_obs': r"$\rho_H$"}
+                  'alpha.temperature': r"$\alpha_{DOECLIM}$",
+                  'beta0_gsic.slr_brick': r"$\beta_0$",
+                  'V0_gsic.slr_brick': r"$V_{0, GSIC}$",
+                  'n_gsic.slr_brick': r"$n$",
+                  'Gs0_gsic.slr_brick': r"$G_{s, 0}$",
+                  'a_tee.slr_brick': r"$\alpha_{TE}$",
+                  'a_simple.slr_brick': r"$a_{SIMPLE}$",
+                  'b_simple.slr_brick': r"$b_{SIMPLE}$",
+                  'alpha_simple.slr_brick': r"$\alpha_{SIMPLE}$",
+                  'beta_simple.slr_brick': r"$\beta_{SIMPLE}$",
+                  'V0_simple.slr_brick': r"$V_{0, SIMPLE}$",
+                  'offset.Tgav_obs': r"$T_0$",
+                  'sigma.Tgav_obs': r"$\sigma_T$",
+                  'rho.Tgav_obs': r"$\rho_T$",
+                  'sigma.slr_gsic_obs': r"$\sigma_{GSIC}$",
+                  'rho.slr_gsic_obs': r"$\rho_{GSIC}$",
+                  'sigma.slr_gis_obs': r"$\sigma_{GIS}$",
+                  'rho.slr_gis_obs': r"$\rho_{GIS}$",
+                  'a_anto.slr_brick': r"$a_{ANTO}$",
+                  'b_anto.slr_brick': r"$b_{ANTO}$",
+                  'gamma_dais.slr_brick': r"$\gamma$",
+                  'alpha_dais.slr_brick': r"$\alpha_{DAIS}$",
+                  'mu_dais.slr_brick': r"$\mu$",
+                  'nu_dais.slr_brick': r"$\nu$",
+                  'P0_dais.slr_brick': r"$P_0$",
+                  'kappa_dais.slr_brick': r"$\kappa_{DAIS}$",
+                  'f0_dais.slr_brick': r"$f_0$",
+                  'h0_dais.slr_brick': r"$h_0$",
+                  'c_dais.slr_brick': r"$C$",
+                  'b0_dais.slr_brick': r"$b_0$",
+                  'slope_dais.slr_brick': r"$slope$",
+                  'lambda_dais.slr_brick': r"$\lambda$",
+                  'Tcrit_dais.slr_brick': r"$T_{crit}$",
+                  'offset.ocheat_obs': r"$H_0$",
+                  'sigma.ocheat_obs': r"$\sigma_H$",
+                  'rho.ocheat_obs': r"$\rho_H$"}
+
+MODEL_DICT = {"Climate": ['S.temperature', 'diff.temperature', 'alpha.temperature', 'offset.Tgav_obs',
+                          'sigma.Tgav_obs', 'rho.Tgav_obs', 'offset.ocheat_obs', 'sigma.ocheat_obs',
+                          'rho.ocheat_obs'],
+              "Glaciers & Ice Caps": ['beta0_gsic.slr_brick', 'V0_gsic.slr_brick', 'n_gsic.slr_brick',
+                                      'Gs0_gsic.slr_brick', 'sigma.slr_gsic_obs', 'rho.slr_gsic_obs'],
+              "Thermal Expansion": ['a_tee.slr_brick'],
+              "Greenland Ice Sheet": ['sigma.slr_gis_obs', 'rho.slr_gis_obs', 'a_simple.slr_brick',
+                                      'b_simple.slr_brick', 'alpha_simple.slr_brick', 'beta_simple.slr_brick',
+                                      'V0_simple.slr_brick'],
+              "Antarctic Ice Sheet": ['a_anto.slr_brick', 'b_anto.slr_brick', 'gamma_dais.slr_brick',
+                                      'alpha_dais.slr_brick', 'mu_dais.slr_brick', 'nu_dais.slr_brick',
+                                      'P0_dais.slr_brick', 'kappa_dais.slr_brick', 'f0_dais.slr_brick',
+                                      'h0_dais.slr_brick', 'c_dais.slr_brick', 'b0_dais.slr_brick',
+                                      'slope_dais.slr_brick', 'lambda_dais.slr_brick', 'Tcrit_dais.slr_brick']}
 
 
 def get_previous_splits(forest, feature_names, rcp, year, folder_path):
@@ -471,7 +486,7 @@ def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_
     fig.suptitle(main_title, fontsize=15)
     fig.text(0.52, 0.04, 'Features', ha='center', fontsize=12)
     fig.text(0.04, 0.5, 'Relative Importance', va='center', rotation='vertical', fontsize=12)
-    #plt.show()
+    plt.show()
 
     df_first_quartile = pd.DataFrame(first_quartile_data, columns=["Name", "0%", "25%", "50%", "75%", "100%", "Mean"])
     first_file_path = folder_path + rcp_no_space_no_period + "_first_splits.csv"
@@ -491,9 +506,11 @@ def feature_color_dict(features_list):
     """
     color_map = pylab.get_cmap('terrain')
     color_dict = {}
-    color_dict[features_list[0]] = "black"
-    for i in range(1, len(features_list)):
-        color = color_map((i - 1) / (len(features_list) - 1))
+    #color_dict[features_list[0]] = "black"
+    #for i in range(1, len(features_list)):
+    for i in range(0, len(features_list)):
+        #color = color_map((i - 1) / (len(features_list) - 1))
+        color = color_map(i / len(features_list))
         color_dict[features_list[i]] = color
     return color_dict
 
@@ -545,9 +562,9 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
                         if feature in importances_info:
                             importances_info[feature].append(importance)
                         else:
-                            list = [0 for n in range(0, j)]
-                            list.append(importance)
-                            importances_info[feature] = list
+                            lst = [0 for n in range(0, j)]
+                            lst.append(importance)
+                            importances_info[feature] = lst
                         sum += importance
                 importances_info['Other'].append(1 - sum)
                 for f in importances_info:
@@ -556,20 +573,22 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
         importances_info_list.append(importances_info)
 
     # set color for each feature
-    features_on_plot = []
-    for importances_info in importances_info_list:
-        for feature in importances_info:
-            if feature == "Other":
-                pass
-            elif feature not in features_on_plot:
-                features_on_plot.append(feature)
-    color_dict = feature_color_dict(features_on_plot)
+    features_on_plot_ordered = []
+    for model_component in MODEL_DICT:
+        for importances_info in importances_info_list:
+            for feature in importances_info:
+                if feature == "Other":
+                    pass
+                elif feature not in features_on_plot_ordered and feature in MODEL_DICT[model_component]:
+                    features_on_plot_ordered.append(feature)
+    print(features_on_plot_ordered)
+    color_dict = feature_color_dict(features_on_plot_ordered)
 
     # set up alternating hatching
-    len_plot_features_even = len(features_on_plot) % 2 == 0     # length doesn't include "other" category
+    len_plot_features_even = len(features_on_plot_ordered) % 2 == 0     # length doesn't include "other" category
     hatch_dict = {}
     idx = 0
-    for feature in color_dict:
+    for feature in features_on_plot_ordered:
         if len_plot_features_even:
             if idx % 2 == 0:
                 hatch_dict[feature] = ".."
@@ -586,15 +605,18 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
     fig, axs = plt.subplots(2, 1)
     handles = []
     labels = []
+    order_plotted = []
     for i in range(len(importances_info_list)):
         importances_info = importances_info_list[i]
         # stacked importances plot
         x = np.arange(len(years))
         bottom = None
-        for feature in importances_info:
+        for feature in features_on_plot_ordered:
             if feature == "Other":
                 pass
-            else:
+            elif feature in importances_info:
+                if feature not in order_plotted:
+                    order_plotted.append(feature)
                 color = color_dict[feature]
                 if bottom is None:
                     axs[i].bar(x, importances_info[feature], label=PARAMETER_DICT[feature], color=color,
@@ -629,10 +651,28 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
         legend_details = axs[i].get_legend_handles_labels()
         handles += legend_details[0]
         labels += legend_details[1]
+
+    order_plotted.append(percent_label)
+    features_other_ordered = features_on_plot_ordered.copy()
+    features_other_ordered.append(percent_label)
+
     by_label = dict(zip(labels, handles))
     other = by_label.pop(percent_label)
     by_label[percent_label] = other
-    plt.figlegend(by_label.values(), by_label.keys(), bbox_to_anchor=(.99, .75), fontsize=14)
+
+    reorder = []
+    for val in features_other_ordered:
+        idx = order_plotted.index(val)
+        reorder.append(idx)
+    label_values = list(by_label.values())
+    label_keys = list(by_label.keys())
+
+    print(order_plotted)
+    print([label_keys[idx] for idx in reorder])
+
+    plt.figlegend([label_values[idx] for idx in reorder], [label_keys[idx] for idx in reorder],
+                  bbox_to_anchor=(.99, .75), fontsize=14)
+    #plt.figlegend(by_label.values(), by_label.keys(), bbox_to_anchor=(.99, .75), fontsize=14)
     plt.subplots_adjust(left=.105, right=.825, top=.96, bottom=.065, hspace=.258)
     plt.show()
 
@@ -1041,8 +1081,8 @@ if __name__ == '__main__':
     rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
     slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
-    all_Stemp_max_split_boxplots(list_10_yrs)
-    all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
+    #all_Stemp_max_split_boxplots(list_10_yrs)
+    #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
     #forest_rcp85_2020 = rcp85_forest_list_10yrs[0]
     #features = df.columns.tolist()
