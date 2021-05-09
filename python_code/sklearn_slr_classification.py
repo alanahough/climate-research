@@ -8,6 +8,7 @@ import joblib
 import os
 from collections import Counter
 import matplotlib.ticker as mticker
+import matplotlib.patches as mpatches
 
 
 MAX_DEPTH = 16
@@ -58,13 +59,13 @@ PARAMETER_DICT = {'S.temperature': "ECS",
 MODEL_DICT = {"Climate": ['S.temperature', 'diff.temperature', 'alpha.temperature', 'offset.Tgav_obs',
                           'sigma.Tgav_obs', 'rho.Tgav_obs', 'offset.ocheat_obs', 'sigma.ocheat_obs',
                           'rho.ocheat_obs'],
-              "Glaciers & Ice Caps": ['beta0_gsic.slr_brick', 'V0_gsic.slr_brick', 'n_gsic.slr_brick',
+              "\nGlaciers &\nIce Caps": ['beta0_gsic.slr_brick', 'V0_gsic.slr_brick', 'n_gsic.slr_brick',
                                       'Gs0_gsic.slr_brick', 'sigma.slr_gsic_obs', 'rho.slr_gsic_obs'],
-              "Thermal Expansion": ['a_tee.slr_brick'],
-              "Greenland Ice Sheet": ['sigma.slr_gis_obs', 'rho.slr_gis_obs', 'a_simple.slr_brick',
+              "\nThermal\nExpansion": ['a_tee.slr_brick'],
+              "\nGreenland\nIce Sheet": ['sigma.slr_gis_obs', 'rho.slr_gis_obs', 'a_simple.slr_brick',
                                       'b_simple.slr_brick', 'alpha_simple.slr_brick', 'beta_simple.slr_brick',
                                       'V0_simple.slr_brick'],
-              "Antarctic Ice Sheet": ['a_anto.slr_brick', 'b_anto.slr_brick', 'gamma_dais.slr_brick',
+              "\nAntarctic\nIce Sheet": ['a_anto.slr_brick', 'b_anto.slr_brick', 'gamma_dais.slr_brick',
                                       'alpha_dais.slr_brick', 'mu_dais.slr_brick', 'nu_dais.slr_brick',
                                       'P0_dais.slr_brick', 'kappa_dais.slr_brick', 'f0_dais.slr_brick',
                                       'h0_dais.slr_brick', 'c_dais.slr_brick', 'b0_dais.slr_brick',
@@ -574,14 +575,18 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
 
     # set color for each feature
     features_on_plot_ordered = []
+    model_components_to_plot = {}
+    idx = 0
     for model_component in MODEL_DICT:
         for importances_info in importances_info_list:
             for feature in importances_info:
                 if feature == "Other":
                     pass
                 elif feature not in features_on_plot_ordered and feature in MODEL_DICT[model_component]:
+                    if model_component not in model_components_to_plot.values():
+                        model_components_to_plot[idx] = model_component
                     features_on_plot_ordered.append(feature)
-    print(features_on_plot_ordered)
+                    idx += 1
     color_dict = feature_color_dict(features_on_plot_ordered)
 
     # set up alternating hatching
@@ -665,15 +670,17 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
         idx = order_plotted.index(val)
         reorder.append(idx)
     label_values = list(by_label.values())
+    label_values = [label_values[idx] for idx in reorder]
     label_keys = list(by_label.keys())
+    label_keys = [label_keys[idx] for idx in reorder]
+    adder = 0
+    for idx in model_components_to_plot:
+        label_values.insert(idx + adder, mpatches.Patch(color='none'))
+        label_keys.insert(idx + adder,  model_components_to_plot[idx])
+        adder += 1
 
-    print(order_plotted)
-    print([label_keys[idx] for idx in reorder])
-
-    plt.figlegend([label_values[idx] for idx in reorder], [label_keys[idx] for idx in reorder],
-                  bbox_to_anchor=(.99, .75), fontsize=14)
-    #plt.figlegend(by_label.values(), by_label.keys(), bbox_to_anchor=(.99, .75), fontsize=14)
-    plt.subplots_adjust(left=.105, right=.825, top=.96, bottom=.065, hspace=.258)
+    plt.figlegend(handles=label_values, labels=label_keys, bbox_to_anchor=(.99, .95), fontsize=14)
+    plt.subplots_adjust(left=.105, right=.815, top=.96, bottom=.065, hspace=.258)
     plt.show()
 
 
