@@ -330,7 +330,7 @@ def slr_forest(feature_list, df, year, max_feat="auto", max_d=None, min_samp_lea
     return forest, test_accuracy, train_accuracy
 
 
-def classify_data(df, print_threshold=False):
+def classify_data(df, print_threshold=False, percentile=.9):
     """
     Takes a dataframe of sea-level rise values for various years and classifies the values as "low" or "high"
     depending on if the value is above or below the 90th percentile of the data for each year
@@ -339,7 +339,7 @@ def classify_data(df, print_threshold=False):
     :return: df_classify -- a dataframe where all of the values are either "low" or "high"
     """
     years = df.columns.tolist()
-    threshold = df.quantile(q=.9)
+    threshold = df.quantile(q=percentile)
     if print_threshold is True:
         print("Threshold:\n", threshold)
     row_list = []
@@ -355,7 +355,8 @@ def classify_data(df, print_threshold=False):
     return df_classify
 
 
-def make_forest_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, forest_path, accuracy_path):
+def make_forest_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, forest_path, accuracy_path,
+                           classification_percentile=.9):
     """
     Creates forests for the given years, saves each forest as a file, and saves the validation and training accuracy
     of each forest in a CSV file
@@ -367,7 +368,7 @@ def make_forest_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, 
     :param accuracy_path: path of the folder to save the accuracy CSV files into (ex: "./forests/forest_accuracy/")
     :return: None
     """
-    slr_classify = classify_data(slr_df)
+    slr_classify = classify_data(slr_df, percentile=classification_percentile)
     df_slr_classify = parameter_sample_df.join(slr_classify, how="outer")
     df_slr_classify = df_slr_classify.dropna()
     features = parameter_sample_df.columns.tolist()
@@ -895,7 +896,9 @@ def Stemp_max_split_boxplots(year_list, rcp, show_outliers=True):
     plt.show()
 
 
-def all_Stemp_max_split_boxplots(year_list, show_outliers=True):
+def all_Stemp_max_split_boxplots(year_list, show_outliers=True,
+                                 ECS_splits_folder_path="../data/new_csv/SLR_splits/classification_forest/",
+                                 print_medians=False):
     """
     Opens the saved CSV files of the S.temperature splits for each year in the year_list for both RCPs and creates
     boxplots of the highest S.temperature split in each tree for each year.  The top panel of the plot is RCP 2.6 and
@@ -907,17 +910,19 @@ def all_Stemp_max_split_boxplots(year_list, show_outliers=True):
     rcp26_split_lists = []
     rcp85_split_lists = []
     for yr in year_list:
-        rcp_26_file_path = "../data/new_csv/SLR_splits/classification_forest/RCP26_" + str(yr) + "_splits.csv"
+        rcp_26_file_path = ECS_splits_folder_path + "RCP26_" + str(yr) + "_splits.csv"
         rcp26_df = pd.read_csv(rcp_26_file_path)
         rcp26_max_list = rcp26_df.max(axis=1).dropna().tolist()
         rcp26_split_lists.append(rcp26_max_list)
-        print("RCP 2.6", yr, "\tmedian = %5.4f" % np.median(rcp26_max_list))
+        if print_medians:
+            print("RCP 2.6", yr, "\tmedian = %5.4f" % np.median(rcp26_max_list))
 
-        rcp_85_file_path = "../data/new_csv/SLR_splits/classification_forest/RCP85_" + str(yr) + "_splits.csv"
+        rcp_85_file_path = ECS_splits_folder_path + "RCP85_" + str(yr) + "_splits.csv"
         rcp85_df = pd.read_csv(rcp_85_file_path)
         rcp85_max_list = rcp85_df.max(axis=1).dropna().tolist()
         rcp85_split_lists.append(rcp85_max_list)
-        print("RCP 8.5", yr, "\tmedian = %5.4f" % np.median(rcp85_max_list))
+        if print_medians:
+            print("RCP 8.5", yr, "\tmedian = %5.4f" % np.median(rcp85_max_list))
     all_split_lists = [rcp26_split_lists, rcp85_split_lists]
 
     fig, axs = plt.subplots(2, 1)
@@ -1079,6 +1084,11 @@ if __name__ == '__main__':
     yrs_rcp85 = slr_rcp85_5step.columns.tolist()
     #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/", "./forests/forest_accuracy/")
     #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
+    # make w/ 80th percentile
+    #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/80th_percentile",
+    #                       "./forests/forest_accuracy/80th_percentile")
+    #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/80th_percentile",
+    #                       "./forests/forest_accuracy/80th_percentile")
 
     # making S.temp split csv's
     list_10_yrs = []
@@ -1086,15 +1096,21 @@ if __name__ == '__main__':
         list_10_yrs.append(yr)
     rcp26_forest_list_10yrs = load_forests(list_10_yrs, "rcp26")
     rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
+    #rcp26_forest_list_10yrs = load_forests(list_10_yrs, "80th_percentilercp26") # path for 80th percentile forests
+    #rcp85_forest_list_10yrs = load_forests(list_10_yrs, "80th_percentilercp85") # path for 80th percentile forests
     path = "../data/new_csv/SLR_splits/classification_forest/"
+    #path = "../data/new_csv/SLR_splits/classification_forest/80th_percentile/80th_percentile_"  # path for 80th percentile data
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list_10yrs, list_10_yrs, path)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list_10yrs, list_10_yrs, path)
 
     rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
+    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
     all_Stemp_max_split_boxplots(list_10_yrs)
-    all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
+    # 80th percentile boxplot:
+    #all_Stemp_max_split_boxplots(list_10_yrs,
+    #                             ECS_splits_folder_path="../data/new_csv/SLR_splits/classification_forest/80th_percentile/80th_percentile_")
+    #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
     #forest_rcp85_2020 = rcp85_forest_list_10yrs[0]
     #features = df.columns.tolist()
