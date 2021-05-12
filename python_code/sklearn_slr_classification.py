@@ -302,10 +302,7 @@ def slr_forest(feature_list, df, year, max_feat="auto", max_d=None, min_samp_lea
     # set up subsets
     x = df[feature_list]
     y = df[year]
-    x_train, x_rest, y_train, y_rest = train_test_split(x, y, test_size=0.4)  # train= 60%, validation + test= 40%
-    # split up rest of 40% into validation & test
-    x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest,
-                                                                  test_size=.5)  # validation= 20%, test= 20%
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)  # train= 80%, test= 20%
 
     # random forest creation
     forest = ensemble.RandomForestClassifier(n_estimators=n_estimators, criterion="entropy", max_features=max_feat,
@@ -320,17 +317,17 @@ def slr_forest(feature_list, df, year, max_feat="auto", max_d=None, min_samp_lea
             text = tree.export_text(forest.estimators_[i], feature_names=feature_list)
             print(text)
 
-    # random forest validation
-    y_predicted = forest.predict(x_validation)
-    v_accuracy = metrics.accuracy_score(y_validation, y_predicted)
-    print("\nValidation Accuracy =", v_accuracy)
-
     # random forest training
     y_predicted = forest.predict(x_train)
-    t_accuracy = metrics.accuracy_score(y_train, y_predicted)
-    print("Training Accuracy =", t_accuracy)
+    train_accuracy = metrics.accuracy_score(y_train, y_predicted)
+    print("Training Accuracy =", train_accuracy)
 
-    return forest, v_accuracy, t_accuracy
+    # random forest validation
+    y_predicted = forest.predict(x_test)
+    test_accuracy = metrics.accuracy_score(y_test, y_predicted)
+    print("Test Accuracy =", test_accuracy)
+
+    return forest, test_accuracy, train_accuracy
 
 
 def classify_data(df, print_threshold=False):
@@ -376,13 +373,13 @@ def make_forest_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, 
     features = parameter_sample_df.columns.tolist()
     for yr in yrs_to_output:
         print("\n", rcp_str, yr)
-        forest, v_accuracy, t_accuracy = slr_forest(features, df_slr_classify, yr, max_feat=MAX_FEATURES,
+        forest, test_accuracy, train_accuracy = slr_forest(features, df_slr_classify, yr, max_feat=MAX_FEATURES,
                                                     max_d=MAX_DEPTH, min_samp_leaf=MIN_SAMPLES_LEAF,
                                                     min_samples_split= MIN_SAMPLES_SPLIT, n_estimators=N_ESTIMATORS)
         forest_file_path = forest_path + rcp_str + "_" + yr + ".joblib"
         joblib.dump(forest, forest_file_path, compress=3)
         print(f"Compressed Random Forest: {np.round(os.path.getsize(forest_file_path) / 1024 / 1024, 2)} MB")
-        accuracy_df = pd.DataFrame({"Validation Accuracy": [v_accuracy], "Training Accuracy": [t_accuracy]})
+        accuracy_df = pd.DataFrame({"Testing Accuracy": [test_accuracy], "Training Accuracy": [train_accuracy]})
         accuracy_file_path = accuracy_path + rcp_str + "_" + yr + "_accuracy.csv"
         accuracy_df.to_csv(accuracy_file_path, index=False)
 
@@ -507,12 +504,15 @@ def feature_color_dict(features_list):
     """
     color_map = pylab.get_cmap('terrain')
     color_dict = {}
-    #color_dict[features_list[0]] = "black"
-    #for i in range(1, len(features_list)):
     for i in range(0, len(features_list)):
-        #color = color_map((i - 1) / (len(features_list) - 1))
-        color = color_map(i / len(features_list))
-        color_dict[features_list[i]] = color
+        feature = features_list[i]
+        if feature == 'a_tee.slr_brick':
+            color = 'black'
+        elif feature == 'beta0_gsic.slr_brick':
+            color = 'lightblue'
+        else:
+            color = color_map(i / len(features_list))
+        color_dict[feature] = color
     return color_dict
 
 
@@ -679,7 +679,10 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
         label_keys.insert(idx + adder,  model_components_to_plot[idx])
         adder += 1
 
-    plt.figlegend(handles=label_values, labels=label_keys, bbox_to_anchor=(.99, .95), fontsize=14)
+    label_values.insert(-1, mpatches.Patch(color='none'))
+    label_keys.insert(-1, "")
+
+    plt.figlegend(handles=label_values, labels=label_keys, bbox_to_anchor=(.99, .97), fontsize=14)
     plt.subplots_adjust(left=.105, right=.815, top=.96, bottom=.065, hspace=.258)
     plt.show()
 
@@ -908,11 +911,13 @@ def all_Stemp_max_split_boxplots(year_list, show_outliers=True):
         rcp26_df = pd.read_csv(rcp_26_file_path)
         rcp26_max_list = rcp26_df.max(axis=1).dropna().tolist()
         rcp26_split_lists.append(rcp26_max_list)
+        print("RCP 2.6", yr, "\tmedian = %5.4f" % np.median(rcp26_max_list))
 
         rcp_85_file_path = "../data/new_csv/SLR_splits/classification_forest/RCP85_" + str(yr) + "_splits.csv"
         rcp85_df = pd.read_csv(rcp_85_file_path)
         rcp85_max_list = rcp85_df.max(axis=1).dropna().tolist()
         rcp85_split_lists.append(rcp85_max_list)
+        print("RCP 8.5", yr, "\tmedian = %5.4f" % np.median(rcp85_max_list))
     all_split_lists = [rcp26_split_lists, rcp85_split_lists]
 
     fig, axs = plt.subplots(2, 1)
@@ -1079,17 +1084,17 @@ if __name__ == '__main__':
     list_10_yrs = []
     for yr in range(2020, 2151, 10):
         list_10_yrs.append(yr)
-    #rcp26_forest_list_10yrs = load_forests(list_10_yrs, "rcp26")
-    #rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
-    #path = "../data/new_csv/SLR_splits/classification_forest/"
+    rcp26_forest_list_10yrs = load_forests(list_10_yrs, "rcp26")
+    rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
+    path = "../data/new_csv/SLR_splits/classification_forest/"
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list_10yrs, list_10_yrs, path)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list_10yrs, list_10_yrs, path)
 
     rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
     slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
-    #all_Stemp_max_split_boxplots(list_10_yrs)
-    #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
+    all_Stemp_max_split_boxplots(list_10_yrs)
+    all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
     #forest_rcp85_2020 = rcp85_forest_list_10yrs[0]
     #features = df.columns.tolist()
