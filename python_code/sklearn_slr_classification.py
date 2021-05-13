@@ -646,13 +646,16 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
             else:
                 yrs_10.append("")
         axs[i].set_xticks(x)
+        half_default_bar_width = .4
+        axs[i].set_xlim(left=x[0] - half_default_bar_width, right=x[-1] + half_default_bar_width)
         axs[i].set_xticklabels(yrs_10, fontsize=12)
         axs[i].set_xlabel('Year', fontsize=14)
+        axs[i].set_ylim(bottom=0, top=1)
         if i == 0:
             title_label = "(a)"
         else:
             title_label = "(b)"
-        title = title_label + " SLR " + name[i] + " Feature Importances"
+        title = title_label + " " + name[i] + " Feature Importances"
         axs[i].set_title(title, fontsize=18)
         legend_details = axs[i].get_legend_handles_labels()
         handles += legend_details[0]
@@ -1094,8 +1097,8 @@ if __name__ == '__main__':
     list_10_yrs = []
     for yr in range(2020, 2151, 10):
         list_10_yrs.append(yr)
-    rcp26_forest_list_10yrs = load_forests(list_10_yrs, "rcp26")
-    rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
+    #rcp26_forest_list_10yrs = load_forests(list_10_yrs, "rcp26")
+    #rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
     #rcp26_forest_list_10yrs = load_forests(list_10_yrs, "80th_percentilercp26") # path for 80th percentile forests
     #rcp85_forest_list_10yrs = load_forests(list_10_yrs, "80th_percentilercp85") # path for 80th percentile forests
     path = "../data/new_csv/SLR_splits/classification_forest/"
@@ -1105,12 +1108,13 @@ if __name__ == '__main__':
 
     rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
-    all_Stemp_max_split_boxplots(list_10_yrs)
+    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
+    #all_Stemp_max_split_boxplots(list_10_yrs)
+    # all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
+
     # 80th percentile boxplot:
     #all_Stemp_max_split_boxplots(list_10_yrs,
     #                             ECS_splits_folder_path="../data/new_csv/SLR_splits/classification_forest/80th_percentile/80th_percentile_")
-    #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
     #forest_rcp85_2020 = rcp85_forest_list_10yrs[0]
     #features = df.columns.tolist()
