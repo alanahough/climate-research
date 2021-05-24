@@ -574,6 +574,8 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
                         importances_info[f].append(0)
         importances_info_list.append(importances_info)
 
+    print(importances_info_list)
+
     # set color for each feature
     features_on_plot_ordered = []
     model_components_to_plot = {}
@@ -820,8 +822,8 @@ def all_Stemp_max_split_histograms(year_list):
         i += 1
     main_title = "SLR Histograms of Maximum ECS Split Values ($^\circ$C) of each Tree"
     fig.suptitle(main_title)
-    fig.text(.39, .94, "RCP 2.6", fontsize='large', ha='center')
-    fig.text(.61, .94, "RCP 8.5", fontsize='large', ha='center')
+    fig.text(.39, .94, "RCP2.6", fontsize='large', ha='center')
+    fig.text(.61, .94, "RCP8.5", fontsize='large', ha='center')
     fig.text(0.39, 0.015, 'Maximum ECS Split ($^\circ$C)', ha='center')
     fig.text(0.61, 0.015, 'Maximum ECS Split ($^\circ$C)', ha='center')
     fig.text(0.28, 0.5, 'Density', va='center', rotation='vertical')
@@ -918,14 +920,14 @@ def all_Stemp_max_split_boxplots(year_list, show_outliers=True,
         rcp26_max_list = rcp26_df.max(axis=1).dropna().tolist()
         rcp26_split_lists.append(rcp26_max_list)
         if print_medians:
-            print("RCP 2.6", yr, "\tmedian = %5.4f" % np.median(rcp26_max_list))
+            print("RCP2.6", yr, "\tmedian = %5.4f" % np.median(rcp26_max_list))
 
         rcp_85_file_path = ECS_splits_folder_path + "RCP85_" + str(yr) + "_splits.csv"
         rcp85_df = pd.read_csv(rcp_85_file_path)
         rcp85_max_list = rcp85_df.max(axis=1).dropna().tolist()
         rcp85_split_lists.append(rcp85_max_list)
         if print_medians:
-            print("RCP 8.5", yr, "\tmedian = %5.4f" % np.median(rcp85_max_list))
+            print("RCP8.5", yr, "\tmedian = %5.4f" % np.median(rcp85_max_list))
     all_split_lists = [rcp26_split_lists, rcp85_split_lists]
 
     fig, axs = plt.subplots(2, 1)
@@ -941,8 +943,8 @@ def all_Stemp_max_split_boxplots(year_list, show_outliers=True,
         axs[i].grid(b=True, axis='y', color='gray')
         axs[i].set_ylim(top=10)
         axs[i].set_ylim(bottom=1.5)
-    axs[0].text(.7, 2.1, "(a) RCP 2.6", fontsize=18)
-    axs[1].text(.7, 2.1, "(b) RCP 8.5", fontsize=18)
+    axs[0].text(.7, 2.1, "(a) RCP2.6", fontsize=18)
+    axs[1].text(.7, 2.1, "(b) RCP8.5", fontsize=18)
     plt.subplots_adjust(left=.25, right=.75, hspace=.02, top=.97, bottom=.055)
     plt.show()
 
@@ -1108,9 +1110,9 @@ if __name__ == '__main__':
 
     rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
-    #all_Stemp_max_split_boxplots(list_10_yrs)
-    # all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
+    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
+    all_Stemp_max_split_boxplots(list_10_yrs)
+    all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
     # 80th percentile boxplot:
     #all_Stemp_max_split_boxplots(list_10_yrs,
