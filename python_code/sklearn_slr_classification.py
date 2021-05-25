@@ -903,7 +903,7 @@ def Stemp_max_split_boxplots(year_list, rcp, show_outliers=True):
 
 def all_Stemp_max_split_boxplots(year_list, show_outliers=True,
                                  ECS_splits_folder_path="../data/new_csv/SLR_splits/classification_forest/",
-                                 print_medians=False):
+                                 print_medians=False, print_IQR=False, print_in_latex_table_format=False):
     """
     Opens the saved CSV files of the S.temperature splits for each year in the year_list for both RCPs and creates
     boxplots of the highest S.temperature split in each tree for each year.  The top panel of the plot is RCP 2.6 and
@@ -919,15 +919,34 @@ def all_Stemp_max_split_boxplots(year_list, show_outliers=True,
         rcp26_df = pd.read_csv(rcp_26_file_path)
         rcp26_max_list = rcp26_df.max(axis=1).dropna().tolist()
         rcp26_split_lists.append(rcp26_max_list)
-        if print_medians:
-            print("RCP2.6", yr, "\tmedian = %5.4f" % np.median(rcp26_max_list))
 
         rcp_85_file_path = ECS_splits_folder_path + "RCP85_" + str(yr) + "_splits.csv"
         rcp85_df = pd.read_csv(rcp_85_file_path)
         rcp85_max_list = rcp85_df.max(axis=1).dropna().tolist()
         rcp85_split_lists.append(rcp85_max_list)
-        if print_medians:
-            print("RCP8.5", yr, "\tmedian = %5.4f" % np.median(rcp85_max_list))
+
+        if print_in_latex_table_format and print_medians and print_IQR:
+            print(yr, "%5.4f" % np.quantile(rcp26_max_list, .25), "%5.4f" % np.median(rcp26_max_list),
+                  "%5.4f" % np.quantile(rcp26_max_list, .75),
+                  "%5.4f" % (np.quantile(rcp26_max_list, .75) - np.quantile(rcp26_max_list, .25)),
+                  "%5.4f" % np.quantile(rcp85_max_list, .25), "%5.4f" % np.median(rcp85_max_list),
+                  "%5.4f" % np.quantile(rcp85_max_list, .75),
+                  "%5.4f" % (np.quantile(rcp85_max_list, .75) - np.quantile(rcp85_max_list, .25)),
+                  sep=" & ")
+            print("\\\\")
+        else:
+            if print_medians:
+                print("RCP2.6", yr, "\tmedian = %5.4f" % np.median(rcp26_max_list))
+                print("RCP8.5", yr, "\tmedian = %5.4f" % np.median(rcp85_max_list))
+            if print_IQR:
+                print("RCP2.6", yr, "\tQ1 = %5.4f" % np.quantile(rcp26_max_list, .25),
+                      "\tQ3 = %5.4f" % np.quantile(rcp26_max_list, .75),
+                      "\tIQR = %5.4f" % (np.quantile(rcp26_max_list, .75) - np.quantile(rcp26_max_list, .25)))
+                print("RCP8.5", yr, "\tQ1 = %5.4f" % np.quantile(rcp85_max_list, .25),
+                      "\tQ3 = %5.4f" % np.quantile(rcp85_max_list, .75),
+                      "\tIQR = %5.4f" % (np.quantile(rcp85_max_list, .75) - np.quantile(rcp85_max_list, .25)))
+
+
     all_split_lists = [rcp26_split_lists, rcp85_split_lists]
 
     fig, axs = plt.subplots(2, 1)
@@ -1111,8 +1130,8 @@ if __name__ == '__main__':
     rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
     #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
-    all_Stemp_max_split_boxplots(list_10_yrs)
-    all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
+    all_Stemp_max_split_boxplots(list_10_yrs, print_IQR=True, print_medians=True, print_in_latex_table_format=True)
+    #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
     # 80th percentile boxplot:
     #all_Stemp_max_split_boxplots(list_10_yrs,
