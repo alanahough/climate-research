@@ -1069,9 +1069,17 @@ def gridsearch(param_samples_df, slr_df, year, rcp, folder_path):
         'min_samples_split': [10]
     }
 
+    lower_values_param_grid = {
+        'n_estimators': [250, 500, 750, 1000],
+        'max_depth': [12, 14, 16, 18],
+        'max_features': [4, "sqrt", 10, 15],               # sqrt = 6, added 4, 10, 15
+        'min_samples_leaf': [2, 3, 4, 7, 10, 13],   # added 2 and 3 as lower values
+        'min_samples_split': [4, 7, 10, 13, 16]     # added 4 as lower value
+    }
+
     forest = ensemble.RandomForestClassifier()
     # ****CHANGE PARAM_GRID****
-    grid_search = GridSearchCV(estimator=forest, param_grid=test_subset_output_param_grid, cv=5, n_jobs=-1, verbose=1,
+    grid_search = GridSearchCV(estimator=forest, param_grid=lower_values_param_grid, cv=5, n_jobs=-1, verbose=1,
                                scoring="accuracy")
     grid_search.fit(x_train, y_train)
     print("BEST PARAMETERS:")
@@ -1079,10 +1087,10 @@ def gridsearch(param_samples_df, slr_df, year, rcp, folder_path):
     print("Mean cross-validated score of the best_estimator: ", grid_search.best_score_)
     best_params_df = pd.DataFrame(grid_search.best_params_, index=[0])
     # ****CHANGE FILE NAME WHEN CHANGE PARAM_GRID****
-    best_params_df.to_csv("./gridsearchcv_results/n_estimators_param_grid.csv", index=False)
+    best_params_df.to_csv("./gridsearchcv_results/lower_values_param_grid.csv", index=False)
     score_df = pd.DataFrame(grid_search.cv_results_)
     # ****CHANGE FILE NAME WHEN CHANGE PARAM_GRID****
-    score_df.to_csv("./gridsearchcv_results/n_estimators_cv_results.csv", index=False)
+    score_df.to_csv("./gridsearchcv_results/lower_values_grid_cv_results.csv", index=False)
 
 
 def load_forests(year_list, rcp_str):
@@ -1106,6 +1114,9 @@ if __name__ == '__main__':
     slr_rcp85_5step = pd.read_csv("../data/new_csv/slr_rcp85_5yrstep.csv")
     yrs_rcp26 = slr_rcp26_5step.columns.tolist()
     yrs_rcp85 = slr_rcp85_5step.columns.tolist()
+
+    gridsearch(df, slr_rcp85_5step, "2100", "RCP 8.5", "../data/new_csv/")    # you can change the folder path if you want
+
     #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/", "./forests/forest_accuracy/")
     #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
     # make w/ 80th percentile
@@ -1127,10 +1138,10 @@ if __name__ == '__main__':
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list_10yrs, list_10_yrs, path)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list_10yrs, list_10_yrs, path)
 
-    rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
-    rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
+    #rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
+    #rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
     #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
-    all_Stemp_max_split_boxplots(list_10_yrs, print_IQR=True, print_medians=True, print_in_latex_table_format=True)
+    #all_Stemp_max_split_boxplots(list_10_yrs, print_IQR=True, print_medians=True, print_in_latex_table_format=True)
     #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
     # 80th percentile boxplot:
