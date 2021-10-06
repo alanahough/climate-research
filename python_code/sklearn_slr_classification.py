@@ -11,11 +11,17 @@ import matplotlib.ticker as mticker
 import matplotlib.patches as mpatches
 
 
-MAX_DEPTH = 16
-MAX_FEATURES = "sqrt"
-MIN_SAMPLES_LEAF = 4
-MIN_SAMPLES_SPLIT = 7
-N_ESTIMATORS = 500
+#MAX_DEPTH = 16
+#MAX_FEATURES = "sqrt"
+#MIN_SAMPLES_LEAF = 4
+#MIN_SAMPLES_SPLIT = 7
+#N_ESTIMATORS = 500
+
+MAX_DEPTH = 18
+MAX_FEATURES = 15
+MIN_SAMPLES_LEAF = 2
+MIN_SAMPLES_SPLIT = 4
+N_ESTIMATORS = 250
 
 PARAMETER_DICT = {'S.temperature': "ECS",
                   'diff.temperature': r"$\kappa_{DOECLIM}$",
@@ -317,17 +323,34 @@ def slr_forest(feature_list, df, year, max_feat="auto", max_d=None, min_samp_lea
             text = tree.export_text(forest.estimators_[i], feature_names=feature_list)
             print(text)
 
+    performance_dict = {}
+
     # random forest training
     y_predicted = forest.predict(x_train)
-    train_accuracy = metrics.accuracy_score(y_train, y_predicted)
-    print("Training Accuracy =", train_accuracy)
+    performance_dict["train_accuracy"] = metrics.accuracy_score(y_train, y_predicted)
+    print("Training Accuracy =", performance_dict["train_accuracy"])
+    performance_dict["train_tn"], performance_dict["train_fp"], performance_dict["train_fn"], \
+    performance_dict["train_tp"] = metrics.confusion_matrix(y_train, y_predicted).ravel()
+    print("Training true positive =", performance_dict["train_tp"],
+          "\tTraining true negative =", performance_dict["train_tn"],
+          "\tTraining false positive =", performance_dict["train_fp"],
+          "\tTraining false negative =", performance_dict["train_fn"])
 
     # random forest validation
     y_predicted = forest.predict(x_test)
-    test_accuracy = metrics.accuracy_score(y_test, y_predicted)
-    print("Test Accuracy =", test_accuracy)
+    performance_dict["test_accuracy"] = metrics.accuracy_score(y_test, y_predicted)
+    print("Test Accuracy =", performance_dict["test_accuracy"])
+    performance_dict["test_tn"], performance_dict["test_fp"], performance_dict["test_fn"], \
+    performance_dict["test_tp"] = metrics.confusion_matrix(y_test, y_predicted).ravel()
+    print("Test true positive =", performance_dict["test_tp"],
+          "\tTest true negative =", performance_dict["test_tn"],
+          "\tTest false positive =", performance_dict["test_fp"],
+          "\tTest false negative =", performance_dict["test_fn"])
 
-    return forest, test_accuracy, train_accuracy
+    for measure in performance_dict:
+        performance_dict[measure] = [performance_dict[measure]]
+
+    return forest, performance_dict
 
 
 def classify_data(df, print_threshold=False, percentile=.9):
@@ -355,7 +378,7 @@ def classify_data(df, print_threshold=False, percentile=.9):
     return df_classify
 
 
-def make_forest_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, forest_path, accuracy_path,
+def make_forest_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, forest_path, performance_path,
                            classification_percentile=.9):
     """
     Creates forests for the given years, saves each forest as a file, and saves the validation and training accuracy
@@ -365,7 +388,8 @@ def make_forest_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, 
     :param yrs_to_output: list of the years as strings to create and export forests for
     :param rcp_str: RCP name as a string with no spaces (ex: "rcp85")
     :param forest_path: path of the folder to save the forests into (ex: "./forests/")
-    :param accuracy_path: path of the folder to save the accuracy CSV files into (ex: "./forests/forest_accuracy/")
+    :param performance_path: path of the folder to save the performance measurements CSV files into
+    (ex: "./forests/forest_accuracy/")
     :return: None
     """
     slr_classify = classify_data(slr_df, percentile=classification_percentile)
@@ -373,16 +397,16 @@ def make_forest_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, 
     df_slr_classify = df_slr_classify.dropna()
     features = parameter_sample_df.columns.tolist()
     for yr in yrs_to_output:
-        print("\n", rcp_str, yr)
-        forest, test_accuracy, train_accuracy = slr_forest(features, df_slr_classify, yr, max_feat=MAX_FEATURES,
+        print("\n", rcp_str, " ", yr, sep="")
+        forest, performance_dict = slr_forest(features, df_slr_classify, yr, max_feat=MAX_FEATURES,
                                                     max_d=MAX_DEPTH, min_samp_leaf=MIN_SAMPLES_LEAF,
                                                     min_samples_split= MIN_SAMPLES_SPLIT, n_estimators=N_ESTIMATORS)
         forest_file_path = forest_path + rcp_str + "_" + yr + ".joblib"
         joblib.dump(forest, forest_file_path, compress=3)
         print(f"Compressed Random Forest: {np.round(os.path.getsize(forest_file_path) / 1024 / 1024, 2)} MB")
-        accuracy_df = pd.DataFrame({"Testing Accuracy": [test_accuracy], "Training Accuracy": [train_accuracy]})
-        accuracy_file_path = accuracy_path + rcp_str + "_" + yr + "_accuracy.csv"
-        accuracy_df.to_csv(accuracy_file_path, index=False)
+        performance_df = pd.DataFrame(performance_dict)
+        performance_file_path = performance_path + rcp_str + "_" + yr + "_performance_measures.csv"
+        performance_df.to_csv(performance_file_path, index=False)
 
 
 def perform_splits(forest, feature_list, split_feature):
@@ -1120,14 +1144,6 @@ if __name__ == '__main__':
     yrs_rcp26 = slr_rcp26_5step.columns.tolist()
     yrs_rcp85 = slr_rcp85_5step.columns.tolist()
 
-    for rcp in ["RCP 2.6","RCP 8.5"]:
-        if rcp=="RCP 2.6":
-            slr = slr_rcp26_5step
-        elif rcp=="RCP 8.5":
-            slr = slr_rcp85_5step
-        for year in ["2050","2075","2100"]:
-            gridsearch(df, slr, year, rcp, "../data/new_csv/")    # you can change the folder path if you want
-
     #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/", "./forests/forest_accuracy/")
     #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
     # make w/ 80th percentile
@@ -1135,6 +1151,12 @@ if __name__ == '__main__':
     #                       "./forests/forest_accuracy/80th_percentile")
     #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/80th_percentile",
     #                       "./forests/forest_accuracy/80th_percentile")
+
+    # new hyperparams (10/6/21)
+    make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/new_hyperparams_",
+                           "./forests/forest_performance/new_hyperparams_")
+    make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/new_hyperparams_",
+                           "./forests/forest_performance/new_hyperparams_")
 
     # making S.temp split csv's
     list_10_yrs = []
@@ -1168,3 +1190,12 @@ if __name__ == '__main__':
     # to change RCP -- change slr_rcp85_5step param and "RCP 8.5" string param
     # to change year -- change "2100"
     #gridsearch(df, slr_rcp85_5step, "2100", "RCP 8.5", "../data/new_csv/")
+
+    # grid search loop
+    #for rcp in ["RCP 2.6","RCP 8.5"]:
+    #    if rcp=="RCP 2.6":
+    #        slr = slr_rcp26_5step
+    #    elif rcp=="RCP 8.5":
+    #        slr = slr_rcp85_5step
+    #    for year in ["2050","2075","2100"]:
+    #        gridsearch(df, slr, year, rcp, "../data/new_csv/")    # you can change the folder path if you want
