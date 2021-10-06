@@ -2,51 +2,60 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from collections import Counter
 
-if __name__ == '__main__':
-    rcp26_2050 = pd.read_csv("gridsearchcv_results/cvResults_param_grid_tw_rcp26-2050.csv")
-    rcp26_2050_top20 = rcp26_2050[rcp26_2050["rank_test_score"] <= 20].sort_values(by=['rank_test_score'])
-    rcp26_2050_top20 = rcp26_2050_top20[["param_max_depth",	"param_max_features", "param_min_samples_leaf",
-                                         "param_min_samples_split",	"param_n_estimators", "mean_test_score",
+
+def top_10_cv_tables(rcp26_2050, rcp26_2075, rcp26_2100, rcp85_2050, rcp85_2075, rcp85_2100, top_amount,
+                     file_descriptor):
+    rcp26_2050_top20 = rcp26_2050[rcp26_2050["rank_test_score"] <= top_amount].sort_values(by=['rank_test_score'])
+    rcp26_2050_top20 = rcp26_2050_top20[["param_max_depth", "param_max_features", "param_min_samples_leaf",
+                                         "param_min_samples_split", "param_n_estimators", "mean_test_score",
                                          "rank_test_score"]]
-    rcp26_2050_top20.to_csv("../data/new_csv/hyperparameter_tuning/rcp26_2050_top20.csv", index=False)
+    rcp26_2050_top20.to_csv("../data/new_csv/hyperparameter_tuning/rcp26_2050_top" + str(top_amount) + "_" +
+                            file_descriptor + ".csv", index=False)
 
-    rcp26_2075 = pd.read_csv("gridsearchcv_results/cvResults_param_grid_tw_rcp26-2075.csv")
-    rcp26_2075_top20 = rcp26_2075[rcp26_2075["rank_test_score"] <= 20].sort_values(by=['rank_test_score'])
-    rcp26_2075_top20 = rcp26_2075_top20[["param_max_depth",	"param_max_features", "param_min_samples_leaf",
-                                         "param_min_samples_split",	"param_n_estimators", "mean_test_score",
+    rcp26_2075_top20 = rcp26_2075[rcp26_2075["rank_test_score"] <= top_amount].sort_values(by=['rank_test_score'])
+    rcp26_2075_top20 = rcp26_2075_top20[["param_max_depth", "param_max_features", "param_min_samples_leaf",
+                                         "param_min_samples_split", "param_n_estimators", "mean_test_score",
                                          "rank_test_score"]]
-    rcp26_2075_top20.to_csv("../data/new_csv/hyperparameter_tuning/rcp26_2075_top20.csv", index=False)
+    rcp26_2075_top20.to_csv("../data/new_csv/hyperparameter_tuning/rcp26_2075_top" + str(top_amount) + "_" +
+                            file_descriptor + ".csv", index=False)
 
-    rcp26_2100 = pd.read_csv("gridsearchcv_results/cvResults_param_grid_tw_rcp26-2100.csv")
-    rcp26_2100_top20 = rcp26_2100[rcp26_2100["rank_test_score"] <= 20].sort_values(by=['rank_test_score'])
-    rcp26_2100_top20 = rcp26_2100_top20[["param_max_depth",	"param_max_features", "param_min_samples_leaf",
-                                         "param_min_samples_split",	"param_n_estimators", "mean_test_score",
+    rcp26_2100_top20 = rcp26_2100[rcp26_2100["rank_test_score"] <= top_amount].sort_values(by=['rank_test_score'])
+    rcp26_2100_top20 = rcp26_2100_top20[["param_max_depth", "param_max_features", "param_min_samples_leaf",
+                                         "param_min_samples_split", "param_n_estimators", "mean_test_score",
                                          "rank_test_score"]]
-    rcp26_2100_top20.to_csv("../data/new_csv/hyperparameter_tuning/rcp26_2100_top20.csv", index=False)
+    rcp26_2100_top20.to_csv("../data/new_csv/hyperparameter_tuning/rcp26_2100_top" + str(top_amount) + "_" +
+                            file_descriptor + ".csv", index=False)
 
-    rcp85_2050 = pd.read_csv("gridsearchcv_results/cvResults_param_grid_tw_rcp85-2050.csv")
-    rcp85_2050_top20 = rcp85_2050[rcp85_2050["rank_test_score"] <= 20].sort_values(by=['rank_test_score'])
-    rcp85_2050_top20 = rcp85_2050_top20[["param_max_depth",	"param_max_features", "param_min_samples_leaf",
-                                         "param_min_samples_split",	"param_n_estimators", "mean_test_score",
+    rcp85_2050_top20 = rcp85_2050[rcp85_2050["rank_test_score"] <= top_amount].sort_values(by=['rank_test_score'])
+    rcp85_2050_top20 = rcp85_2050_top20[["param_max_depth", "param_max_features", "param_min_samples_leaf",
+                                         "param_min_samples_split", "param_n_estimators", "mean_test_score",
                                          "rank_test_score"]]
-    rcp85_2050_top20.to_csv("../data/new_csv/hyperparameter_tuning/rcp85_2050_top20.csv", index=False)
+    rcp85_2050_top20.to_csv("../data/new_csv/hyperparameter_tuning/rcp85_2050_top" + str(top_amount) + "_" +
+                            file_descriptor + ".csv", index=False)
 
-    rcp85_2075 = pd.read_csv("gridsearchcv_results/cvResults_param_grid_tw_rcp85-2075.csv")
-    rcp85_2075_top20 = rcp85_2075[rcp85_2075["rank_test_score"] <= 20].sort_values(by=['rank_test_score'])
-    rcp85_2075_top20 = rcp85_2075_top20[["param_max_depth",	"param_max_features", "param_min_samples_leaf",
-                                         "param_min_samples_split",	"param_n_estimators", "mean_test_score",
+    rcp85_2075_top20 = rcp85_2075[rcp85_2075["rank_test_score"] <= top_amount].sort_values(by=['rank_test_score'])
+    rcp85_2075_top20 = rcp85_2075_top20[["param_max_depth", "param_max_features", "param_min_samples_leaf",
+                                         "param_min_samples_split", "param_n_estimators", "mean_test_score",
                                          "rank_test_score"]]
-    rcp85_2075_top20.to_csv("../data/new_csv/hyperparameter_tuning/rcp85_2075_top20.csv", index=False)
+    rcp85_2075_top20.to_csv("../data/new_csv/hyperparameter_tuning/rcp85_2075_top" + str(top_amount) + "_" +
+                            file_descriptor + ".csv", index=False)
 
-    rcp85_2100 = pd.read_csv("gridsearchcv_results/cvResults_param_grid_tw_rcp85-2100.csv")
-    rcp85_2100_top20 = rcp85_2100[rcp85_2100["rank_test_score"] <= 20].sort_values(by=['rank_test_score'])
-    rcp85_2100_top20 = rcp85_2100_top20[["param_max_depth",	"param_max_features", "param_min_samples_leaf",
-                                         "param_min_samples_split",	"param_n_estimators", "mean_test_score",
+    rcp85_2100_top20 = rcp85_2100[rcp85_2100["rank_test_score"] <= top_amount].sort_values(by=['rank_test_score'])
+    rcp85_2100_top20 = rcp85_2100_top20[["param_max_depth", "param_max_features", "param_min_samples_leaf",
+                                         "param_min_samples_split", "param_n_estimators", "mean_test_score",
                                          "rank_test_score"]]
-    rcp85_2100_top20.to_csv("../data/new_csv/hyperparameter_tuning/rcp85_2100_top20.csv", index=False)
+    rcp85_2100_top20.to_csv("../data/new_csv/hyperparameter_tuning/rcp85_2100_top" + str(top_amount) + "_" +
+                            file_descriptor + ".csv", index=False)
 
 
-    # plot max_depth
+def plot_max_depth():
+    rcp26_2050_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2050_top20.csv")
+    rcp26_2075_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2075_top20.csv")
+    rcp26_2100_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2100_top20.csv")
+    rcp85_2050_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2050_top20.csv")
+    rcp85_2075_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2075_top20.csv")
+    rcp85_2100_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2100_top20.csv")
+
     plt.scatter(rcp26_2050_top20[["param_max_depth"]], rcp26_2050_top20[["mean_test_score"]], label="RCP 2.6\n2050",
                 facecolors='none', edgecolors='blue')
     plt.scatter(rcp26_2075_top20[["param_max_depth"]], rcp26_2075_top20[["mean_test_score"]], label="RCP 2.6\n2075",
@@ -66,7 +75,15 @@ if __name__ == '__main__':
     plt.subplots_adjust(right=.81)
     plt.show()
 
-    # plot min_samples_leaf
+
+def plot_min_samples_leaf():
+    rcp26_2050_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2050_top20.csv")
+    rcp26_2075_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2075_top20.csv")
+    rcp26_2100_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2100_top20.csv")
+    rcp85_2050_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2050_top20.csv")
+    rcp85_2075_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2075_top20.csv")
+    rcp85_2100_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2100_top20.csv")
+
     plt.scatter(rcp26_2050_top20[["param_min_samples_leaf"]], rcp26_2050_top20[["mean_test_score"]],
                 label="RCP 2.6\n2050", facecolors='none', edgecolors='blue')
     plt.scatter(rcp26_2075_top20[["param_min_samples_leaf"]], rcp26_2075_top20[["mean_test_score"]],
@@ -86,7 +103,15 @@ if __name__ == '__main__':
     plt.subplots_adjust(right=.81)
     plt.show()
 
-    # plot min_samples_split
+
+def plot_min_samples_split():
+    rcp26_2050_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2050_top20.csv")
+    rcp26_2075_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2075_top20.csv")
+    rcp26_2100_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2100_top20.csv")
+    rcp85_2050_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2050_top20.csv")
+    rcp85_2075_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2075_top20.csv")
+    rcp85_2100_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2100_top20.csv")
+
     plt.scatter(rcp26_2050_top20[["param_min_samples_split"]], rcp26_2050_top20[["mean_test_score"]],
                 label="RCP 2.6\n2050", facecolors='none', edgecolors='blue')
     plt.scatter(rcp26_2075_top20[["param_min_samples_split"]], rcp26_2075_top20[["mean_test_score"]],
@@ -106,7 +131,15 @@ if __name__ == '__main__':
     plt.subplots_adjust(right=.81)
     plt.show()
 
-    # plot n_estimators
+
+def plot_n_estimators():
+    rcp26_2050_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2050_top20.csv")
+    rcp26_2075_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2075_top20.csv")
+    rcp26_2100_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2100_top20.csv")
+    rcp85_2050_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2050_top20.csv")
+    rcp85_2075_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2075_top20.csv")
+    rcp85_2100_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2100_top20.csv")
+
     plt.scatter(rcp26_2050_top20[["param_n_estimators"]], rcp26_2050_top20[["mean_test_score"]],
                 label="RCP 2.6\n2050", facecolors='none', edgecolors='blue')
     plt.scatter(rcp26_2075_top20[["param_n_estimators"]], rcp26_2075_top20[["mean_test_score"]],
@@ -126,7 +159,15 @@ if __name__ == '__main__':
     plt.subplots_adjust(right=.81)
     plt.show()
 
-    # histogram max_depth
+
+def histogram_max_depth():
+    rcp26_2050_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2050_top20.csv")
+    rcp26_2075_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2075_top20.csv")
+    rcp26_2100_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2100_top20.csv")
+    rcp85_2050_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2050_top20.csv")
+    rcp85_2075_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2075_top20.csv")
+    rcp85_2100_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2100_top20.csv")
+
     max_depth_list = [x[0] for x in rcp26_2050_top20[["param_max_depth"]].values.tolist()]
     max_depth_list += [x[0] for x in rcp26_2075_top20[["param_max_depth"]].values.tolist()]
     max_depth_list += [x[0] for x in rcp26_2100_top20[["param_max_depth"]].values.tolist()]
@@ -141,7 +182,15 @@ if __name__ == '__main__':
     plt.title("Histogram of max_depth")
     plt.show()
 
-    # histogram min_samples_split
+
+def histogram_min_samples_split():
+    rcp26_2050_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2050_top20.csv")
+    rcp26_2075_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2075_top20.csv")
+    rcp26_2100_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2100_top20.csv")
+    rcp85_2050_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2050_top20.csv")
+    rcp85_2075_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2075_top20.csv")
+    rcp85_2100_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2100_top20.csv")
+
     min_samples_split_list = [x[0] for x in rcp26_2050_top20[["param_min_samples_split"]].values.tolist()]
     min_samples_split_list += [x[0] for x in rcp26_2075_top20[["param_min_samples_split"]].values.tolist()]
     min_samples_split_list += [x[0] for x in rcp26_2100_top20[["param_min_samples_split"]].values.tolist()]
@@ -156,7 +205,15 @@ if __name__ == '__main__':
     plt.title("Histogram of min_samples_split")
     plt.show()
 
-    # histogram n_estimators
+
+def histogram_n_estimators():
+    rcp26_2050_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2050_top20.csv")
+    rcp26_2075_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2075_top20.csv")
+    rcp26_2100_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp26_2100_top20.csv")
+    rcp85_2050_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2050_top20.csv")
+    rcp85_2075_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2075_top20.csv")
+    rcp85_2100_top20 = pd.read_csv("../data/new_csv/hyperparameter_tuning/rcp85_2100_top20.csv")
+
     n_estimators_list = [x[0] for x in rcp26_2050_top20[["param_n_estimators"]].values.tolist()]
     n_estimators_list += [x[0] for x in rcp26_2075_top20[["param_n_estimators"]].values.tolist()]
     n_estimators_list += [x[0] for x in rcp26_2100_top20[["param_n_estimators"]].values.tolist()]
@@ -170,3 +227,21 @@ if __name__ == '__main__':
     plt.ylabel("frequency")
     plt.title("Histogram of n_estimators")
     plt.show()
+
+
+if __name__ == '__main__':
+    rcp26_2050 = pd.read_csv("gridsearchcv_results/lower_values_grid_cv_results_RCP 2.6-2050.csv")
+    rcp26_2075 = pd.read_csv("gridsearchcv_results/lower_values_grid_cv_results_RCP 2.6-2075.csv")
+    rcp26_2100 = pd.read_csv("gridsearchcv_results/lower_values_grid_cv_results_RCP 2.6-2100.csv")
+    rcp85_2050 = pd.read_csv("gridsearchcv_results/lower_values_grid_cv_results_RCP 8.5-2050.csv")
+    rcp85_2075 = pd.read_csv("gridsearchcv_results/lower_values_grid_cv_results_RCP 8.5-2075.csv")
+    rcp85_2100 = pd.read_csv("gridsearchcv_results/lower_values_grid_cv_results_RCP 8.5-2100.csv")
+
+    #top_10_cv_tables(rcp26_2050, rcp26_2075, rcp26_2100, rcp85_2050, rcp85_2075, rcp85_2100, 10, "lower_values_grid")
+
+    df = rcp26_2100[rcp26_2100['params'] == "{'max_depth': 16, 'max_features': 'sqrt', 'min_samples_leaf': 4, 'min_samples_split': 7, 'n_estimators': 500}"]
+    df = df[["param_max_depth", "param_max_features", "param_min_samples_leaf",
+                      "param_min_samples_split", "param_n_estimators", "mean_test_score",
+                      "rank_test_score"]]
+    pd.set_option('display.max_columns', None)
+    print(df)
