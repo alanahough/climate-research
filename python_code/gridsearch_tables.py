@@ -239,7 +239,7 @@ if __name__ == '__main__':
 
     #top_10_cv_tables(rcp26_2050, rcp26_2075, rcp26_2100, rcp85_2050, rcp85_2075, rcp85_2100, 10, "lower_values_grid")
 
-    df = rcp26_2050[rcp26_2050['params'] == "{'max_depth': 14, 'max_features': 15, 'min_samples_leaf': 1, 'min_samples_split': 4, 'n_estimators': 500}"]
+    df = rcp85_2050[rcp85_2050['params'] == "{'max_depth': 12, 'max_features': 15, 'min_samples_leaf': 3, 'min_samples_split': 4, 'n_estimators': 500}"]
     df = df[["param_max_depth", "param_max_features", "param_min_samples_leaf",
                       "param_min_samples_split", "param_n_estimators", "mean_test_score",
                       "rank_test_score"]]
