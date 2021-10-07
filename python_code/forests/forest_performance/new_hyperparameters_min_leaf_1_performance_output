@@ -1,0 +1,377 @@
+rcp26 2020
+Training Accuracy = 1.0
+Training true positive = 7203 	Training true negative = 797 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9025
+Test true positive = 1793 	Test true negative = 12 	Test false positive = 191 	Test false negative = 4
+Compressed Random Forest: 3.17 MB
+
+rcp26 2025
+Training Accuracy = 1.0
+Training true positive = 7200 	Training true negative = 800 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9055
+Test true positive = 1790 	Test true negative = 21 	Test false positive = 179 	Test false negative = 10
+Compressed Random Forest: 2.99 MB
+
+rcp26 2030
+Training Accuracy = 1.0
+Training true positive = 7209 	Training true negative = 791 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.907
+Test true positive = 1784 	Test true negative = 30 	Test false positive = 179 	Test false negative = 7
+Compressed Random Forest: 2.9 MB
+
+rcp26 2035
+Training Accuracy = 1.0
+Training true positive = 7185 	Training true negative = 815 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.916
+Test true positive = 1801 	Test true negative = 31 	Test false positive = 154 	Test false negative = 14
+Compressed Random Forest: 2.8 MB
+
+rcp26 2040
+Training Accuracy = 1.0
+Training true positive = 7188 	Training true negative = 812 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.922
+Test true positive = 1801 	Test true negative = 43 	Test false positive = 145 	Test false negative = 11
+Compressed Random Forest: 2.71 MB
+
+rcp26 2045
+Training Accuracy = 1.0
+Training true positive = 7215 	Training true negative = 785 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9235
+Test true positive = 1771 	Test true negative = 76 	Test false positive = 139 	Test false negative = 14
+Compressed Random Forest: 2.51 MB
+
+rcp26 2050
+Training Accuracy = 1.0
+Training true positive = 7170 	Training true negative = 830 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9405
+Test true positive = 1816 	Test true negative = 65 	Test false positive = 105 	Test false negative = 14
+Compressed Random Forest: 2.45 MB
+
+rcp26 2055
+Training Accuracy = 1.0
+Training true positive = 7187 	Training true negative = 813 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9425
+Test true positive = 1794 	Test true negative = 91 	Test false positive = 96 	Test false negative = 19
+Compressed Random Forest: 2.31 MB
+
+rcp26 2060
+Training Accuracy = 1.0
+Training true positive = 7185 	Training true negative = 815 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.94
+Test true positive = 1799 	Test true negative = 81 	Test false positive = 104 	Test false negative = 16
+Compressed Random Forest: 2.2 MB
+
+rcp26 2065
+Training Accuracy = 1.0
+Training true positive = 7195 	Training true negative = 805 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9475
+Test true positive = 1794 	Test true negative = 101 	Test false positive = 94 	Test false negative = 11
+Compressed Random Forest: 2.01 MB
+
+rcp26 2070
+Training Accuracy = 1.0
+Training true positive = 7194 	Training true negative = 806 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9485
+Test true positive = 1791 	Test true negative = 106 	Test false positive = 88 	Test false negative = 15
+Compressed Random Forest: 1.9 MB
+
+rcp26 2075
+Training Accuracy = 1.0
+Training true positive = 7205 	Training true negative = 795 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.951
+Test true positive = 1783 	Test true negative = 119 	Test false positive = 86 	Test false negative = 12
+Compressed Random Forest: 1.79 MB
+
+rcp26 2080
+Training Accuracy = 1.0
+Training true positive = 7207 	Training true negative = 793 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9505
+Test true positive = 1779 	Test true negative = 122 	Test false positive = 85 	Test false negative = 14
+Compressed Random Forest: 1.83 MB
+
+rcp26 2085
+Training Accuracy = 1.0
+Training true positive = 7201 	Training true negative = 799 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.953
+Test true positive = 1784 	Test true negative = 122 	Test false positive = 79 	Test false negative = 15
+Compressed Random Forest: 1.76 MB
+
+rcp26 2090
+Training Accuracy = 1.0
+Training true positive = 7190 	Training true negative = 810 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9555
+Test true positive = 1791 	Test true negative = 120 	Test false positive = 70 	Test false negative = 19
+Compressed Random Forest: 1.72 MB
+
+rcp26 2095
+Training Accuracy = 0.999875
+Training true positive = 7189 	Training true negative = 810 	Training false positive = 1 	Training false negative = 0
+Test Accuracy = 0.959
+Test true positive = 1799 	Test true negative = 119 	Test false positive = 70 	Test false negative = 12
+Compressed Random Forest: 1.97 MB
+
+rcp26 2100
+Training Accuracy = 1.0
+Training true positive = 7207 	Training true negative = 793 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9575
+Test true positive = 1779 	Test true negative = 136 	Test false positive = 71 	Test false negative = 14
+Compressed Random Forest: 1.95 MB
+
+rcp26 2105
+Training Accuracy = 1.0
+Training true positive = 7205 	Training true negative = 795 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9535
+Test true positive = 1774 	Test true negative = 133 	Test false positive = 72 	Test false negative = 21
+Compressed Random Forest: 1.84 MB
+
+rcp26 2110
+Training Accuracy = 1.0
+Training true positive = 7191 	Training true negative = 809 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9605
+Test true positive = 1794 	Test true negative = 127 	Test false positive = 64 	Test false negative = 15
+Compressed Random Forest: 1.87 MB
+
+rcp26 2115
+Training Accuracy = 1.0
+Training true positive = 7208 	Training true negative = 792 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9565
+Test true positive = 1781 	Test true negative = 132 	Test false positive = 76 	Test false negative = 11
+Compressed Random Forest: 1.74 MB
+
+rcp26 2120
+Training Accuracy = 1.0
+Training true positive = 7194 	Training true negative = 806 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.968
+Test true positive = 1796 	Test true negative = 140 	Test false positive = 54 	Test false negative = 10
+Compressed Random Forest: 1.58 MB
+
+rcp26 2125
+Training Accuracy = 1.0
+Training true positive = 7212 	Training true negative = 788 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.955
+Test true positive = 1772 	Test true negative = 138 	Test false positive = 74 	Test false negative = 16
+Compressed Random Forest: 1.51 MB
+
+rcp26 2130
+Training Accuracy = 1.0
+Training true positive = 7205 	Training true negative = 795 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9585
+Test true positive = 1774 	Test true negative = 143 	Test false positive = 62 	Test false negative = 21
+Compressed Random Forest: 1.51 MB
+
+rcp26 2135
+Training Accuracy = 1.0
+Training true positive = 7203 	Training true negative = 797 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.961
+Test true positive = 1783 	Test true negative = 139 	Test false positive = 64 	Test false negative = 14
+Compressed Random Forest: 1.55 MB
+
+rcp26 2140
+Training Accuracy = 1.0
+Training true positive = 7199 	Training true negative = 801 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9575
+Test true positive = 1779 	Test true negative = 136 	Test false positive = 63 	Test false negative = 22
+Compressed Random Forest: 1.56 MB
+
+rcp26 2145
+Training Accuracy = 1.0
+Training true positive = 7197 	Training true negative = 803 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9635
+Test true positive = 1791 	Test true negative = 136 	Test false positive = 61 	Test false negative = 12
+Compressed Random Forest: 1.55 MB
+
+rcp26 2150
+Training Accuracy = 1.0
+Training true positive = 7192 	Training true negative = 808 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.96
+Test true positive = 1790 	Test true negative = 130 	Test false positive = 62 	Test false negative = 18
+Compressed Random Forest: 1.57 MB
+
+rcp85 2020
+Training Accuracy = 1.0
+Training true positive = 7217 	Training true negative = 783 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.893
+Test true positive = 1777 	Test true negative = 9 	Test false positive = 208 	Test false negative = 6
+Compressed Random Forest: 2.98 MB
+
+rcp85 2025
+Training Accuracy = 1.0
+Training true positive = 7194 	Training true negative = 806 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.909
+Test true positive = 1803 	Test true negative = 15 	Test false positive = 179 	Test false negative = 3
+Compressed Random Forest: 3.04 MB
+
+rcp85 2030
+Training Accuracy = 1.0
+Training true positive = 7188 	Training true negative = 812 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.908
+Test true positive = 1802 	Test true negative = 14 	Test false positive = 174 	Test false negative = 10
+Compressed Random Forest: 2.98 MB
+
+rcp85 2035
+Training Accuracy = 1.0
+Training true positive = 7206 	Training true negative = 794 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9075
+Test true positive = 1779 	Test true negative = 36 	Test false positive = 170 	Test false negative = 15
+Compressed Random Forest: 2.81 MB
+
+rcp85 2040
+Training Accuracy = 1.0
+Training true positive = 7201 	Training true negative = 799 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.923
+Test true positive = 1777 	Test true negative = 69 	Test false positive = 132 	Test false negative = 22
+Compressed Random Forest: 2.52 MB
+
+rcp85 2045
+Training Accuracy = 1.0
+Training true positive = 7171 	Training true negative = 829 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9415
+Test true positive = 1808 	Test true negative = 75 	Test false positive = 96 	Test false negative = 21
+Compressed Random Forest: 2.2 MB
+
+rcp85 2050
+Training Accuracy = 1.0
+Training true positive = 7210 	Training true negative = 790 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.929
+Test true positive = 1769 	Test true negative = 89 	Test false positive = 121 	Test false negative = 21
+Compressed Random Forest: 1.99 MB
+
+rcp85 2055
+Training Accuracy = 1.0
+Training true positive = 7187 	Training true negative = 813 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.938
+Test true positive = 1794 	Test true negative = 82 	Test false positive = 105 	Test false negative = 19
+Compressed Random Forest: 2.09 MB
+
+rcp85 2060
+Training Accuracy = 1.0
+Training true positive = 7183 	Training true negative = 817 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9445
+Test true positive = 1810 	Test true negative = 79 	Test false positive = 104 	Test false negative = 7
+Compressed Random Forest: 2.21 MB
+
+rcp85 2065
+Training Accuracy = 1.0
+Training true positive = 7204 	Training true negative = 796 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9295
+Test true positive = 1786 	Test true negative = 73 	Test false positive = 131 	Test false negative = 10
+Compressed Random Forest: 2.24 MB
+
+rcp85 2070
+Training Accuracy = 1.0
+Training true positive = 7196 	Training true negative = 804 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.931
+Test true positive = 1792 	Test true negative = 70 	Test false positive = 126 	Test false negative = 12
+Compressed Random Forest: 2.35 MB
+
+rcp85 2075
+Training Accuracy = 1.0
+Training true positive = 7184 	Training true negative = 816 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.933
+Test true positive = 1800 	Test true negative = 66 	Test false positive = 118 	Test false negative = 16
+Compressed Random Forest: 2.37 MB
+
+rcp85 2080
+Training Accuracy = 1.0
+Training true positive = 7207 	Training true negative = 793 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9275
+Test true positive = 1783 	Test true negative = 72 	Test false positive = 135 	Test false negative = 10
+Compressed Random Forest: 2.29 MB
+
+rcp85 2085
+Training Accuracy = 1.0
+Training true positive = 7210 	Training true negative = 790 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9355
+Test true positive = 1782 	Test true negative = 89 	Test false positive = 121 	Test false negative = 8
+Compressed Random Forest: 2.26 MB
+
+rcp85 2090
+Training Accuracy = 1.0
+Training true positive = 7203 	Training true negative = 797 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.937
+Test true positive = 1787 	Test true negative = 87 	Test false positive = 116 	Test false negative = 10
+Compressed Random Forest: 2.2 MB
+
+rcp85 2095
+Training Accuracy = 1.0
+Training true positive = 7181 	Training true negative = 819 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9415
+Test true positive = 1801 	Test true negative = 82 	Test false positive = 99 	Test false negative = 18
+Compressed Random Forest: 2.22 MB
+
+rcp85 2100
+Training Accuracy = 1.0
+Training true positive = 7200 	Training true negative = 800 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9355
+Test true positive = 1788 	Test true negative = 83 	Test false positive = 117 	Test false negative = 12
+Compressed Random Forest: 2.09 MB
+
+rcp85 2105
+Training Accuracy = 1.0
+Training true positive = 7199 	Training true negative = 801 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9395
+Test true positive = 1789 	Test true negative = 90 	Test false positive = 109 	Test false negative = 12
+Compressed Random Forest: 2.13 MB
+
+rcp85 2110
+Training Accuracy = 1.0
+Training true positive = 7208 	Training true negative = 792 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9415
+Test true positive = 1779 	Test true negative = 104 	Test false positive = 103 	Test false negative = 14
+Compressed Random Forest: 2.07 MB
+
+rcp85 2115
+Training Accuracy = 1.0
+Training true positive = 7178 	Training true negative = 822 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9455
+Test true positive = 1807 	Test true negative = 84 	Test false positive = 93 	Test false negative = 16
+Compressed Random Forest: 2.12 MB
+
+rcp85 2120
+Training Accuracy = 1.0
+Training true positive = 7197 	Training true negative = 803 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9465
+Test true positive = 1798 	Test true negative = 95 	Test false positive = 100 	Test false negative = 7
+Compressed Random Forest: 2.01 MB
+
+rcp85 2125
+Training Accuracy = 1.0
+Training true positive = 7192 	Training true negative = 808 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.943
+Test true positive = 1793 	Test true negative = 93 	Test false positive = 96 	Test false negative = 18
+Compressed Random Forest: 2.0 MB
+
+rcp85 2130
+Training Accuracy = 1.0
+Training true positive = 7213 	Training true negative = 787 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9425
+Test true positive = 1774 	Test true negative = 111 	Test false positive = 98 	Test false negative = 17
+Compressed Random Forest: 1.95 MB
+
+rcp85 2135
+Training Accuracy = 1.0
+Training true positive = 7190 	Training true negative = 810 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.952
+Test true positive = 1804 	Test true negative = 100 	Test false positive = 85 	Test false negative = 11
+Compressed Random Forest: 1.98 MB
+
+rcp85 2140
+Training Accuracy = 1.0
+Training true positive = 7193 	Training true negative = 807 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.9505
+Test true positive = 1796 	Test true negative = 105 	Test false positive = 83 	Test false negative = 16
+Compressed Random Forest: 2.08 MB
+
+rcp85 2145
+Training Accuracy = 1.0
+Training true positive = 7220 	Training true negative = 780 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.942
+Test true positive = 1773 	Test true negative = 111 	Test false positive = 102 	Test false negative = 14
+Compressed Random Forest: 1.93 MB
+
+rcp85 2150
+Training Accuracy = 1.0
+Training true positive = 7205 	Training true negative = 795 	Training false positive = 0 	Training false negative = 0
+Test Accuracy = 0.951
+Test true positive = 1792 	Test true negative = 110 	Test false positive = 87 	Test false negative = 11
+Compressed Random Forest: 1.98 MB
