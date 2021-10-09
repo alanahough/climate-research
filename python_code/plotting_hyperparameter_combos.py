@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import pprint
+from python_code.sklearn_slr_classification import feature_color_dict
 
 
 def plotting_accuracies():
@@ -38,6 +39,8 @@ def plotting_accuracies():
                                                     "min_samples_leaf=7, " \
                                                     "min_samples_split=10, n_estimators=750"
 
+    color_dict = feature_color_dict(file_prefixes)
+
     for rcp in rcp_list:
         for yr in years:
             for prefix in file_prefixes:
@@ -45,16 +48,20 @@ def plotting_accuracies():
                 accuracy_dict[prefix][rcp]["Training Accuracy"].append(df['train_accuracy'][0])
                 accuracy_dict[prefix][rcp]["Test Accuracy"].append(df['test_accuracy'][0])
 
-    pprint.pprint(accuracy_dict)
+    #pprint.pprint(accuracy_dict)
 
     for key in accuracy_dict:
         params_label = accuracy_dict[key]["Params"]
         # column 0 = RCP 2.6    column 1 = RCP 8.5
         # row 0 = Training   row 1 = Testing
-        axs[0, 0].plot(years, accuracy_dict[key]["rcp26"]["Training Accuracy"], label=params_label)
-        axs[1, 0].plot(years, accuracy_dict[key]["rcp26"]["Test Accuracy"], label=params_label)
-        axs[0, 1].plot(years, accuracy_dict[key]["rcp85"]["Training Accuracy"], label=params_label)
-        axs[1, 1].plot(years, accuracy_dict[key]["rcp85"]["Test Accuracy"], label=params_label)
+        axs[0, 0].plot(years, accuracy_dict[key]["rcp26"]["Training Accuracy"], label=params_label,
+                       color=color_dict[key])
+        axs[1, 0].plot(years, accuracy_dict[key]["rcp26"]["Test Accuracy"], label=params_label,
+                       color=color_dict[key])
+        axs[0, 1].plot(years, accuracy_dict[key]["rcp85"]["Training Accuracy"], label=params_label,
+                       color=color_dict[key])
+        axs[1, 1].plot(years, accuracy_dict[key]["rcp85"]["Test Accuracy"], label=params_label,
+                       color=color_dict[key])
 
     axs[0, 0].legend(bbox_to_anchor=(.1, 1.07))
     axs[0, 0].set_title("RCP 2.6")
