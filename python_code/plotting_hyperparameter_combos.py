@@ -7,7 +7,7 @@ def plotting_accuracies():
     fig, axs = plt.subplots(2, 2)
     file_path = "./forests/forest_performance/"
     file_prefixes = ["new_hyperparams_", "new_hyperparams_2_", "new_hyperparams_3_",
-                     "new_hyperparams_min_leaf_1_", "new_hyperparams_min_leaf_4_"]
+                     "new_hyperparams_min_leaf_1_", "new_hyperparams_min_leaf_4_", "new_hyperparams_4_"]
     file_suffix = "_performance_measures.csv"
     rcp_list = ['rcp26', 'rcp85']
     years = [n for n in range(2020, 2151, 5)]
@@ -34,6 +34,9 @@ def plotting_accuracies():
     accuracy_dict["new_hyperparams_min_leaf_4_"]["Params"] = "max_depth=18, max_features=15, " \
                                                                  "min_samples_leaf=4, " \
                                                                  "min_samples_split=4, n_estimators=250"
+    accuracy_dict["new_hyperparams_4_"]["Params"] = "max_depth=14, max_features=15, " \
+                                                    "min_samples_leaf=7, " \
+                                                    "min_samples_split=10, n_estimators=750"
 
     for rcp in rcp_list:
         for yr in years:
