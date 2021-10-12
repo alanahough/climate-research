@@ -8,7 +8,8 @@ def plotting_accuracies():
     fig, axs = plt.subplots(2, 2)
     file_path = "./forests/forest_performance/"
     file_prefixes = ["new_hyperparams_", "new_hyperparams_2_", "new_hyperparams_3_",
-                     "new_hyperparams_min_leaf_1_", "new_hyperparams_min_leaf_4_", "new_hyperparams_4_"]
+                     "new_hyperparams_min_leaf_1_", "new_hyperparams_min_leaf_4_", "new_hyperparams_4_",
+                     "new_hyperparams_5_"]
     file_suffix = "_performance_measures.csv"
     rcp_list = ['rcp26', 'rcp85']
     years = [n for n in range(2020, 2151, 5)]
@@ -38,6 +39,9 @@ def plotting_accuracies():
     accuracy_dict["new_hyperparams_4_"]["Params"] = "max_depth=14, max_features=15, " \
                                                     "min_samples_leaf=7, " \
                                                     "min_samples_split=10, n_estimators=750"
+    accuracy_dict["new_hyperparams_5_"]["Params"] = "max_depth=16, max_features=15, " \
+                                                    "min_samples_leaf=3, " \
+                                                    "min_samples_split=13, n_estimators=1000"
 
     color_dict = feature_color_dict(file_prefixes)
 
@@ -72,7 +76,7 @@ def plotting_accuracies():
     axs[0, 1].set_ylim(bottom=.89, top=1)
     axs[1, 0].set_ylim(bottom=.89, top=1)
     axs[1, 1].set_ylim(bottom=.89, top=1)
-    plt.subplots_adjust(top=.82, bottom=.045, left=.08, right=.97)
+    plt.subplots_adjust(top=.78, bottom=.045, left=.08, right=.97)
     plt.show()
 
 
