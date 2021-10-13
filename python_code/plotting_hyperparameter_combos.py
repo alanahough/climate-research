@@ -9,7 +9,7 @@ def plotting_accuracies():
     file_path = "./forests/forest_performance/"
     file_prefixes = ["new_hyperparams_", "new_hyperparams_2_", "new_hyperparams_3_",
                      "new_hyperparams_min_leaf_1_", "new_hyperparams_min_leaf_4_", "new_hyperparams_4_",
-                     "new_hyperparams_5_"]
+                     "new_hyperparams_5_", "new_hyperparams_6_"]
     file_suffix = "_performance_measures.csv"
     rcp_list = ['rcp26', 'rcp85']
     years = [n for n in range(2020, 2151, 5)]
@@ -42,8 +42,11 @@ def plotting_accuracies():
     accuracy_dict["new_hyperparams_5_"]["Params"] = "max_depth=16, max_features=15, " \
                                                     "min_samples_leaf=3, " \
                                                     "min_samples_split=13, n_estimators=1000"
+    accuracy_dict["new_hyperparams_6_"]["Params"] = "max_depth=16, max_features=15, " \
+                                                    "min_samples_leaf=2, " \
+                                                    "min_samples_split=16, n_estimators=250"
 
-    color_dict = feature_color_dict(file_prefixes)
+    #color_dict = feature_color_dict(file_prefixes)
 
     for rcp in rcp_list:
         for yr in years:
@@ -58,14 +61,14 @@ def plotting_accuracies():
         params_label = accuracy_dict[key]["Params"]
         # column 0 = RCP 2.6    column 1 = RCP 8.5
         # row 0 = Training   row 1 = Testing
-        axs[0, 0].plot(years, accuracy_dict[key]["rcp26"]["Training Accuracy"], label=params_label,
-                       color=color_dict[key])
-        axs[1, 0].plot(years, accuracy_dict[key]["rcp26"]["Test Accuracy"], label=params_label,
-                       color=color_dict[key])
-        axs[0, 1].plot(years, accuracy_dict[key]["rcp85"]["Training Accuracy"], label=params_label,
-                       color=color_dict[key])
-        axs[1, 1].plot(years, accuracy_dict[key]["rcp85"]["Test Accuracy"], label=params_label,
-                       color=color_dict[key])
+        axs[0, 0].plot(years, accuracy_dict[key]["rcp26"]["Training Accuracy"], label=params_label)
+                       #color=color_dict[key])
+        axs[1, 0].plot(years, accuracy_dict[key]["rcp26"]["Test Accuracy"], label=params_label)
+                       #color=color_dict[key])
+        axs[0, 1].plot(years, accuracy_dict[key]["rcp85"]["Training Accuracy"], label=params_label)
+                       #color=color_dict[key])
+        axs[1, 1].plot(years, accuracy_dict[key]["rcp85"]["Test Accuracy"], label=params_label)
+                       #color=color_dict[key])
 
     axs[0, 0].legend(bbox_to_anchor=(.1, 1.07))
     axs[0, 0].set_title("RCP 2.6")
@@ -76,7 +79,7 @@ def plotting_accuracies():
     axs[0, 1].set_ylim(bottom=.89, top=1)
     axs[1, 0].set_ylim(bottom=.89, top=1)
     axs[1, 1].set_ylim(bottom=.89, top=1)
-    plt.subplots_adjust(top=.78, bottom=.045, left=.08, right=.97)
+    plt.subplots_adjust(top=.75, bottom=.045, left=.08, right=.97)
     plt.show()
 
 

@@ -61,11 +61,18 @@ import matplotlib.patches as mpatches
 #N_ESTIMATORS = 750
 
 # new hyperparameters 5
+#MAX_DEPTH = 16
+#MAX_FEATURES = 15
+#MIN_SAMPLES_LEAF = 3
+#MIN_SAMPLES_SPLIT = 13
+#N_ESTIMATORS = 1000
+
+# new hyperparameters 6
 MAX_DEPTH = 16
 MAX_FEATURES = 15
-MIN_SAMPLES_LEAF = 3
-MIN_SAMPLES_SPLIT = 13
-N_ESTIMATORS = 1000
+MIN_SAMPLES_LEAF = 2
+MIN_SAMPLES_SPLIT = 16
+N_ESTIMATORS = 250
 
 PARAMETER_DICT = {'S.temperature': "ECS",
                   'diff.temperature': r"$\kappa_{DOECLIM}$",
@@ -1197,10 +1204,10 @@ if __name__ == '__main__':
     #                       "./forests/forest_accuracy/80th_percentile")
 
     # new hyperparams -- 5
-    make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/new_hyperparams_5_",
-                           "./forests/forest_performance/new_hyperparams_5_")
-    make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/new_hyperparams_5_",
-                           "./forests/forest_performance/new_hyperparams_5_")
+    make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/new_hyperparams_6_",
+                           "./forests/forest_performance/new_hyperparams_6_")
+    make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/new_hyperparams_6_",
+                           "./forests/forest_performance/new_hyperparams_6_")
 
     # making S.temp split csv's
     list_10_yrs = []
