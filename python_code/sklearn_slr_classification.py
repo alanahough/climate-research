@@ -9,6 +9,7 @@ import os
 from collections import Counter
 import matplotlib.ticker as mticker
 import matplotlib.patches as mpatches
+from pprint import pprint
 
 
 # original hyperparameters
@@ -19,11 +20,11 @@ import matplotlib.patches as mpatches
 #N_ESTIMATORS = 500
 
 # new hyperparameters
-#MAX_DEPTH = 18
-#MAX_FEATURES = 15
-#MIN_SAMPLES_LEAF = 2
-#MIN_SAMPLES_SPLIT = 4
-#N_ESTIMATORS = 250
+MAX_DEPTH = 18
+MAX_FEATURES = 15
+MIN_SAMPLES_LEAF = 2
+MIN_SAMPLES_SPLIT = 4
+N_ESTIMATORS = 250
 
 # new hyperparameters 2
 #MAX_DEPTH = 14
@@ -68,11 +69,11 @@ import matplotlib.patches as mpatches
 #N_ESTIMATORS = 1000
 
 # new hyperparameters 6
-MAX_DEPTH = 16
-MAX_FEATURES = 15
-MIN_SAMPLES_LEAF = 2
-MIN_SAMPLES_SPLIT = 16
-N_ESTIMATORS = 250
+#MAX_DEPTH = 16
+#MAX_FEATURES = 15
+#MIN_SAMPLES_LEAF = 2
+#MIN_SAMPLES_SPLIT = 16
+#N_ESTIMATORS = 250
 
 PARAMETER_DICT = {'S.temperature': "ECS",
                   'diff.temperature': r"$\kappa_{DOECLIM}$",
@@ -489,7 +490,7 @@ def perform_splits(forest, feature_list, split_feature):
         return split_df, all, first_only
 
 
-def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_path):
+def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_path, show_plot=False):
     """
     Runs the perform_splits() function and runs the splits_table() function for each forest, and creates a plot of the
     feature importances of each forest in the same pop-up.  The S.temperature split values are saved into a separate
@@ -560,7 +561,8 @@ def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_
     fig.suptitle(main_title, fontsize=15)
     fig.text(0.52, 0.04, 'Features', ha='center', fontsize=12)
     fig.text(0.04, 0.5, 'Relative Importance', va='center', rotation='vertical', fontsize=12)
-    plt.show()
+    if show_plot is True:
+        plt.show()
 
     df_first_quartile = pd.DataFrame(first_quartile_data, columns=["Name", "0%", "25%", "50%", "75%", "100%", "Mean"])
     first_file_path = folder_path + rcp_no_space_no_period + "_first_splits.csv"
@@ -649,7 +651,7 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
                         importances_info[f].append(0)
         importances_info_list.append(importances_info)
 
-    print(importances_info_list)
+    #pprint(importances_info_list)
 
     # set color for each feature
     features_on_plot_ordered = []
@@ -856,7 +858,7 @@ def Stemp_max_split_histogram(year_list, rcp):
     plt.show()
 
 
-def all_Stemp_max_split_histograms(year_list):
+def all_Stemp_max_split_histograms(year_list, ECS_splits_folder_path="../data/new_csv/SLR_splits/classification_forest/",):
     """
     Opens the saved CSV files of the S.temperature splits for each year in the year_list for both RCPs and creates
     density histograms of the highest S.temperature split in each tree for each year.  The left plots are RCP 2.6 and
@@ -867,12 +869,12 @@ def all_Stemp_max_split_histograms(year_list):
     rcp26_split_dict = {}
     rcp85_split_dict = {}
     for yr in year_list:
-        rcp_26_file_path = "../data/new_csv/SLR_splits/classification_forest/RCP26_" + str(yr) + "_splits.csv"
+        rcp_26_file_path = ECS_splits_folder_path + "RCP26_" + str(yr) + "_splits.csv"
         rcp26_df = pd.read_csv(rcp_26_file_path)
         rcp26_max_list = rcp26_df.max(axis=1).dropna().tolist()
         rcp26_split_dict[str(yr)] = rcp26_max_list
 
-        rcp_85_file_path = "../data/new_csv/SLR_splits/classification_forest/RCP85_" + str(yr) + "_splits.csv"
+        rcp_85_file_path = ECS_splits_folder_path + "RCP85_" + str(yr) + "_splits.csv"
         rcp85_df = pd.read_csv(rcp_85_file_path)
         rcp85_max_list = rcp85_df.max(axis=1).dropna().tolist()
         rcp85_split_dict[str(yr)] = rcp85_max_list
@@ -1204,10 +1206,10 @@ if __name__ == '__main__':
     #                       "./forests/forest_accuracy/80th_percentile")
 
     # new hyperparams -- 5
-    make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/new_hyperparams_6_",
-                           "./forests/forest_performance/new_hyperparams_6_")
-    make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/new_hyperparams_6_",
-                           "./forests/forest_performance/new_hyperparams_6_")
+    #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/new_hyperparams_6_",
+    #                       "./forests/forest_performance/new_hyperparams_6_")
+    #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/new_hyperparams_6_",
+    #                       "./forests/forest_performance/new_hyperparams_6_")
 
     # making S.temp split csv's
     list_10_yrs = []
@@ -1217,16 +1219,27 @@ if __name__ == '__main__':
     #rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
     #rcp26_forest_list_10yrs = load_forests(list_10_yrs, "80th_percentilercp26") # path for 80th percentile forests
     #rcp85_forest_list_10yrs = load_forests(list_10_yrs, "80th_percentilercp85") # path for 80th percentile forests
-    path = "../data/new_csv/SLR_splits/classification_forest/"
+    #path = "../data/new_csv/SLR_splits/classification_forest/"
     #path = "../data/new_csv/SLR_splits/classification_forest/80th_percentile/80th_percentile_"  # path for 80th percentile data
-    #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list_10yrs, list_10_yrs, path)
-    #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list_10yrs, list_10_yrs, path)
+    rcp26_forest_list = load_forests(yrs_rcp26,
+                                           "new_hyperparams_rcp26")  # path for new hyperparameters (post-review) forests
+    rcp85_forest_list = load_forests(yrs_rcp85,
+                                           "new_hyperparams_rcp85")  # path for new hyperparameters (post-review) forests
+    new_hyperparams_path = "../data/new_csv/SLR_splits/classification_forest/new_hyperparams/new_hyperparams"  # path for new hyperparameters (post-review) forests
+    #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, new_hyperparams_path)
+    #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, new_hyperparams_path)
 
+    # plots
     #rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     #rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
     #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
     #all_Stemp_max_split_boxplots(list_10_yrs, print_IQR=True, print_medians=True, print_in_latex_table_format=True)
     #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
+
+    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
+    all_Stemp_max_split_boxplots(list_10_yrs, ECS_splits_folder_path=new_hyperparams_path, print_IQR=True,
+                                 print_medians=True, print_in_latex_table_format=True)
+    #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150], ECS_splits_folder_path=new_hyperparams_path)
 
     # 80th percentile boxplot:
     #all_Stemp_max_split_boxplots(list_10_yrs,
