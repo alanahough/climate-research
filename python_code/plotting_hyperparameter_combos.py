@@ -94,30 +94,38 @@ def plotting_accuracies():
     for yr in range(2020, 2151, 10):
         list_10_yrs.append(yr)
 
+    xticks = []
+    for i in range(len(list_10_yrs)):
+        if i % 2 == 0:
+            xticks.append(list_10_yrs[i])
+        else:
+            xticks.append("")
+
     for i in [0, 1]:
         axs[2, i].set_ylim(bottom=-.015, top=.015)      # +/- 0.013 limit for no min_samples_leaf = 1
         axs[2, i].grid(b=True)
         axs[2, i].set_xlim(left=2020, right=2150)
         axs[2, i].set_xticks(list_10_yrs)
+        axs[2, i].set_xticklabels(xticks)
         for j in [0, 1]:
             axs[i, j].set_ylim(bottom=.89, top=1)
             axs[i, j].grid(b=True)
             axs[i, j].set_xlim(left=2020, right=2150)
             axs[i, j].set_xticks(list_10_yrs)
-            axs[i, j].set_xticklabels(list_10_yrs)
+            axs[i, j].set_xticklabels(xticks)
 
     #axs[0, 0].legend(bbox_to_anchor=(.1, 1.115), ncol=2)       # legend loc for no min_samples_leaf = 1
-    axs[0, 0].legend(bbox_to_anchor=(.1, 1.14), ncol=2)       # with min_samples_leaf = 1
+    axs[0, 0].legend(bbox_to_anchor=(.04, 1.11), ncol=1, fontsize=9)       # with min_samples_leaf = 1
     axs[0, 0].set_ylabel('Training Accuracy', fontsize=12)
     axs[1, 0].set_ylabel('Testing Accuracy', fontsize=12)
     axs[2, 0].set_ylabel('Normalized Testing Accuracy', fontsize=12)
     #plt.subplots_adjust(top=.85, bottom=.045, left=.08, right=.97)     # subplot adjustments for no min_samples_leaf = 1
-    plt.subplots_adjust(top=.8, bottom=.045, left=.08, right=.97)      # with min_samples_leaf = 1
+    plt.subplots_adjust(top=.738, bottom=.035, left=.28, right=.77)      # with min_samples_leaf = 1
     fig.suptitle("Accuracy for Random Forests using Various Hyperparameter Combinations", fontsize=16)
     #fig.text(.27, .855, "RCP2.6", fontsize=14, ha='center')     # for no min_samples_leaf = 1
     #fig.text(.785, .855, "RCP8.5", fontsize=14, ha='center')    # for no min_samples_leaf = 1
-    fig.text(.27, .81, "RCP2.6", fontsize=14, ha='center')      # with min_samples_leaf = 1
-    fig.text(.785, .81, "RCP8.5", fontsize=14, ha='center')     # with min_samples_leaf = 1
+    fig.text(.383, .745, "RCP2.6", fontsize=14, ha='center')      # with min_samples_leaf = 1
+    fig.text(.658, .745, "RCP8.5", fontsize=14, ha='center')     # with min_samples_leaf = 1
     axs[0, 0].set_title("(a)", loc='left', x=.01, y=.865, fontsize=14)      # y = .885 for no min_samples_leaf = 1
     axs[0, 1].set_title("(b)", loc='left', x=.01, y=.865, fontsize=14)
     axs[1, 0].set_title("(c)", loc='left', x=.01, y=.865, fontsize=14)

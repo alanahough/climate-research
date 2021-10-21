@@ -1200,10 +1200,12 @@ if __name__ == '__main__':
     #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/", "./forests/forest_accuracy/")
     #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
     # make w/ 80th percentile
-    #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/80th_percentile",
-    #                       "./forests/forest_accuracy/80th_percentile")
-    #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/80th_percentile",
-    #                       "./forests/forest_accuracy/80th_percentile")
+    #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/new_hyperparams_80th_percentile",
+    #                       "./forests/forest_performance/new_hyperparams_80th_percentile",
+    #                       classification_percentile=.8)
+    #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/new_hyperparams_80th_percentile",
+    #                       "./forests/forest_performance/new_hyperparams_80th_percentile",
+    #                       classification_percentile=.8)
 
     # new hyperparams -- 5
     #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/new_hyperparams_6_",
@@ -1217,17 +1219,19 @@ if __name__ == '__main__':
         list_10_yrs.append(yr)
     #rcp26_forest_list_10yrs = load_forests(list_10_yrs, "rcp26")
     #rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
-    #rcp26_forest_list_10yrs = load_forests(list_10_yrs, "80th_percentilercp26") # path for 80th percentile forests
-    #rcp85_forest_list_10yrs = load_forests(list_10_yrs, "80th_percentilercp85") # path for 80th percentile forests
+    #rcp26_forest_list_10yrs = load_forests(list_10_yrs, "new_hyperparams_80th_percentilercp26") # path for 80th percentile forests
+    #rcp85_forest_list_10yrs = load_forests(list_10_yrs, "new_hyperparams_80th_percentilercp85") # path for 80th percentile forests
     #path = "../data/new_csv/SLR_splits/classification_forest/"
-    #path = "../data/new_csv/SLR_splits/classification_forest/80th_percentile/80th_percentile_"  # path for 80th percentile data
-    rcp26_forest_list = load_forests(yrs_rcp26,
-                                           "new_hyperparams_rcp26")  # path for new hyperparameters (post-review) forests
-    rcp85_forest_list = load_forests(yrs_rcp85,
-                                           "new_hyperparams_rcp85")  # path for new hyperparameters (post-review) forests
-    new_hyperparams_path = "../data/new_csv/SLR_splits/classification_forest/new_hyperparams/new_hyperparams"  # path for new hyperparameters (post-review) forests
-    #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, new_hyperparams_path)
-    #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, new_hyperparams_path)
+    path_80th_percent = "../data/new_csv/SLR_splits/classification_forest/new_hyperparams/new_hyperparams_80th_percentile"
+    #rcp26_forest_list = load_forests(yrs_rcp26,
+    #                                       "new_hyperparams_rcp26")  # path for new hyperparameters (post-review) forests
+    #rcp85_forest_list = load_forests(yrs_rcp85,
+    #                                       "new_hyperparams_rcp85")  # path for new hyperparameters (post-review) forests
+    #new_hyperparams_path = "../data/new_csv/SLR_splits/classification_forest/new_hyperparams/new_hyperparams"  # path for new hyperparameters (post-review) forests
+    rcp26_forest_list = load_forests(yrs_rcp26, "new_hyperparams_5_rcp26")
+    rcp85_forest_list = load_forests(yrs_rcp85, "new_hyperparams_5_rcp85")
+    #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, path_80th_percent)
+    #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, path_80th_percent)
 
     # plots
     #rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
@@ -1236,14 +1240,13 @@ if __name__ == '__main__':
     #all_Stemp_max_split_boxplots(list_10_yrs, print_IQR=True, print_medians=True, print_in_latex_table_format=True)
     #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
-    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
-    all_Stemp_max_split_boxplots(list_10_yrs, ECS_splits_folder_path=new_hyperparams_path, print_IQR=True,
-                                 print_medians=True, print_in_latex_table_format=True)
+    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
+    #all_Stemp_max_split_boxplots(list_10_yrs, ECS_splits_folder_path=new_hyperparams_path, print_IQR=True,
+    #                             print_medians=True, print_in_latex_table_format=True)
     #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150], ECS_splits_folder_path=new_hyperparams_path)
 
     # 80th percentile boxplot:
-    #all_Stemp_max_split_boxplots(list_10_yrs,
-    #                             ECS_splits_folder_path="../data/new_csv/SLR_splits/classification_forest/80th_percentile/80th_percentile_")
+    #all_Stemp_max_split_boxplots(list_10_yrs, ECS_splits_folder_path=path_80th_percent)
 
     #forest_rcp85_2020 = rcp85_forest_list_10yrs[0]
     #features = df.columns.tolist()
