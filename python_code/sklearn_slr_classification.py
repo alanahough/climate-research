@@ -337,8 +337,9 @@ def splits_table(forest, feature_names):
     return df
 
 
-def slr_forest(feature_list, df, year, max_feat="auto", max_d=None, min_samp_leaf=1, n_estimators=100,
-               min_samples_split=2, print_forest=False):
+def slr_forest(feature_list, df, year, rcp, max_feat="auto", max_d=None, min_samp_leaf=1, n_estimators=100,
+               min_samples_split=2, print_forest=False, save_train_test=False,
+               train_test_folder_path="../data/new_csv/"):
     """
     Creates a forest using the desired parameters and fits the forest with 60% of the data in df
     :param feature_list: list of the input column names as strings
@@ -361,6 +362,15 @@ def slr_forest(feature_list, df, year, max_feat="auto", max_d=None, min_samp_lea
     x = df[feature_list]
     y = df[year]
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)  # train= 80%, test= 20%
+    if save_train_test:
+        x_train_file_path = train_test_folder_path + "/" + rcp + "_" + str(year) + "_Xtrain.csv"
+        x_train.to_csv(x_train_file_path, index=False)
+        y_train_file_path = train_test_folder_path + "/" + rcp + "_" + str(year) + "_ytrain.csv"
+        y_train.to_csv(y_train_file_path, index=False, header=False)
+        x_test_file_path = train_test_folder_path + "/" + rcp + "_" + str(year) + "_Xtest.csv"
+        x_test.to_csv(x_test_file_path, index=False)
+        y_test_file_path = train_test_folder_path + "/" + rcp + "_" + str(year) + "_ytest.csv"
+        y_test.to_csv(y_test_file_path, index=False, header=False)
 
     # random forest creation
     forest = ensemble.RandomForestClassifier(n_estimators=n_estimators, criterion="entropy", max_features=max_feat,
@@ -431,7 +441,8 @@ def classify_data(df, print_threshold=False, percentile=.9):
 
 
 def make_forest_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, forest_path, performance_path,
-                           classification_percentile=.9):
+                           classification_percentile=.9, save_train_test=False,
+                           train_test_folder_path="../data/new_csv/"):
     """
     Creates forests for the given years, saves each forest as a file, and saves the validation and training accuracy
     of each forest in a CSV file
@@ -450,9 +461,10 @@ def make_forest_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, 
     features = parameter_sample_df.columns.tolist()
     for yr in yrs_to_output:
         print("\n", rcp_str, " ", yr, sep="")
-        forest, performance_dict = slr_forest(features, df_slr_classify, yr, max_feat=MAX_FEATURES,
-                                                    max_d=MAX_DEPTH, min_samp_leaf=MIN_SAMPLES_LEAF,
-                                                    min_samples_split= MIN_SAMPLES_SPLIT, n_estimators=N_ESTIMATORS)
+        forest, performance_dict = slr_forest(features, df_slr_classify, yr, max_feat=MAX_FEATURES, max_d=MAX_DEPTH,
+                                              min_samp_leaf=MIN_SAMPLES_LEAF, min_samples_split= MIN_SAMPLES_SPLIT,
+                                              n_estimators=N_ESTIMATORS, save_train_test=save_train_test,
+                                              train_test_folder_path=train_test_folder_path, rcp=rcp_str)
         forest_file_path = forest_path + rcp_str + "_" + yr + ".joblib"
         joblib.dump(forest, forest_file_path, compress=3)
         print(f"Compressed Random Forest: {np.round(os.path.getsize(forest_file_path) / 1024 / 1024, 2)} MB")
@@ -651,7 +663,7 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
                         importances_info[f].append(0)
         importances_info_list.append(importances_info)
 
-    #pprint(importances_info_list)
+    pprint(importances_info_list)
 
     # set color for each feature
     features_on_plot_ordered = []
@@ -1045,7 +1057,7 @@ def all_Stemp_max_split_boxplots(year_list, show_outliers=True,
     plt.show()
 
 
-def gridsearch(param_samples_df, slr_df, year, rcp, folder_path):
+def gridsearch(param_samples_df, slr_df, year, rcp, folder_path, cv_folds=5):
     """
     Perform a gridsearch of the parameters used to create the forests, saves the best parameters to a CSV, and saves
     the cross validation information/result to another CSV.
@@ -1161,7 +1173,7 @@ def gridsearch(param_samples_df, slr_df, year, rcp, folder_path):
     # ****CHANGE PARAM_GRID****
 #    grid_search = GridSearchCV(estimator=forest, param_grid=lower_values_param_grid, cv=5, n_jobs=-1, verbose=1,
 #                               scoring="accuracy")
-    grid_search = GridSearchCV(estimator=forest, param_grid=lower_values_param_grid, cv=5, n_jobs=-1, verbose=1,
+    grid_search = GridSearchCV(estimator=forest, param_grid=lower_values_param_grid, cv=cv_folds, n_jobs=-1, verbose=1,
                                scoring="accuracy")
     grid_search.fit(x_train, y_train)
     print("BEST PARAMETERS:")
@@ -1169,7 +1181,8 @@ def gridsearch(param_samples_df, slr_df, year, rcp, folder_path):
     print("Mean cross-validated score of the best_estimator: ", grid_search.best_score_)
     best_params_df = pd.DataFrame(grid_search.best_params_, index=[0])
     # ****CHANGE FILE NAME WHEN CHANGE PARAM_GRID****
-    best_params_df.to_csv("./gridsearchcv_results/lower_values_param_grid_"+rcp+"-"+year+".csv", index=False)
+    best_params_df.to_csv("./gridsearchcv_results/lower_values_param_grid_"+rcp+"-"+year+"-"+str(cv_folds)+"_folds.csv",
+                          index=False)
     score_df = pd.DataFrame(grid_search.cv_results_)
     # ****CHANGE FILE NAME WHEN CHANGE PARAM_GRID****
     score_df.to_csv("./gridsearchcv_results/lower_values_grid_cv_results_"+rcp+"-"+year+".csv", index=False)
@@ -1207,11 +1220,11 @@ if __name__ == '__main__':
     #                       "./forests/forest_performance/new_hyperparams_80th_percentile",
     #                       classification_percentile=.8)
 
-    # new hyperparams -- 5
-    #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/new_hyperparams_6_",
-    #                       "./forests/forest_performance/new_hyperparams_6_")
-    #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/new_hyperparams_6_",
-    #                       "./forests/forest_performance/new_hyperparams_6_")
+    # new hyperparams
+    make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/new_hyperparams_",
+                           "./forests/forest_performance/new_hyperparams_", save_train_test=True)
+    make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/new_hyperparams_",
+                           "./forests/forest_performance/new_hyperparams_", save_train_test=True)
 
     # making S.temp split csv's
     list_10_yrs = []
@@ -1228,8 +1241,8 @@ if __name__ == '__main__':
     #rcp85_forest_list = load_forests(yrs_rcp85,
     #                                       "new_hyperparams_rcp85")  # path for new hyperparameters (post-review) forests
     #new_hyperparams_path = "../data/new_csv/SLR_splits/classification_forest/new_hyperparams/new_hyperparams"  # path for new hyperparameters (post-review) forests
-    rcp26_forest_list = load_forests(yrs_rcp26, "new_hyperparams_5_rcp26")
-    rcp85_forest_list = load_forests(yrs_rcp85, "new_hyperparams_5_rcp85")
+    rcp26_forest_list = load_forests(yrs_rcp26, "new_hyperparams_rcp26")
+    rcp85_forest_list = load_forests(yrs_rcp85, "new_hyperparams_rcp85")
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, path_80th_percent)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, path_80th_percent)
 
@@ -1240,7 +1253,7 @@ if __name__ == '__main__':
     #all_Stemp_max_split_boxplots(list_10_yrs, print_IQR=True, print_medians=True, print_in_latex_table_format=True)
     #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
-    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
+    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
     #all_Stemp_max_split_boxplots(list_10_yrs, ECS_splits_folder_path=new_hyperparams_path, print_IQR=True,
     #                             print_medians=True, print_in_latex_table_format=True)
     #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150], ECS_splits_folder_path=new_hyperparams_path)
@@ -1256,7 +1269,7 @@ if __name__ == '__main__':
     # grid search -- rcp 2.6 df is slr_rcp26_5step
     # to change RCP -- change slr_rcp85_5step param and "RCP 8.5" string param
     # to change year -- change "2100"
-    #gridsearch(df, slr_rcp85_5step, "2100", "RCP 8.5", "../data/new_csv/")
+    #gridsearch(df, slr_rcp85_5step, "2050", "RCP 8.5", "../data/new_csv/", cv_folds=10)
 
     # grid search loop
     #for rcp in ["RCP 2.6","RCP 8.5"]:
@@ -1265,4 +1278,4 @@ if __name__ == '__main__':
     #    elif rcp=="RCP 8.5":
     #        slr = slr_rcp85_5step
     #    for year in ["2050","2075","2100"]:
-    #        gridsearch(df, slr, year, rcp, "../data/new_csv/")    # you can change the folder path if you want
+     #       gridsearch(df, slr, year, rcp, "../data/new_csv/", cv_folds=10)    # you can change the folder path if you want
