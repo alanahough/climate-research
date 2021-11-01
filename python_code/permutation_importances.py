@@ -1,10 +1,11 @@
-from python_code.sklearn_slr_classification import MODEL_DICT, feature_color_dict
+from python_code.sklearn_slr_classification import MODEL_DICT, feature_color_dict, PARAMETER_DICT, load_forests
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.ticker as mticker
 import matplotlib.patches as mpatches
 from pprint import pprint
 from sklearn.inspection import permutation_importance
+import pandas as pd
 
 
 def slr_stacked_dif_importances_plot(param_sample_df, rcp85_forest_list, years, importance_threshold=.04):
@@ -20,21 +21,24 @@ def slr_stacked_dif_importances_plot(param_sample_df, rcp85_forest_list, years, 
     :return: None
     """
     features = param_sample_df.columns.tolist()
-    name = ["RCP8.5", "RCP8.5"]
-    forest_masterlist=[rcp85_forest_list, rcp85_forest_list]
+    name = "RCP8.5"
     importances_info_list = []
 
-    for i in range(len(forest_masterlist)):
-        forest_list = forest_masterlist[i]
+    for i in range(2):
+        forest_list = rcp85_forest_list
         importances_info = {}
         for j in range(len(forest_list)):
             forest = forest_list[j]
+            yr = years[j]
 
             # stacked importances dictionary
             if i == 0:
                 importances = forest.feature_importances_
             else:
-                importances = permutation_importance(forest, X_test, y_test)
+                X_test = pd.read_csv("../data/new_csv/rcp85_" + str(yr) +"_Xtest.csv")
+                y_test = pd.read_csv("../data/new_csv/rcp85_" + str(yr) + "_ytest.csv", header=None)
+                importances = permutation_importance(forest, X_test, y_test).importances_mean
+                importances = importances / importances.sum()
 
             indices = np.argsort(importances)[::-1]
 
@@ -130,7 +134,10 @@ def slr_stacked_dif_importances_plot(param_sample_df, rcp85_forest_list, years, 
         percent_label = "Other (< " + str(round(importance_threshold*100, 1)) + " %)"
         axs[i].bar(x, importances_info["Other"], bottom=bottom, label=percent_label, color='white',
                    hatch='//')
-        axs[i].set_ylabel("Relative Importances", fontsize=14)
+        if i == 0:
+            axs[i].set_ylabel("Relative Gini Importance", fontsize=14)
+        elif i == 1:
+            axs[i].set_ylabel("Relative Mean Permutation Importance", fontsize=14)
         ticks_loc = axs[i].get_yticks().tolist()
         axs[i].yaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
         axs[i].set_yticklabels(["{:.1f}".format(x) for x in ticks_loc], fontsize=12)
@@ -150,7 +157,7 @@ def slr_stacked_dif_importances_plot(param_sample_df, rcp85_forest_list, years, 
             title_label = "(a)"
         else:
             title_label = "(b)"
-        title = title_label + " " + name[i] + " Feature Importances"
+        title = title_label + " " + name + " Feature Importances"
         axs[i].set_title(title, fontsize=18)
         legend_details = axs[i].get_legend_handles_labels()
         handles += legend_details[0]
@@ -181,6 +188,14 @@ def slr_stacked_dif_importances_plot(param_sample_df, rcp85_forest_list, years, 
     label_values.insert(-1, mpatches.Patch(color='none'))
     label_keys.insert(-1, "")
 
-    plt.figlegend(handles=label_values, labels=label_keys, bbox_to_anchor=(.99, .97), fontsize=14)
+    plt.figlegend(handles=label_values, labels=label_keys, bbox_to_anchor=(.99, .995), fontsize=12)
     plt.subplots_adjust(left=.105, right=.815, top=.96, bottom=.065, hspace=.258)
     plt.show()
+
+
+if __name__ == '__main__':
+    df = pd.read_csv("../data/new_csv/RData_parameters_sample.csv")
+    slr_rcp85_5step = pd.read_csv("../data/new_csv/slr_rcp85_5yrstep.csv")
+    yrs_rcp85 = slr_rcp85_5step.columns.tolist()
+    rcp85_forest_list = load_forests(yrs_rcp85, "new_hyperparams_rcp85")
+    slr_stacked_dif_importances_plot(df, rcp85_forest_list, yrs_rcp85)

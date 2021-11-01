@@ -20,11 +20,11 @@ from pprint import pprint
 #N_ESTIMATORS = 500
 
 # new hyperparameters
-MAX_DEPTH = 18
-MAX_FEATURES = 15
-MIN_SAMPLES_LEAF = 2
-MIN_SAMPLES_SPLIT = 4
-N_ESTIMATORS = 250
+#MAX_DEPTH = 18
+#MAX_FEATURES = 15
+#MIN_SAMPLES_LEAF = 2
+#MIN_SAMPLES_SPLIT = 4
+#N_ESTIMATORS = 250
 
 # new hyperparameters 2
 #MAX_DEPTH = 14
@@ -74,6 +74,13 @@ N_ESTIMATORS = 250
 #MIN_SAMPLES_LEAF = 2
 #MIN_SAMPLES_SPLIT = 16
 #N_ESTIMATORS = 250
+
+# new hyperparameters -- 10 folds
+MAX_DEPTH = 18
+MAX_FEATURES = 15
+MIN_SAMPLES_LEAF = 4
+MIN_SAMPLES_SPLIT = 7
+N_ESTIMATORS = 250
 
 PARAMETER_DICT = {'S.temperature': "ECS",
                   'diff.temperature': r"$\kappa_{DOECLIM}$",
