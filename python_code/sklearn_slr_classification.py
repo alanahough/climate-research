@@ -1228,10 +1228,10 @@ if __name__ == '__main__':
     #                       classification_percentile=.8)
 
     # new hyperparams
-    make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/new_hyperparams_",
-                           "./forests/forest_performance/new_hyperparams_", save_train_test=True)
-    make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/new_hyperparams_",
-                           "./forests/forest_performance/new_hyperparams_", save_train_test=True)
+    #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/new_hyperparams_10fold_",
+    #                       "./forests/forest_performance/new_hyperparams_10fold_", save_train_test=True)
+    #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/new_hyperparams_10fold_",
+    #                       "./forests/forest_performance/new_hyperparams_10fold_", save_train_test=True)
 
     # making S.temp split csv's
     list_10_yrs = []
@@ -1248,15 +1248,15 @@ if __name__ == '__main__':
     #rcp85_forest_list = load_forests(yrs_rcp85,
     #                                       "new_hyperparams_rcp85")  # path for new hyperparameters (post-review) forests
     #new_hyperparams_path = "../data/new_csv/SLR_splits/classification_forest/new_hyperparams/new_hyperparams"  # path for new hyperparameters (post-review) forests
-    rcp26_forest_list = load_forests(yrs_rcp26, "new_hyperparams_rcp26")
-    rcp85_forest_list = load_forests(yrs_rcp85, "new_hyperparams_rcp85")
+    rcp26_forest_list = load_forests(yrs_rcp26, "new_hyperparams_10fold_rcp26")
+    rcp85_forest_list = load_forests(yrs_rcp85, "new_hyperparams_10fold_rcp85")
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, path_80th_percent)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, path_80th_percent)
 
     # plots
     #rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     #rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
+    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
     #all_Stemp_max_split_boxplots(list_10_yrs, print_IQR=True, print_medians=True, print_in_latex_table_format=True)
     #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
