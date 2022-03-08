@@ -345,8 +345,8 @@ def splits_table(forest, feature_names):
 
 
 def slr_forest(feature_list, df, year, rcp, max_feat="auto", max_d=None, min_samp_leaf=1, n_estimators=100,
-               min_samples_split=2, print_forest=False, save_train_test=False,
-               train_test_folder_path="../data/new_csv/"):
+               min_samples_split=2, print_forest=False, save_train_val_test=False,
+               train_val_test_folder_path="../data/new_csv/", print_ratios=False):
     """
     Creates a forest using the desired parameters and fits the forest with 60% of the data in df
     :param feature_list: list of the input column names as strings
@@ -368,15 +368,29 @@ def slr_forest(feature_list, df, year, rcp, max_feat="auto", max_d=None, min_sam
     # set up subsets
     x = df[feature_list]
     y = df[year]
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)  # train= 80%, test= 20%
-    if save_train_test:
-        x_train_file_path = train_test_folder_path + "/" + rcp + "_" + str(year) + "_Xtrain.csv"
+    x_train, x_rest, y_train, y_rest = train_test_split(x, y, test_size=0.2)  # train= 60%, rest= 40%
+    x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest, test_size=0.5)    # validation = 20%, test= 20%
+
+    if print_ratios:
+        print(year, " train --- low:", y_train[y_train == 'low'].shape[0], "high:", y_train[y_train == 'high'].shape[0])
+        print(year, " validation --- low:", y_validation[y_validation == 'low'].shape[0], "high:",
+              y_validation[y_validation == 'high'].shape[0])
+        print(year, " test --- low:", y_test[y_test == 'low'].shape[0], "high:", y_test[y_test == 'high'].shape[0])
+
+    if save_train_val_test:
+        x_train_file_path = train_val_test_folder_path + "/" + rcp + "_" + str(year) + "_Xtrain.csv"
         x_train.to_csv(x_train_file_path, index=False)
-        y_train_file_path = train_test_folder_path + "/" + rcp + "_" + str(year) + "_ytrain.csv"
+        y_train_file_path = train_val_test_folder_path + "/" + rcp + "_" + str(year) + "_ytrain.csv"
         y_train.to_csv(y_train_file_path, index=False, header=False)
-        x_test_file_path = train_test_folder_path + "/" + rcp + "_" + str(year) + "_Xtest.csv"
+
+        x_val_file_path = train_val_test_folder_path + "/" + rcp + "_" + str(year) + "_Xvalidation.csv"
+        x_test.to_csv(x_val_file_path, index=False)
+        y_val_file_path = train_val_test_folder_path + "/" + rcp + "_" + str(year) + "_yvalidation.csv"
+        y_test.to_csv(y_val_file_path, index=False, header=False)
+
+        x_test_file_path = train_val_test_folder_path + "/" + rcp + "_" + str(year) + "_Xtest.csv"
         x_test.to_csv(x_test_file_path, index=False)
-        y_test_file_path = train_test_folder_path + "/" + rcp + "_" + str(year) + "_ytest.csv"
+        y_test_file_path = train_val_test_folder_path + "/" + rcp + "_" + str(year) + "_ytest.csv"
         y_test.to_csv(y_test_file_path, index=False, header=False)
 
     # random forest creation
@@ -386,7 +400,7 @@ def slr_forest(feature_list, df, year, rcp, max_feat="auto", max_d=None, min_sam
     forest = forest.fit(x_train, y_train)
 
     # print random forest
-    if print_forest == True:
+    if print_forest:
         for i in range(0, len(forest.estimators_)):
             print("\nEstimator", i, ":")
             text = tree.export_text(forest.estimators_[i], feature_names=feature_list)
@@ -406,6 +420,17 @@ def slr_forest(feature_list, df, year, rcp, max_feat="auto", max_d=None, min_sam
           "\tTraining false negative =", performance_dict["train_fn"])
 
     # random forest validation
+    y_predicted = forest.predict(x_validation)
+    performance_dict["val_accuracy"] = metrics.accuracy_score(y_validation, y_predicted)
+    print("Validation Accuracy =", performance_dict["val_accuracy"])
+    performance_dict["val_tn"], performance_dict["val_fp"], performance_dict["val_fn"], \
+    performance_dict["val_tp"] = metrics.confusion_matrix(y_validation, y_predicted).ravel()
+    print("Validation true positive =", performance_dict["val_tp"],
+          "\tValidation true negative =", performance_dict["val_tn"],
+          "\tValidation false positive =", performance_dict["val_fp"],
+          "\tValidation false negative =", performance_dict["val_fn"])
+
+    # random forest test
     y_predicted = forest.predict(x_test)
     performance_dict["test_accuracy"] = metrics.accuracy_score(y_test, y_predicted)
     print("Test Accuracy =", performance_dict["test_accuracy"])
@@ -467,9 +492,8 @@ def prep_data(parameter_sample_df, slr_df, rcp_str, print_threshold=False, perce
 
 
 
-def make_forest_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, forest_path, performance_path,
-                           classification_percentile=.9, save_train_test=False,
-                           train_test_folder_path="../data/new_csv/"):
+def make_forest_and_export(yrs_to_output, rcp_str, forest_path, performance_path, save_train_val_test=False,
+                           train_val_test_folder_path="../data/new_csv/", print_ratios=True):
     """
     Creates forests for the given years, saves each forest as a file, and saves the validation and training accuracy
     of each forest in a CSV file
@@ -482,16 +506,17 @@ def make_forest_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, 
     (ex: "./forests/forest_accuracy/")
     :return: None
     """
-    slr_classify = prep_data(slr_df, percentile=classification_percentile)
-    df_slr_classify = parameter_sample_df.join(slr_classify, how="outer")
-    df_slr_classify = df_slr_classify.dropna()
-    features = parameter_sample_df.columns.tolist()
     for yr in yrs_to_output:
+        data_path = "../data/new_csv/preprocessed_data/" + rcp_str + "_" + yr + ".csv"
+        df_slr_classify = pd.read_csv(data_path)
+        features = df_slr_classify.columns.tolist()[:-1]    # don't include year (last column) as feature
+
         print("\n", rcp_str, " ", yr, sep="")
         forest, performance_dict = slr_forest(features, df_slr_classify, yr, max_feat=MAX_FEATURES, max_d=MAX_DEPTH,
                                               min_samp_leaf=MIN_SAMPLES_LEAF, min_samples_split= MIN_SAMPLES_SPLIT,
-                                              n_estimators=N_ESTIMATORS, save_train_test=save_train_test,
-                                              train_test_folder_path=train_test_folder_path, rcp=rcp_str)
+                                              n_estimators=N_ESTIMATORS, save_train_val_test=save_train_val_test,
+                                              train_val_test_folder_path=train_val_test_folder_path, rcp=rcp_str,
+                                              print_ratios=print_ratios)
         forest_file_path = forest_path + rcp_str + "_" + yr + ".joblib"
         joblib.dump(forest, forest_file_path, compress=3)
         print(f"Compressed Random Forest: {np.round(os.path.getsize(forest_file_path) / 1024 / 1024, 2)} MB")
@@ -1237,6 +1262,11 @@ if __name__ == '__main__':
 
     #prep_data(df, slr_rcp26_5step, "rcp26")
     #prep_data(df, slr_rcp85_5step, "rcp85")
+
+    make_forest_and_export(yrs_rcp26, "rcp26", "./forests/oversample_60_20_20_split_",
+                           "./forests/forest_accuracy/oversample_60_20_20_split_")
+    make_forest_and_export(yrs_rcp85, "rcp85", "./forests/oversample_60_20_20_split_",
+                           "./forests/forest_accuracy/oversample_60_20_20_split_")
 
     #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/", "./forests/forest_accuracy/")
     #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
