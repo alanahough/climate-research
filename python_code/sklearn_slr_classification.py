@@ -422,7 +422,7 @@ def slr_forest(feature_list, df, year, rcp, max_feat="auto", max_d=None, min_sam
     return forest, performance_dict
 
 
-def classify_data(df, print_threshold=False, percentile=.9):
+def prep_data(parameter_sample_df, slr_df, rcp_str, print_threshold=False, percentile=.9, file_path="../data/new_csv/preprocessed_data/"):
     """
     Takes a dataframe of sea-level rise values for various years and classifies the values as "low" or "high"
     depending on if the value is above or below the 90th percentile of the data for each year
@@ -430,21 +430,41 @@ def classify_data(df, print_threshold=False, percentile=.9):
     :param print_threshold: boolean that controls whether the 90th percentile value of each year should be printed
     :return: df_classify -- a dataframe where all of the values are either "low" or "high"
     """
-    years = df.columns.tolist()
-    threshold = df.quantile(q=percentile)
+
+    # classify data
+    years = slr_df.columns.tolist()
+    threshold = slr_df.quantile(q=percentile)
     if print_threshold is True:
         print("Threshold:\n", threshold)
     row_list = []
-    for i in range(df.shape[0]):
+    for i in range(slr_df.shape[0]):
         row = []
         for j in range(len(years)):
-            if df.iloc[i, j] >= threshold.iloc[j]:
+            if slr_df.iloc[i, j] >= threshold.iloc[j]:
                 row.append("high")
             else:
                 row.append("low")
         row_list.append(row)
     df_classify = pd.DataFrame(row_list, columns=years)
-    return df_classify
+
+    for yr in years:
+        # join param values with output values of that year
+        yr_df = parameter_sample_df.join(df_classify[yr], how="outer")
+        yr_df = yr_df.dropna()
+
+        # oversample "high" GMSLR class
+        high_df = yr_df[yr_df[yr] == "high"]
+        yr_df = yr_df.append([high_df]*8, ignore_index=True)
+
+        # shuffle data
+        yr_df = yr_df.sample(frac=1)
+
+        print(yr, "--- low:", yr_df[yr_df[yr] == 'low'].shape[0], "high:", yr_df[yr_df[yr] == 'high'].shape[0])
+
+        # save to csv
+        yr_file_path = file_path + rcp_str + "_" + yr + ".csv"
+        yr_df.to_csv(yr_file_path, index=False)
+
 
 
 def make_forest_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, forest_path, performance_path,
@@ -462,7 +482,7 @@ def make_forest_and_export(parameter_sample_df, slr_df, yrs_to_output, rcp_str, 
     (ex: "./forests/forest_accuracy/")
     :return: None
     """
-    slr_classify = classify_data(slr_df, percentile=classification_percentile)
+    slr_classify = prep_data(slr_df, percentile=classification_percentile)
     df_slr_classify = parameter_sample_df.join(slr_classify, how="outer")
     df_slr_classify = df_slr_classify.dropna()
     features = parameter_sample_df.columns.tolist()
@@ -669,8 +689,6 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
                     if len(importances_info[f]) < (j + 1):
                         importances_info[f].append(0)
         importances_info_list.append(importances_info)
-
-    pprint(importances_info_list)
 
     # set color for each feature
     features_on_plot_ordered = []
@@ -1077,7 +1095,7 @@ def gridsearch(param_samples_df, slr_df, year, rcp, folder_path, cv_folds=5):
     """
     rcp_no_space = rcp.replace(" ", "")
     rcp_no_space_no_period = rcp_no_space.replace(".", "")
-    slr_classify = classify_data(slr_df)
+    slr_classify = prep_data(slr_df)
     df_slr = param_samples_df.join(slr_classify, how="outer")
     df_slr = df_slr.dropna()
     features = param_samples_df.columns.tolist()
@@ -1217,6 +1235,9 @@ if __name__ == '__main__':
     yrs_rcp26 = slr_rcp26_5step.columns.tolist()
     yrs_rcp85 = slr_rcp85_5step.columns.tolist()
 
+    #prep_data(df, slr_rcp26_5step, "rcp26")
+    #prep_data(df, slr_rcp85_5step, "rcp85")
+
     #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/", "./forests/forest_accuracy/")
     #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
     # make w/ 80th percentile
@@ -1242,21 +1263,25 @@ if __name__ == '__main__':
     #rcp26_forest_list_10yrs = load_forests(list_10_yrs, "new_hyperparams_80th_percentilercp26") # path for 80th percentile forests
     #rcp85_forest_list_10yrs = load_forests(list_10_yrs, "new_hyperparams_80th_percentilercp85") # path for 80th percentile forests
     #path = "../data/new_csv/SLR_splits/classification_forest/"
-    path_80th_percent = "../data/new_csv/SLR_splits/classification_forest/new_hyperparams/new_hyperparams_80th_percentile"
+    #path_80th_percent = "../data/new_csv/SLR_splits/classification_forest/new_hyperparams/new_hyperparams_80th_percentile"
     #rcp26_forest_list = load_forests(yrs_rcp26,
     #                                       "new_hyperparams_rcp26")  # path for new hyperparameters (post-review) forests
     #rcp85_forest_list = load_forests(yrs_rcp85,
     #                                       "new_hyperparams_rcp85")  # path for new hyperparameters (post-review) forests
     #new_hyperparams_path = "../data/new_csv/SLR_splits/classification_forest/new_hyperparams/new_hyperparams"  # path for new hyperparameters (post-review) forests
-    rcp26_forest_list = load_forests(yrs_rcp26, "new_hyperparams_10fold_rcp26")
-    rcp85_forest_list = load_forests(yrs_rcp85, "new_hyperparams_10fold_rcp85")
+    #rcp26_forest_list = load_forests(yrs_rcp26, "new_hyperparams_10fold_rcp26")
+    #rcp85_forest_list = load_forests(yrs_rcp85, "new_hyperparams_10fold_rcp85")
+    #rcp26_forest_list = load_forests(yrs_rcp26,
+    #                                       "new_hyperparams_80th_percentilercp26")  # path for 80th percentile forests
+    #rcp85_forest_list = load_forests(yrs_rcp85,
+    #                                       "new_hyperparams_80th_percentilercp85")  # path for 80th percentile forests
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, path_80th_percent)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, path_80th_percent)
 
     # plots
     #rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
     #rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
+    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
     #all_Stemp_max_split_boxplots(list_10_yrs, print_IQR=True, print_medians=True, print_in_latex_table_format=True)
     #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
 
