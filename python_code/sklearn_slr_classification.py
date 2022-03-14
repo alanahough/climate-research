@@ -1221,11 +1221,19 @@ def gridsearch(prepped_df, year, rcp, cv_folds=5):
         'min_samples_split': [4, 7, 10, 13, 16]     # added 4 as lower value
     }
 
+    revision_2_values_param_grid = {
+        'n_estimators': [100, 250, 500, 750],
+        'max_depth': [12, 15, 18, 21, 24],
+        'max_features': [10, 15, 20, 25],
+        'min_samples_leaf': [1, 2, 4, 7],
+        'min_samples_split': [1, 2, 4, 7, 10]
+    }
+
     forest = ensemble.RandomForestClassifier()
     # ****CHANGE PARAM_GRID****
     #grid_search = GridSearchCV(estimator=forest, param_grid=lower_values_param_grid, cv=cv_folds, n_jobs=-1, verbose=1,
     #                           scoring="accuracy")
-    grid_search = GridSearchCV(estimator=forest, param_grid=test_subset_output_param_grid, cv=cv_to_use, n_jobs=-1, verbose=1,
+    grid_search = GridSearchCV(estimator=forest, param_grid=revision_2_values_param_grid, cv=cv_to_use, n_jobs=-1, verbose=1,
                                scoring="accuracy")
     #grid_search.fit(x_train, y_train)
     grid_search.fit(x, y)
@@ -1234,11 +1242,11 @@ def gridsearch(prepped_df, year, rcp, cv_folds=5):
     print("Mean cross-validated score of the best_estimator: ", grid_search.best_score_)
     best_params_df = pd.DataFrame(grid_search.best_params_, index=[0])
     # ****CHANGE FILE NAME WHEN CHANGE PARAM_GRID****
-    best_params_df.to_csv("./gridsearchcv_results/test_"+rcp+"-"+year+".csv",
+    best_params_df.to_csv("./gridsearchcv_results/revisions_2_"+rcp+"-"+year+".csv",
                           index=False)
     score_df = pd.DataFrame(grid_search.cv_results_)
     # ****CHANGE FILE NAME WHEN CHANGE PARAM_GRID****
-    score_df.to_csv("./gridsearchcv_results/test_cv_results_"+rcp+"-"+year+".csv", index=False)
+    score_df.to_csv("./gridsearchcv_results/revisions_2_cv_results_"+rcp+"-"+year+".csv", index=False)
 
 
 def load_forests(year_list, rcp_str):
@@ -1334,15 +1342,17 @@ if __name__ == '__main__':
     # grid search -- rcp 2.6 df is slr_rcp26_5step
     # to change RCP -- change slr_rcp85_5step param and "RCP 8.5" string param
     # to change year -- change "2100"
-    data_path = "../data/new_csv/preprocessed_data/rcp85_2100.csv"
-    preprocessed_df = pd.read_csv(data_path)
-    gridsearch(preprocessed_df, "2100", "RCP 8.5")
+    #preprocessed_df = pd.read_csv("../data/new_csv/preprocessed_data/rcp85_2100.csv")
+    #gridsearch(preprocessed_df, "2100", "RCP 8.5")
 
     # grid search loop
-    #for rcp in ["RCP 2.6","RCP 8.5"]:
-    #    if rcp=="RCP 2.6":
-    #        slr = slr_rcp26_5step
-    #    elif rcp=="RCP 8.5":
-    #        slr = slr_rcp85_5step
-    #    for year in ["2050","2075","2100"]:
-     #       gridsearch(df, slr, year, rcp, "../data/new_csv/", cv_folds=10)    # you can change the folder path if you want
+    for rcp in ["RCP 2.6", "RCP 8.5"]:
+        if rcp == "RCP 2.6":
+            rcp_str = 'rcp26'
+        elif rcp == "RCP 8.5":
+            rcp_str = 'rcp85'
+        for year in ["2050", "2075", "2100"]:
+            data_path = "../data/new_csv/preprocessed_data/"+ rcp_str + "_" + year + ".csv"
+            preprocessed_df = pd.read_csv(data_path)
+            print("Running", rcp, year)
+            gridsearch(preprocessed_df, year, rcp)
