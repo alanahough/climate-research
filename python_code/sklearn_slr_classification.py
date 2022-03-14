@@ -368,7 +368,7 @@ def slr_forest(feature_list, df, year, rcp, max_feat="auto", max_d=None, min_sam
     # set up subsets
     x = df[feature_list]
     y = df[year]
-    x_train, x_rest, y_train, y_rest = train_test_split(x, y, test_size=0.2)  # train= 60%, rest= 40%
+    x_train, x_rest, y_train, y_rest = train_test_split(x, y, test_size=0.4)  # train= 60%, rest= 40%
     x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest, test_size=0.5)    # validation = 20%, test= 20%
 
     if print_ratios:
@@ -1107,7 +1107,7 @@ def all_Stemp_max_split_boxplots(year_list, show_outliers=True,
     plt.show()
 
 
-def gridsearch(param_samples_df, slr_df, year, rcp, folder_path, cv_folds=5):
+def gridsearch(prepped_df, year, rcp, cv_folds=5):
     """
     Perform a gridsearch of the parameters used to create the forests, saves the best parameters to a CSV, and saves
     the cross validation information/result to another CSV.
@@ -1119,24 +1119,26 @@ def gridsearch(param_samples_df, slr_df, year, rcp, folder_path, cv_folds=5):
     :return: None
     """
     rcp_no_space = rcp.replace(" ", "")
-    rcp_no_space_no_period = rcp_no_space.replace(".", "")
-    slr_classify = prep_data(slr_df)
-    df_slr = param_samples_df.join(slr_classify, how="outer")
-    df_slr = df_slr.dropna()
-    features = param_samples_df.columns.tolist()
-    x = df_slr[features]
-    y = df_slr[year]
+    rcp= rcp_no_space.replace(".", "")
 
-    # 80% training, 20% testing
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
-    x_train_file_path = folder_path + "/" + rcp_no_space_no_period + "_" + str(year) + "_Xtrain.csv"
-    x_train.to_csv(x_train_file_path, index=False)
-    y_train_file_path = folder_path + "/" + rcp_no_space_no_period + "_" + str(year) + "_ytrain.csv"
-    y_train.to_csv(y_train_file_path, index=False, header=False)
-    x_test_file_path = folder_path + "/" + rcp_no_space_no_period + "_" + str(year) + "_Xtest.csv"
-    x_test.to_csv(x_test_file_path, index=False)
-    y_test_file_path = folder_path + "/" + rcp_no_space_no_period + "_" + str(year) + "_ytest.csv"
-    y_test.to_csv(y_test_file_path, index=False, header=False)
+    features = prepped_df.columns.tolist()[:-1]    # don't include year (last column) as feature
+    x = prepped_df[features]
+    y = prepped_df[year]
+
+    x_rest, x_test, y_rest, y_test = train_test_split(x, y, test_size=0.2)
+    x_train, x_validation, y_train, y_validation = train_test_split(x_rest, y_rest, test_size=0.75)
+    train_idx = [x_train.index.tolist()]
+    validation_idx = [x_validation.index.tolist()]
+    cv_to_use = zip(train_idx, validation_idx)
+
+    #x_train_file_path = folder_path + "/" + rcp_no_space_no_period + "_" + str(year) + "_Xtrain.csv"
+    #x_train.to_csv(x_train_file_path, index=False)
+    #y_train_file_path = folder_path + "/" + rcp_no_space_no_period + "_" + str(year) + "_ytrain.csv"
+    #y_train.to_csv(y_train_file_path, index=False, header=False)
+    #x_test_file_path = folder_path + "/" + rcp_no_space_no_period + "_" + str(year) + "_Xtest.csv"
+    #x_test.to_csv(x_test_file_path, index=False)
+    #y_test_file_path = folder_path + "/" + rcp_no_space_no_period + "_" + str(year) + "_ytest.csv"
+    #y_test.to_csv(y_test_file_path, index=False, header=False)
 ### ^--- TW note: doesn't like the y_train.to_csv or y_test.to_csv above
 ### __main__:5: FutureWarning: The signature of `Series.to_csv` was aligned to that of 
 ###`DataFrame.to_csv`, and argument 'header' will change its default value from False to 
@@ -1204,11 +1206,11 @@ def gridsearch(param_samples_df, slr_df, year, rcp, folder_path, cv_folds=5):
         # n_estimators:300, Mean cross-validated score of the best_estimator:  0.936875
 
     test_subset_output_param_grid = {
-        'n_estimators': [100,500],
+        'n_estimators': [100 ,500],
         'max_depth': [2, 3],
         'max_features': ["sqrt", 10],
-        'min_samples_leaf': [2,4],
-        'min_samples_split': [4,10]
+        'min_samples_leaf': [2 ,4],
+        'min_samples_split': [4 ,10]
     }
 
     lower_values_param_grid = {
@@ -1221,21 +1223,22 @@ def gridsearch(param_samples_df, slr_df, year, rcp, folder_path, cv_folds=5):
 
     forest = ensemble.RandomForestClassifier()
     # ****CHANGE PARAM_GRID****
-#    grid_search = GridSearchCV(estimator=forest, param_grid=lower_values_param_grid, cv=5, n_jobs=-1, verbose=1,
-#                               scoring="accuracy")
-    grid_search = GridSearchCV(estimator=forest, param_grid=lower_values_param_grid, cv=cv_folds, n_jobs=-1, verbose=1,
+    #grid_search = GridSearchCV(estimator=forest, param_grid=lower_values_param_grid, cv=cv_folds, n_jobs=-1, verbose=1,
+    #                           scoring="accuracy")
+    grid_search = GridSearchCV(estimator=forest, param_grid=test_subset_output_param_grid, cv=cv_to_use, n_jobs=-1, verbose=1,
                                scoring="accuracy")
-    grid_search.fit(x_train, y_train)
+    #grid_search.fit(x_train, y_train)
+    grid_search.fit(x, y)
     print("BEST PARAMETERS:")
     print(grid_search.best_params_)
     print("Mean cross-validated score of the best_estimator: ", grid_search.best_score_)
     best_params_df = pd.DataFrame(grid_search.best_params_, index=[0])
     # ****CHANGE FILE NAME WHEN CHANGE PARAM_GRID****
-    best_params_df.to_csv("./gridsearchcv_results/lower_values_param_grid_"+rcp+"-"+year+"-"+str(cv_folds)+"_folds.csv",
+    best_params_df.to_csv("./gridsearchcv_results/test_"+rcp+"-"+year+".csv",
                           index=False)
     score_df = pd.DataFrame(grid_search.cv_results_)
     # ****CHANGE FILE NAME WHEN CHANGE PARAM_GRID****
-    score_df.to_csv("./gridsearchcv_results/lower_values_grid_cv_results_"+rcp+"-"+year+".csv", index=False)
+    score_df.to_csv("./gridsearchcv_results/test_cv_results_"+rcp+"-"+year+".csv", index=False)
 
 
 def load_forests(year_list, rcp_str):
@@ -1263,10 +1266,10 @@ if __name__ == '__main__':
     #prep_data(df, slr_rcp26_5step, "rcp26")
     #prep_data(df, slr_rcp85_5step, "rcp85")
 
-    make_forest_and_export(yrs_rcp26, "rcp26", "./forests/oversample_60_20_20_split_",
-                           "./forests/forest_accuracy/oversample_60_20_20_split_")
-    make_forest_and_export(yrs_rcp85, "rcp85", "./forests/oversample_60_20_20_split_",
-                           "./forests/forest_accuracy/oversample_60_20_20_split_")
+    #make_forest_and_export(yrs_rcp26, "rcp26", "./forests/oversample_60_20_20_split_",
+    #                       "./forests/forest_accuracy/oversample_60_20_20_split_")
+    #make_forest_and_export(yrs_rcp85, "rcp85", "./forests/oversample_60_20_20_split_",
+    #                       "./forests/forest_accuracy/oversample_60_20_20_split_")
 
     #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/", "./forests/forest_accuracy/")
     #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
@@ -1331,7 +1334,9 @@ if __name__ == '__main__':
     # grid search -- rcp 2.6 df is slr_rcp26_5step
     # to change RCP -- change slr_rcp85_5step param and "RCP 8.5" string param
     # to change year -- change "2100"
-    #gridsearch(df, slr_rcp85_5step, "2050", "RCP 8.5", "../data/new_csv/", cv_folds=10)
+    data_path = "../data/new_csv/preprocessed_data/rcp85_2100.csv"
+    preprocessed_df = pd.read_csv(data_path)
+    gridsearch(preprocessed_df, "2100", "RCP 8.5")
 
     # grid search loop
     #for rcp in ["RCP 2.6","RCP 8.5"]:
