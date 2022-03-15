@@ -1,0 +1,2 @@
+max_depth,max_features,min_impurity_decrease,n_estimators
+20,30,0.001,110

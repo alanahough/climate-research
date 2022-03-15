@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import train_test_split, GridSearchCV
+from hypopt import GridSearch
 import pylab
 import joblib
 import os
@@ -1126,125 +1127,35 @@ def gridsearch(prepped_df, year, rcp, cv_folds=5):
     y = prepped_df[year]
 
     x_rest, x_test, y_rest, y_test = train_test_split(x, y, test_size=0.2)
-    x_train, x_validation, y_train, y_validation = train_test_split(x_rest, y_rest, test_size=0.75)
+    #x_train, x_validation, y_train, y_validation = train_test_split(x_rest, y_rest, test_size=0.75) # TWchange
+    x_train, x_validation, y_train, y_validation = train_test_split(x_rest, y_rest, test_size=0.25)
     train_idx = [x_train.index.tolist()]
     validation_idx = [x_validation.index.tolist()]
-    cv_to_use = zip(train_idx, validation_idx)
 
-    #x_train_file_path = folder_path + "/" + rcp_no_space_no_period + "_" + str(year) + "_Xtrain.csv"
-    #x_train.to_csv(x_train_file_path, index=False)
-    #y_train_file_path = folder_path + "/" + rcp_no_space_no_period + "_" + str(year) + "_ytrain.csv"
-    #y_train.to_csv(y_train_file_path, index=False, header=False)
-    #x_test_file_path = folder_path + "/" + rcp_no_space_no_period + "_" + str(year) + "_Xtest.csv"
-    #x_test.to_csv(x_test_file_path, index=False)
-    #y_test_file_path = folder_path + "/" + rcp_no_space_no_period + "_" + str(year) + "_ytest.csv"
-    #y_test.to_csv(y_test_file_path, index=False, header=False)
-### ^--- TW note: doesn't like the y_train.to_csv or y_test.to_csv above
-### __main__:5: FutureWarning: The signature of `Series.to_csv` was aligned to that of 
-###`DataFrame.to_csv`, and argument 'header' will change its default value from False to 
-###True: please pass an explicit value to suppress this warning.
-    
-    param_grid_1 = {
-        'max_depth': [2, 4, 6, 8, 10],
-        'max_features': ["sqrt", 10, 15, 20, 25, 30, 35],
-        'max_samples': [1000, 2000, 3000, 4000, 4800],
-        'min_samples_leaf': [1, 15, 30, 45, 60, 75, 90, 105],
-        'min_samples_split': [15, 30, 45, 60, 75, 90, 105]
-    }   #took like 14.5 hours and I forgot to print the best params :))))))
-    param_grid_2 = {
-        'max_depth': [3, 4, 5, 6],
-        'max_features': ["sqrt", 10, 15, 20, 25, 30],
-        'max_samples': [1000, 2000, 3000, 4000],
-        'min_samples_leaf': [1, 20, 40, 60, 80, 100],
-        'min_samples_split': [2, 20, 40, 60, 80, 100]
-    }   #took around 4.5 hours -- {'max_depth': 6, 'max_features': 30, 'max_samples': 3000, 'min_samples_leaf': 1,
-    # 'min_samples_split': 20}
-    param_grid_3 = {
-        'max_depth': [4, 5, 6, 7],
-        'max_features': [20, 25, 30, 35],
-        'max_samples': [2000, 3000, 4000],
-        'min_samples_leaf': [1, 2, 4, 8, 12, 16],
-        'min_samples_split': [5, 10, 15, 20, 25, 30]
-    }   #took around 4 hours -- {'max_depth': 7, 'max_features': 35, 'max_samples': 4000, 'min_samples_leaf': 4,
-    # 'min_samples_split': 20}
-    param_grid_4 = {
-        'max_depth': [6, 7, 8, 9, 10],
-        'max_features': [25, 30, 32, 35, 38],
-        'max_samples': [3000, 3500, 4000, 4500, 4800],
-        'min_samples_leaf': [2, 4, 8],
-        'min_samples_split': [10, 15, 20, 25, 30]
-    }   #took around 7.5 hours -- {'max_depth': 10, 'max_features': 38, 'max_samples': 4800, 'min_samples_leaf': 8,
-    # 'min_samples_split': 15}
-    param_grid_5 = {
-        'max_depth': [7, 10, 13, 16, 19],
-        'max_features': [30, 32, 35, 38],
-        'max_samples': [3500, 4000, 4500, 4800],
-        'min_samples_leaf': [2, 4, 8, 10, 12],
-        'min_samples_split': [10, 15, 20, 25, 30]
-    }   #took around 11 hours -- {'max_depth': 13, 'max_features': 35, 'max_samples': 4500, 'min_samples_leaf': 2,
-    # 'min_samples_split': 10}
-    param_grid_6 = {
-        'max_depth': [12, 13, 14],
-        'max_features': [35, 36, 37, 38],
-        'max_samples': [4000, 4500, 4800],
-        'min_samples_leaf': [2, 4, 6, 8],
-        'min_samples_split': [10, 13, 16, 20]
-    }   #took around 3 hours -- {'max_depth': 13, 'max_features': 38, 'max_samples': 4800, 'min_samples_leaf': 8,
-    # 'min_samples_split': 13}
-        # BEST PARAMETERS:
-        # {'max_depth': 14, 'max_features': 37, 'max_samples': 4500, 'min_samples_leaf': 4, 'min_samples_split': 10}
-        # Mean cross-validated score of the best_estimator:  0.9333333333333333
-
-    n_estimators_param_grid = {
-        'n_estimators': range(100, 1001, 100),
-        'max_depth': [14],
-        'max_features': [37],
-        'max_samples': [4500],
-        'min_samples_leaf': [4],
-        'min_samples_split': [10]
-    }   # 'n_estimators': 700, Mean cross-validated score of the best_estimator:  0.9373750000000001
-        # n_estimators:300, Mean cross-validated score of the best_estimator:  0.936875
-
-    test_subset_output_param_grid = {
-        'n_estimators': [100 ,500],
-        'max_depth': [2, 3],
-        'max_features': ["sqrt", 10],
-        'min_samples_leaf': [2 ,4],
-        'min_samples_split': [4 ,10]
-    }
-
-    lower_values_param_grid = {
-        'n_estimators': [250, 500, 750, 1000],
-        'max_depth': [12, 14, 16, 18],
-        'max_features': [4, "sqrt", 10, 15],               # sqrt = 6, added 4, 10, 15
-        'min_samples_leaf': [1, 2, 3, 4, 7, 10],   # added 2 and 3 as lower values
-        'min_samples_split': [4, 7, 10, 13, 16]     # added 4 as lower value
-    }
 
     revision_2_values_param_grid = {
-        'n_estimators': [100, 250, 500, 750],
-        'max_depth': [12, 15, 18, 21, 24],
-        'max_features': [10, 15, 20, 25],
-        'min_samples_leaf': [1, 2, 4, 7],
-        'min_samples_split': [1, 2, 4, 7, 10]
+        'n_estimators': [80, 110, 140, 170, 200, 250],
+        'max_depth': [10, 15, 20, 25, 30],
+        'max_features': [3, 6, 12, 24, 30, 36],
+        'min_impurity_decrease': [0.001]
     }
 
-    forest = ensemble.RandomForestClassifier()
-    # ****CHANGE PARAM_GRID****
-    #grid_search = GridSearchCV(estimator=forest, param_grid=lower_values_param_grid, cv=cv_folds, n_jobs=-1, verbose=1,
-    #                           scoring="accuracy")
-    grid_search = GridSearchCV(estimator=forest, param_grid=revision_2_values_param_grid, cv=cv_to_use, n_jobs=-1, verbose=1,
-                               scoring="accuracy")
-    #grid_search.fit(x_train, y_train)
-    grid_search.fit(x, y)
+    grid_search = GridSearch(model=ensemble.RandomForestClassifier(criterion="entropy"), param_grid=revision_2_values_param_grid)
+    grid_search.fit(x_train, y_train, x_validation, y_validation)
+    
     print("BEST PARAMETERS:")
-    print(grid_search.best_params_)
-    print("Mean cross-validated score of the best_estimator: ", grid_search.best_score_)
-    best_params_df = pd.DataFrame(grid_search.best_params_, index=[0])
+    print(grid_search.best_params)
+    
+    print("Mean cross-validated score of the best_estimator: ", grid_search.best_score)
+    best_params_df = pd.DataFrame(grid_search.best_params, index=[0])
     # ****CHANGE FILE NAME WHEN CHANGE PARAM_GRID****
     best_params_df.to_csv("./gridsearchcv_results/revisions_2_"+rcp+"-"+year+".csv",
                           index=False)
-    score_df = pd.DataFrame(grid_search.cv_results_)
+    score_dict = {}
+    for nn in grid_search.param_grid.keys():
+        score_dict[nn] = [grid_search.param_scores[k][0][nn] for k in range(len(grid_search.param_scores))]
+    score_dict["score"] = [grid_search.param_scores[k][1] for k in range(len(grid_search.param_scores))]
+    score_df = pd.DataFrame(score_dict)
     # ****CHANGE FILE NAME WHEN CHANGE PARAM_GRID****
     score_df.to_csv("./gridsearchcv_results/revisions_2_cv_results_"+rcp+"-"+year+".csv", index=False)
 
