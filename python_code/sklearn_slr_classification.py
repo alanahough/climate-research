@@ -1134,9 +1134,9 @@ def gridsearch(prepped_df, year, rcp, cv_folds=5):
 
 
     revision_2_values_param_grid = {
-        'n_estimators': [80, 110, 140, 170, 200, 250],
+        'n_estimators': [25, 50, 100, 150, 200, 250],
         'max_depth': [10, 15, 20, 25, 30],
-        'max_features': [3, 6, 12, 24, 30, 36],
+        'max_features': [3, 6, 12, 24, 30, 38],
         'min_impurity_decrease': [0.001]
     }
 
@@ -1158,6 +1158,25 @@ def gridsearch(prepped_df, year, rcp, cv_folds=5):
     score_df = pd.DataFrame(score_dict)
     # ****CHANGE FILE NAME WHEN CHANGE PARAM_GRID****
     score_df.to_csv("./gridsearchcv_results/revisions_2_cv_results_"+rcp+"-"+year+".csv", index=False)
+    
+    # write to csv the training, validation, and test parameter sets
+    dfTrain = pd.DataFrame(x_train)
+    dfTrain["class"] = y_train
+    dfTrain.to_csv("./gridsearchcv_results/revisions_2_trainingData_"+rcp+"-"+year+".csv", index=False)
+
+    dfValid = pd.DataFrame(x_validation)
+    dfValid["class"] = y_validation
+    dfValid.to_csv("./gridsearchcv_results/revisions_2_validationData_"+rcp+"-"+year+".csv", index=False)
+
+    dfTest = pd.DataFrame(x_test)
+    dfTest["class"] = y_test
+    dfTest.to_csv("./gridsearchcv_results/revisions_2_testingData_"+rcp+"-"+year+".csv", index=False)
+
+    # Compare with default model without hyperopt
+    outofbox = ensemble.RandomForestClassifier(criterion="entropy",random_state=0)
+    outofbox.fit(x_train, y_train)
+    print('Out-of-box hyperparameters:', outofbox.score(x_test, y_test))
+    print('Optimized harameters:', grid_search.score(x_test, y_test))
 
 
 def load_forests(year_list, rcp_str):
