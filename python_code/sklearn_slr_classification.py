@@ -13,70 +13,7 @@ import matplotlib.patches as mpatches
 from pprint import pprint
 
 
-# original hyperparameters
-#MAX_DEPTH = 16
-#MAX_FEATURES = "sqrt"
-#MIN_SAMPLES_LEAF = 4
-#MIN_SAMPLES_SPLIT = 7
-#N_ESTIMATORS = 500
-
-# new hyperparameters
-#MAX_DEPTH = 18
-#MAX_FEATURES = 15
-#MIN_SAMPLES_LEAF = 2
-#MIN_SAMPLES_SPLIT = 4
-#N_ESTIMATORS = 250
-
-# new hyperparameters 2
-#MAX_DEPTH = 14
-#MAX_FEATURES = 15
-#MIN_SAMPLES_LEAF = 1
-#MIN_SAMPLES_SPLIT = 4
-#N_ESTIMATORS = 500
-
-# new hyperparameters -- min_samples_leaf = 1
-#MAX_DEPTH = 18
-#MAX_FEATURES = 15
-#MIN_SAMPLES_LEAF = 1
-#MIN_SAMPLES_SPLIT = 4
-#N_ESTIMATORS = 250
-
-# new hyperparameters -- min_samples_leaf = 4
-#MAX_DEPTH = 18
-#MAX_FEATURES = 15
-#MIN_SAMPLES_LEAF = 4
-#MIN_SAMPLES_SPLIT = 4
-#N_ESTIMATORS = 250
-
-# new hyperparameters 3
-#MAX_DEPTH = 12
-#MAX_FEATURES = 15
-#MIN_SAMPLES_LEAF = 3
-#MIN_SAMPLES_SPLIT = 4
-#N_ESTIMATORS = 500
-
-# new hyperparameters 4
-#MAX_DEPTH = 14
-#MAX_FEATURES = 15
-#MIN_SAMPLES_LEAF = 7
-#MIN_SAMPLES_SPLIT = 10
-#N_ESTIMATORS = 750
-
-# new hyperparameters 5
-#MAX_DEPTH = 16
-#MAX_FEATURES = 15
-#MIN_SAMPLES_LEAF = 3
-#MIN_SAMPLES_SPLIT = 13
-#N_ESTIMATORS = 1000
-
-# new hyperparameters 6
-#MAX_DEPTH = 16
-#MAX_FEATURES = 15
-#MIN_SAMPLES_LEAF = 2
-#MIN_SAMPLES_SPLIT = 16
-#N_ESTIMATORS = 250
-
-# new hyperparameters -- 10 folds
+# hyperparameters (via gridsearch)
 MAX_DEPTH = 18
 MAX_FEATURES = 15
 MIN_SAMPLES_LEAF = 4
@@ -1127,7 +1064,6 @@ def gridsearch(prepped_df, year, rcp, cv_folds=5):
     y = prepped_df[year]
 
     x_rest, x_test, y_rest, y_test = train_test_split(x, y, test_size=0.2)
-    #x_train, x_validation, y_train, y_validation = train_test_split(x_rest, y_rest, test_size=0.75) # TWchange
     x_train, x_validation, y_train, y_validation = train_test_split(x_rest, y_rest, test_size=0.25)
     train_idx = [x_train.index.tolist()]
     validation_idx = [x_validation.index.tolist()]
@@ -1269,20 +1205,7 @@ if __name__ == '__main__':
     #get_previous_splits(forest_rcp85_2020, features, "RCP 8.5", 2020, path)
 
 
-    # grid search -- rcp 2.6 df is slr_rcp26_5step
-    # to change RCP -- change slr_rcp85_5step param and "RCP 8.5" string param
-    # to change year -- change "2100"
-    #preprocessed_df = pd.read_csv("../data/new_csv/preprocessed_data/rcp85_2100.csv")
-    #gridsearch(preprocessed_df, "2100", "RCP 8.5")
+    # perform grid search
+    preprocessed_df = pd.read_csv("../data/new_csv/preprocessed_data/rcp85_2100.csv")
+    gridsearch(preprocessed_df, "2100", "RCP 8.5")
 
-    # grid search loop
-    for rcp in ["RCP 2.6", "RCP 8.5"]:
-        if rcp == "RCP 2.6":
-            rcp_str = 'rcp26'
-        elif rcp == "RCP 8.5":
-            rcp_str = 'rcp85'
-        for year in ["2050", "2075", "2100"]:
-            data_path = "../data/new_csv/preprocessed_data/"+ rcp_str + "_" + year + ".csv"
-            preprocessed_df = pd.read_csv(data_path)
-            print("Running", rcp, year)
-            gridsearch(preprocessed_df, year, rcp)

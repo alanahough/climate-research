@@ -1,15 +1,4 @@
-from sklearn import tree, metrics, ensemble
-import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
-from sklearn.model_selection import train_test_split, GridSearchCV
-import pylab
 import joblib
-import os
-from collections import Counter
-import matplotlib.ticker as mticker
-import matplotlib.patches as mpatches
-from pprint import pprint
 
 
 if __name__ == '__main__':
