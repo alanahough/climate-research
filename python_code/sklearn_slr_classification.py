@@ -385,50 +385,6 @@ def slr_forest(feature_list, df, year, rcp, max_feat="auto", max_d=None, min_sam
     return forest, performance_dict
 
 
-def prep_data(parameter_sample_df, slr_df, rcp_str, print_threshold=False, percentile=.9, file_path="../data/new_csv/preprocessed_data/"):
-    """
-    Takes a dataframe of sea-level rise values for various years and classifies the values as "low" or "high"
-    depending on if the value is above or below the 90th percentile of the data for each year
-    :param df: dataframe of the output sea-level rise values, where the columns are years
-    :param print_threshold: boolean that controls whether the 90th percentile value of each year should be printed
-    :return: df_classify -- a dataframe where all of the values are either "low" or "high"
-    """
-
-    # classify data
-    years = slr_df.columns.tolist()
-    threshold = slr_df.quantile(q=percentile)
-    if print_threshold is True:
-        print("Threshold:\n", threshold)
-    row_list = []
-    for i in range(slr_df.shape[0]):
-        row = []
-        for j in range(len(years)):
-            if slr_df.iloc[i, j] >= threshold.iloc[j]:
-                row.append("high")
-            else:
-                row.append("low")
-        row_list.append(row)
-    df_classify = pd.DataFrame(row_list, columns=years)
-
-    for yr in years:
-        # join param values with output values of that year
-        yr_df = parameter_sample_df.join(df_classify[yr], how="outer")
-        yr_df = yr_df.dropna()
-
-        # oversample "high" GMSLR class
-        high_df = yr_df[yr_df[yr] == "high"]
-        yr_df = yr_df.append([high_df]*8, ignore_index=True)
-
-        # shuffle data
-        yr_df = yr_df.sample(frac=1)
-
-        print(yr, "--- low:", yr_df[yr_df[yr] == 'low'].shape[0], "high:", yr_df[yr_df[yr] == 'high'].shape[0])
-
-        # save to csv
-        yr_file_path = file_path + rcp_str + "_" + yr + ".csv"
-        yr_df.to_csv(yr_file_path, index=False)
-
-
 
 def make_forest_and_export(yrs_to_output, rcp_str, forest_path, performance_path, save_train_val_test=False,
                            train_val_test_folder_path="../data/new_csv/", print_ratios=True):
