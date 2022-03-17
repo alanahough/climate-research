@@ -14,11 +14,10 @@ from pprint import pprint
 
 
 # hyperparameters (via gridsearch)
-MAX_DEPTH = 18
-MAX_FEATURES = 15
-MIN_SAMPLES_LEAF = 4
-MIN_SAMPLES_SPLIT = 7
-N_ESTIMATORS = 250
+MAX_DEPTH = 15
+MAX_FEATURES = 24
+N_ESTIMATORS = 100
+MIN_IMPURITY_DECREASE = 0.001
 
 PARAMETER_DICT = {'S.temperature': "ECS",
                   'diff.temperature': r"$\kappa_{DOECLIM}$",
@@ -282,9 +281,8 @@ def splits_table(forest, feature_names):
     return df
 
 
-def slr_forest(feature_list, df, year, rcp, max_feat="auto", max_d=None, min_samp_leaf=1, n_estimators=100,
-               min_samples_split=2, print_forest=False, save_train_val_test=False,
-               train_val_test_folder_path="../data/new_csv/", print_ratios=False):
+def slr_forest(x_train, y_train, x_validation, y_validation, x_test, y_test, year, rcp, feature_list,
+               max_feat="auto", max_d=None, n_estimators=100, min_impurity_decrease=0, print_forest=False):
     """
     Creates a forest using the desired parameters and fits the forest with 60% of the data in df
     :param feature_list: list of the input column names as strings
@@ -303,38 +301,9 @@ def slr_forest(feature_list, df, year, rcp, max_feat="auto", max_d=None, min_sam
                                             -- v_accuracy is the validation accuracy as a decimal value
                                             -- t_accuracy is the training accuracy as a decimal value
     """
-    # set up subsets
-    x = df[feature_list]
-    y = df[year]
-    x_train, x_rest, y_train, y_rest = train_test_split(x, y, test_size=0.4)  # train= 60%, rest= 40%
-    x_validation, x_test, y_validation, y_test = train_test_split(x_rest, y_rest, test_size=0.5)    # validation = 20%, test= 20%
-
-    if print_ratios:
-        print(year, " train --- low:", y_train[y_train == 'low'].shape[0], "high:", y_train[y_train == 'high'].shape[0])
-        print(year, " validation --- low:", y_validation[y_validation == 'low'].shape[0], "high:",
-              y_validation[y_validation == 'high'].shape[0])
-        print(year, " test --- low:", y_test[y_test == 'low'].shape[0], "high:", y_test[y_test == 'high'].shape[0])
-
-    if save_train_val_test:
-        x_train_file_path = train_val_test_folder_path + "/" + rcp + "_" + str(year) + "_Xtrain.csv"
-        x_train.to_csv(x_train_file_path, index=False)
-        y_train_file_path = train_val_test_folder_path + "/" + rcp + "_" + str(year) + "_ytrain.csv"
-        y_train.to_csv(y_train_file_path, index=False, header=False)
-
-        x_val_file_path = train_val_test_folder_path + "/" + rcp + "_" + str(year) + "_Xvalidation.csv"
-        x_test.to_csv(x_val_file_path, index=False)
-        y_val_file_path = train_val_test_folder_path + "/" + rcp + "_" + str(year) + "_yvalidation.csv"
-        y_test.to_csv(y_val_file_path, index=False, header=False)
-
-        x_test_file_path = train_val_test_folder_path + "/" + rcp + "_" + str(year) + "_Xtest.csv"
-        x_test.to_csv(x_test_file_path, index=False)
-        y_test_file_path = train_val_test_folder_path + "/" + rcp + "_" + str(year) + "_ytest.csv"
-        y_test.to_csv(y_test_file_path, index=False, header=False)
-
     # random forest creation
     forest = ensemble.RandomForestClassifier(n_estimators=n_estimators, criterion="entropy", max_features=max_feat,
-                                             max_depth=max_d, min_samples_leaf=min_samp_leaf,
-                                             min_samples_split=min_samples_split)
+                                             max_depth=max_d, min_impurity_decrease=min_impurity_decrease)
     forest = forest.fit(x_train, y_train)
 
     # print random forest
@@ -385,9 +354,7 @@ def slr_forest(feature_list, df, year, rcp, max_feat="auto", max_d=None, min_sam
     return forest, performance_dict
 
 
-
-def make_forest_and_export(yrs_to_output, rcp_str, forest_path, performance_path, save_train_val_test=False,
-                           train_val_test_folder_path="../data/new_csv/", print_ratios=True):
+def make_forest_and_export(yrs_to_output, rcp_str, forest_path, performance_path):
     """
     Creates forests for the given years, saves each forest as a file, and saves the validation and training accuracy
     of each forest in a CSV file
@@ -401,16 +368,22 @@ def make_forest_and_export(yrs_to_output, rcp_str, forest_path, performance_path
     :return: None
     """
     for yr in yrs_to_output:
-        data_path = "../data/new_csv/preprocessed_data/" + rcp_str + "_" + yr + ".csv"
-        df_slr_classify = pd.read_csv(data_path)
-        features = df_slr_classify.columns.tolist()[:-1]    # don't include year (last column) as feature
+        data_path = "../data/new_csv/preprocessed_data/" + rcp_str + "_" + yr
+        x_train = pd.read_csv(data_path + "_Xtrain.csv")
+        y_train = pd.read_csv(data_path + "_ytrain.csv", header=None)
+        x_validation = pd.read_csv(data_path + "_Xvalidation.csv")
+        y_validation = pd.read_csv(data_path + "_yvalidation.csv", header=None)
+        x_test = pd.read_csv(data_path + "_Xtest.csv")
+        y_test = pd.read_csv(data_path + "_ytest.csv", header=None)
+
+        features = x_train.columns.tolist()
 
         print("\n", rcp_str, " ", yr, sep="")
-        forest, performance_dict = slr_forest(features, df_slr_classify, yr, max_feat=MAX_FEATURES, max_d=MAX_DEPTH,
-                                              min_samp_leaf=MIN_SAMPLES_LEAF, min_samples_split= MIN_SAMPLES_SPLIT,
-                                              n_estimators=N_ESTIMATORS, save_train_val_test=save_train_val_test,
-                                              train_val_test_folder_path=train_val_test_folder_path, rcp=rcp_str,
-                                              print_ratios=print_ratios)
+        forest, performance_dict = slr_forest(x_train, y_train, x_validation, y_validation, x_test, y_test,
+                                              year=yr, rcp=rcp_str, feature_list=features, max_feat=MAX_FEATURES,
+                                              max_d=MAX_DEPTH, min_impurity_decrease=MIN_IMPURITY_DECREASE,
+                                              n_estimators=N_ESTIMATORS)
+
         forest_file_path = forest_path + rcp_str + "_" + yr + ".joblib"
         joblib.dump(forest, forest_file_path, compress=3)
         print(f"Compressed Random Forest: {np.round(os.path.getsize(forest_file_path) / 1024 / 1024, 2)} MB")
@@ -529,7 +502,6 @@ def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_
     df_all_quartile = pd.DataFrame(all_quartile_data, columns=["Name", "0%", "25%", "50%", "75%", "100%", "Mean"])
     all_file_path = folder_path + rcp_no_space_no_period + "_all_splits.csv"
     df_all_quartile.to_csv(all_file_path, index=False)
-
 
 
 def feature_color_dict(features_list):
@@ -1001,7 +973,7 @@ def all_Stemp_max_split_boxplots(year_list, show_outliers=True,
     plt.show()
 
 
-def gridsearch(prepped_df, year, rcp, cv_folds=5):
+def gridsearch(year, rcp):
     """
     Perform a gridsearch of the parameters used to create the forests, saves the best parameters to a CSV, and saves
     the cross validation information/result to another CSV.
@@ -1013,16 +985,15 @@ def gridsearch(prepped_df, year, rcp, cv_folds=5):
     :return: None
     """
     rcp_no_space = rcp.replace(" ", "")
-    rcp= rcp_no_space.replace(".", "")
+    rcp = rcp_no_space.replace(".", "")
 
-    features = prepped_df.columns.tolist()[:-1]    # don't include year (last column) as feature
-    x = prepped_df[features]
-    y = prepped_df[year]
-
-    x_rest, x_test, y_rest, y_test = train_test_split(x, y, test_size=0.2)
-    x_train, x_validation, y_train, y_validation = train_test_split(x_rest, y_rest, test_size=0.25)
-    train_idx = [x_train.index.tolist()]
-    validation_idx = [x_validation.index.tolist()]
+    data_path = "../data/new_csv/preprocessed_data/" + rcp + "_" + str(yr)
+    x_train = pd.read_csv(data_path + "_Xtrain.csv")
+    y_train = pd.read_csv(data_path + "_ytrain.csv", header=None)
+    x_validation = pd.read_csv(data_path + "_Xvalidation.csv")
+    y_validation = pd.read_csv(data_path + "_yvalidation.csv", header=None)
+    x_test = pd.read_csv(data_path + "_Xtest.csv")
+    y_test = pd.read_csv(data_path + "_ytest.csv", header=None)
 
 
     revision_2_values_param_grid = {
@@ -1050,19 +1021,6 @@ def gridsearch(prepped_df, year, rcp, cv_folds=5):
     score_df = pd.DataFrame(score_dict)
     # ****CHANGE FILE NAME WHEN CHANGE PARAM_GRID****
     score_df.to_csv("./gridsearchcv_results/revisions_2_cv_results_"+rcp+"-"+year+".csv", index=False)
-    
-    # write to csv the training, validation, and test parameter sets
-    dfTrain = pd.DataFrame(x_train)
-    dfTrain["class"] = y_train
-    dfTrain.to_csv("./gridsearchcv_results/revisions_2_trainingData_"+rcp+"-"+year+".csv", index=False)
-
-    dfValid = pd.DataFrame(x_validation)
-    dfValid["class"] = y_validation
-    dfValid.to_csv("./gridsearchcv_results/revisions_2_validationData_"+rcp+"-"+year+".csv", index=False)
-
-    dfTest = pd.DataFrame(x_test)
-    dfTest["class"] = y_test
-    dfTest.to_csv("./gridsearchcv_results/revisions_2_testingData_"+rcp+"-"+year+".csv", index=False)
 
     # Compare with default model without hyperopt
     outofbox = ensemble.RandomForestClassifier(criterion="entropy",random_state=0)
@@ -1093,13 +1051,10 @@ if __name__ == '__main__':
     yrs_rcp26 = slr_rcp26_5step.columns.tolist()
     yrs_rcp85 = slr_rcp85_5step.columns.tolist()
 
-    #prep_data(df, slr_rcp26_5step, "rcp26")
-    #prep_data(df, slr_rcp85_5step, "rcp85")
-
-    #make_forest_and_export(yrs_rcp26, "rcp26", "./forests/oversample_60_20_20_split_",
-    #                       "./forests/forest_accuracy/oversample_60_20_20_split_")
-    #make_forest_and_export(yrs_rcp85, "rcp85", "./forests/oversample_60_20_20_split_",
-    #                       "./forests/forest_accuracy/oversample_60_20_20_split_")
+    make_forest_and_export(yrs_rcp26, "rcp26", "./forests/revision_2_",
+                           "./forests/forest_accuracy/revision_2_")
+    make_forest_and_export(yrs_rcp85, "rcp85", "./forests/revision_2_",
+                           "./forests/forest_accuracy/revision_2_")
 
     #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/", "./forests/forest_accuracy/")
     #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
@@ -1162,6 +1117,5 @@ if __name__ == '__main__':
 
 
     # perform grid search
-    preprocessed_df = pd.read_csv("../data/new_csv/preprocessed_data/rcp85_2100.csv")
-    gridsearch(preprocessed_df, "2100", "RCP 8.5")
+    #gridsearch("2100", "RCP 8.5")
 

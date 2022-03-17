@@ -1,0 +1,2 @@
+train_accuracy,train_tn,train_fp,train_fn,train_tp,val_accuracy,val_tn,val_fp,val_fn,val_tp,test_accuracy,test_tn,test_fp,test_fn,test_tp
+0.9968518518518519,5358,0,34,5408,0.9830555555555556,1821,0,61,1718,0.9830555555555556,1821,0,61,1718
