@@ -1051,10 +1051,10 @@ if __name__ == '__main__':
     yrs_rcp26 = slr_rcp26_5step.columns.tolist()
     yrs_rcp85 = slr_rcp85_5step.columns.tolist()
 
-    make_forest_and_export(yrs_rcp26, "rcp26", "./forests/revision_2_",
-                           "./forests/forest_accuracy/revision_2_")
-    make_forest_and_export(yrs_rcp85, "rcp85", "./forests/revision_2_",
-                           "./forests/forest_accuracy/revision_2_")
+    #make_forest_and_export(yrs_rcp26, "rcp26", "./forests/revision_2_",
+    #                       "./forests/forest_accuracy/revision_2_")
+    #make_forest_and_export(yrs_rcp85, "rcp85", "./forests/revision_2_",
+    #                       "./forests/forest_accuracy/revision_2_")
 
     #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/", "./forests/forest_accuracy/")
     #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
@@ -1087,14 +1087,17 @@ if __name__ == '__main__':
     #rcp85_forest_list = load_forests(yrs_rcp85,
     #                                       "new_hyperparams_rcp85")  # path for new hyperparameters (post-review) forests
     #new_hyperparams_path = "../data/new_csv/SLR_splits/classification_forest/new_hyperparams/new_hyperparams"  # path for new hyperparameters (post-review) forests
-    #rcp26_forest_list = load_forests(yrs_rcp26, "new_hyperparams_10fold_rcp26")
-    #rcp85_forest_list = load_forests(yrs_rcp85, "new_hyperparams_10fold_rcp85")
+
+
+    rcp26_forest_list = load_forests(yrs_rcp26, "revision_2_rcp26")
+    rcp85_forest_list = load_forests(yrs_rcp85, "revision_2_rcp85")
     #rcp26_forest_list = load_forests(yrs_rcp26,
     #                                       "new_hyperparams_80th_percentilercp26")  # path for 80th percentile forests
     #rcp85_forest_list = load_forests(yrs_rcp85,
     #                                       "new_hyperparams_80th_percentilercp85")  # path for 80th percentile forests
-    #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, path_80th_percent)
-    #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, path_80th_percent)
+    revision_2_path = "../data/new_csv/SLR_splits/classification_forest/revisions_2/"
+    #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, revision_2_path)
+    #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, revision_2_path)
 
     # plots
     #rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
