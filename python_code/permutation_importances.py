@@ -8,7 +8,7 @@ from sklearn.inspection import permutation_importance
 import pandas as pd
 
 
-def slr_stacked_dif_importances_plot(param_sample_df, rcp85_forest_list, years, importance_threshold=.04):
+def slr_stacked_dif_importances_plot(param_sample_df, rcp85_forest_list, years, training_testing_path, importance_threshold=.04):
     """
     Create a stacked histogram of the feature importances over time for each RCP
     :param param_sample_df: dataframe of the input feature values
@@ -35,8 +35,9 @@ def slr_stacked_dif_importances_plot(param_sample_df, rcp85_forest_list, years, 
             if i == 0:
                 importances = forest.feature_importances_
             else:
-                X_test = pd.read_csv("../data/new_csv/rcp85_" + str(yr) +"_Xtest.csv")
-                y_test = pd.read_csv("../data/new_csv/rcp85_" + str(yr) + "_ytest.csv", header=None)
+                print("file names:", training_testing_path + "rcp85_" + str(yr) +"_Xtest.csv", training_testing_path + "rcp85_" + str(yr) + "_ytest.csv")
+                X_test = pd.read_csv(training_testing_path + "rcp85_" + str(yr) +"_Xtest.csv")
+                y_test = pd.read_csv(training_testing_path + "rcp85_" + str(yr) + "_ytest.csv", header=None)
                 importances = permutation_importance(forest, X_test, y_test).importances_mean
                 importances = importances / importances.sum()
 
@@ -70,8 +71,6 @@ def slr_stacked_dif_importances_plot(param_sample_df, rcp85_forest_list, years, 
                     if len(importances_info[f]) < (j + 1):
                         importances_info[f].append(0)
         importances_info_list.append(importances_info)
-
-    pprint(importances_info_list)
 
     # set color for each feature
     features_on_plot_ordered = []
@@ -197,5 +196,7 @@ if __name__ == '__main__':
     df = pd.read_csv("../data/new_csv/RData_parameters_sample.csv")
     slr_rcp85_5step = pd.read_csv("../data/new_csv/slr_rcp85_5yrstep.csv")
     yrs_rcp85 = slr_rcp85_5step.columns.tolist()
-    rcp85_forest_list = load_forests(yrs_rcp85, "new_hyperparams_rcp85")
-    slr_stacked_dif_importances_plot(df, rcp85_forest_list, yrs_rcp85)
+
+    rcp85_forest_list = load_forests(yrs_rcp85, "revision_2_rcp85")
+    slr_stacked_dif_importances_plot(df, rcp85_forest_list, yrs_rcp85,
+                                     training_testing_path="../data/new_csv/preprocessed_data/")

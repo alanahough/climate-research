@@ -526,7 +526,7 @@ def feature_color_dict(features_list):
 
 
 def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_forest_list, years,
-                                 importance_threshold=.05):
+                                 importance_threshold=.05, print_importances=False):
     """
     Create a stacked histogram of the feature importances over time for each RCP
     :param param_sample_df: dataframe of the input feature values
@@ -581,6 +581,9 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
                     if len(importances_info[f]) < (j + 1):
                         importances_info[f].append(0)
         importances_info_list.append(importances_info)
+
+    if print_importances:
+        pprint(importances_info_list)
 
     # set color for each feature
     features_on_plot_ordered = []
@@ -1084,28 +1087,25 @@ if __name__ == '__main__':
 
     #rcp26_forest_list = load_forests(yrs_rcp26, "revision_2_rcp26")
     #rcp85_forest_list = load_forests(yrs_rcp85, "revision_2_rcp85")
-    rcp26_forest_list = load_forests(yrs_rcp26,
-                                           "new_hyperparams_80th_percentilercp26")  # path for 80th percentile forests
-    rcp85_forest_list = load_forests(yrs_rcp85,
-                                           "new_hyperparams_80th_percentilercp85")  # path for 80th percentile forests
+    #rcp26_forest_list = load_forests(yrs_rcp26,
+    #                                       "new_hyperparams_80th_percentilercp26")  # path for 80th percentile forests
+    #rcp85_forest_list = load_forests(yrs_rcp85,
+    #                                       "new_hyperparams_80th_percentilercp85")  # path for 80th percentile forests
     revision_2_path = "../data/new_csv/SLR_splits/classification_forest/revisions_2/"
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, revision_2_path)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, revision_2_path)
-    revision_2_80th_percentile_path = "../data/new_csv/SLR_splits/classification_forest/revisions_2/80th_percentile/"
-    tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, revision_2_80th_percentile_path)
-    tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, revision_2_80th_percentile_path)
+    #revision_2_80th_percentile_path = "../data/new_csv/SLR_splits/classification_forest/revisions_2/80th_percentile/"
+    #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, revision_2_80th_percentile_path)
+    #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, revision_2_80th_percentile_path)
 
     # plots
-    #rcp26_forest_list = load_forests(yrs_rcp26, "rcp26")
-    #rcp85_forest_list = load_forests(yrs_rcp85, "rcp85")
-    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
-    #all_Stemp_max_split_boxplots(list_10_yrs, print_IQR=True, print_medians=True, print_in_latex_table_format=True)
-    #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150])
-
-    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04)
-    #all_Stemp_max_split_boxplots(list_10_yrs, ECS_splits_folder_path=new_hyperparams_path, print_IQR=True,
-    #                             print_medians=True, print_in_latex_table_format=True)
-    #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150], ECS_splits_folder_path=new_hyperparams_path)
+    rcp26_forest_list = load_forests(yrs_rcp26, "revision_2_rcp26")
+    rcp85_forest_list = load_forests(yrs_rcp85, "revision_2_rcp85")
+    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04,
+                                 print_importances=True)
+    all_Stemp_max_split_boxplots(list_10_yrs, ECS_splits_folder_path=revision_2_path, print_IQR=True,
+                                 print_medians=True, print_in_latex_table_format=True)
+    all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150], ECS_splits_folder_path=revision_2_path)
 
     # 80th percentile boxplot:
     #all_Stemp_max_split_boxplots(list_10_yrs, ECS_splits_folder_path=path_80th_percent)
