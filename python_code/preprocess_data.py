@@ -1,3 +1,5 @@
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
@@ -58,24 +60,24 @@ def split_train_validation_test(df, feature_list, rcp, year, print_ratios, file_
         print(year, " test --- low (non-high-end):", y_test[y_test == 'low'].shape[0], "high:",
               y_test[y_test == 'high'].shape[0])
 
-    x_train_file_path = file_path + "/" + rcp + "_" + str(year) + "_Xtrain.csv"
+    x_train_file_path = file_path + rcp + "_" + str(year) + "_Xtrain.csv"
     x_train.to_csv(x_train_file_path, index=False)
-    y_train_file_path = file_path + "/" + rcp + "_" + str(year) + "_ytrain.csv"
+    y_train_file_path = file_path + rcp + "_" + str(year) + "_ytrain.csv"
     y_train.to_csv(y_train_file_path, index=False, header=False)
 
-    x_val_file_path = file_path + "/" + rcp + "_" + str(year) + "_Xvalidation.csv"
+    x_val_file_path = file_path + rcp + "_" + str(year) + "_Xvalidation.csv"
     x_test.to_csv(x_val_file_path, index=False)
-    y_val_file_path = file_path + "/" + rcp + "_" + str(year) + "_yvalidation.csv"
+    y_val_file_path = file_path + rcp + "_" + str(year) + "_yvalidation.csv"
     y_test.to_csv(y_val_file_path, index=False, header=False)
 
-    x_test_file_path = file_path + "/" + rcp + "_" + str(year) + "_Xtest.csv"
+    x_test_file_path = file_path + rcp + "_" + str(year) + "_Xtest.csv"
     x_test.to_csv(x_test_file_path, index=False)
-    y_test_file_path = file_path + "/" + rcp + "_" + str(year) + "_ytest.csv"
+    y_test_file_path = file_path + rcp + "_" + str(year) + "_ytest.csv"
     y_test.to_csv(y_test_file_path, index=False, header=False)
 
 
 def oversample_data(parameter_sample_df, df_classify, rcp, print_class_count=False, print_ratios=False,
-                    file_path="../data/new_csv/preprocessed_data/", skip_years=None):
+                    file_path="../data/new_csv/preprocessed_data/", skip_years=None, classify_percentile=.9):
     """
     Oversamples the data to make the amount of non-high-end and high-end data points approximately equal.  Calls
     the split_train_validation_test() function to split data into training, validation, and testing and saves them
@@ -94,9 +96,10 @@ def oversample_data(parameter_sample_df, df_classify, rcp, print_class_count=Fal
 
     features = parameter_sample_df.columns.tolist()
     years = df_classify.columns.tolist()
+    oversample_by = int(classify_percentile / (1 - classify_percentile) - 1)
 
     for yr in years:
-        if int(yr) in skip_years:
+        if skip_years is not None and int(yr) in skip_years:
             if print_class_count:
                 print("Skipping", yr)
             continue
@@ -107,8 +110,7 @@ def oversample_data(parameter_sample_df, df_classify, rcp, print_class_count=Fal
 
         # oversample "high" GMSLR class
         high_df = yr_df[yr_df[yr] == "high"]
-        yr_df = yr_df.append([high_df]*8, ignore_index=True)    # gives a future warning about df.append
-        # yr_df = pd.concat([yr_df, [high_df]*8], ignore_index=True)
+        yr_df = yr_df.append([high_df]*oversample_by, ignore_index=True)    # gives a future warning about df.append
 
         # shuffle data
         yr_df = yr_df.sample(frac=1)
@@ -127,7 +129,9 @@ if __name__ == '__main__':
     slr_rcp85_5step = pd.read_csv("../data/new_csv/slr_rcp85_5yrstep.csv")
 
     rcp_dict = {'rcp26': slr_rcp26_5step, 'rcp85': slr_rcp85_5step}
+    percentile = .8
 
     for rcp in rcp_dict.keys():
-        classify_df = classify_data(rcp_dict[rcp])
-        oversample_data(parameter_sample_df, classify_df, rcp)
+        classify_df = classify_data(rcp_dict[rcp], percentile=percentile)
+        oversample_data(parameter_sample_df, classify_df, rcp, classify_percentile=percentile, print_ratios=True,
+                        print_class_count=True, file_path="../data/new_csv/preprocessed_data/80th_percentile/")
