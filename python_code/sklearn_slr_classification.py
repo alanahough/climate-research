@@ -354,7 +354,8 @@ def slr_forest(x_train, y_train, x_validation, y_validation, x_test, y_test, yea
     return forest, performance_dict
 
 
-def make_forest_and_export(yrs_to_output, rcp_str, forest_path, performance_path):
+def make_forest_and_export(yrs_to_output, rcp_str, forest_path, performance_path,
+                           data_path="../data/new_csv/preprocessed_data/"):
     """
     Creates forests for the given years, saves each forest as a file, and saves the validation and training accuracy
     of each forest in a CSV file
@@ -368,13 +369,13 @@ def make_forest_and_export(yrs_to_output, rcp_str, forest_path, performance_path
     :return: None
     """
     for yr in yrs_to_output:
-        data_path = "../data/new_csv/preprocessed_data/" + rcp_str + "_" + yr
-        x_train = pd.read_csv(data_path + "_Xtrain.csv")
-        y_train = pd.read_csv(data_path + "_ytrain.csv", header=None)
-        x_validation = pd.read_csv(data_path + "_Xvalidation.csv")
-        y_validation = pd.read_csv(data_path + "_yvalidation.csv", header=None)
-        x_test = pd.read_csv(data_path + "_Xtest.csv")
-        y_test = pd.read_csv(data_path + "_ytest.csv", header=None)
+        updated_data_path = data_path + rcp_str + "_" + yr
+        x_train = pd.read_csv(updated_data_path + "_Xtrain.csv")
+        y_train = pd.read_csv(updated_data_path + "_ytrain.csv", header=None)
+        x_validation = pd.read_csv(updated_data_path + "_Xvalidation.csv")
+        y_validation = pd.read_csv(updated_data_path + "_yvalidation.csv", header=None)
+        x_test = pd.read_csv(updated_data_path + "_Xtest.csv")
+        y_test = pd.read_csv(updated_data_path + "_ytest.csv", header=None)
 
         features = x_train.columns.tolist()
 
@@ -1056,15 +1057,13 @@ if __name__ == '__main__':
     #make_forest_and_export(yrs_rcp85, "rcp85", "./forests/revision_2_",
     #                       "./forests/forest_accuracy/revision_2_")
 
-    #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/", "./forests/forest_accuracy/")
-    #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/", "./forests/forest_accuracy/")
     # make w/ 80th percentile
-    #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/new_hyperparams_80th_percentile",
-    #                       "./forests/forest_performance/new_hyperparams_80th_percentile",
-    #                       classification_percentile=.8)
-    #make_forest_and_export(df, slr_rcp85_5step, yrs_rcp85, "rcp85", "./forests/new_hyperparams_80th_percentile",
-    #                       "./forests/forest_performance/new_hyperparams_80th_percentile",
-    #                       classification_percentile=.8)
+    make_forest_and_export(yrs_rcp26, "rcp26", "./forests/revision_2_80th_percentile_",
+                           "./forests/forest_performance/revision_2_80th_percentile_",
+                           data_path="../data/new_csv/preprocessed_data/80th_percentile/")
+    make_forest_and_export(yrs_rcp85, "rcp85", "./forests/revision_2_80th_percentile_",
+                           "./forests/forest_performance/revision_2_80th_percentile_",
+                           data_path="../data/new_csv/preprocessed_data/80th_percentile/")
 
     # new hyperparams
     #make_forest_and_export(df, slr_rcp26_5step, yrs_rcp26, "rcp26", "./forests/new_hyperparams_10fold_",
