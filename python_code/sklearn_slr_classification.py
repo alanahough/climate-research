@@ -1087,28 +1087,28 @@ if __name__ == '__main__':
 
     #rcp26_forest_list = load_forests(yrs_rcp26, "revision_2_rcp26")
     #rcp85_forest_list = load_forests(yrs_rcp85, "revision_2_rcp85")
-    #rcp26_forest_list = load_forests(yrs_rcp26,
-    #                                       "new_hyperparams_80th_percentilercp26")  # path for 80th percentile forests
-    #rcp85_forest_list = load_forests(yrs_rcp85,
-    #                                       "new_hyperparams_80th_percentilercp85")  # path for 80th percentile forests
+    rcp26_forest_list = load_forests(yrs_rcp26, "revision_2_80th_percentile_rcp26")  # path for 80th percentile forests
+    rcp85_forest_list = load_forests(yrs_rcp85, "revision_2_80th_percentile_rcp85")  # path for 80th percentile forests
     revision_2_path = "../data/new_csv/SLR_splits/classification_forest/revisions_2/"
     #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, revision_2_path)
     #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, revision_2_path)
-    #revision_2_80th_percentile_path = "../data/new_csv/SLR_splits/classification_forest/revisions_2/80th_percentile/"
-    #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, revision_2_80th_percentile_path)
-    #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, revision_2_80th_percentile_path)
+    revision_2_80th_percentile_path = "../data/new_csv/SLR_splits/classification_forest/revisions_2/80th_percentile/"
+    tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, revision_2_80th_percentile_path)
+    tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, revision_2_80th_percentile_path)
 
     # plots
-    rcp26_forest_list = load_forests(yrs_rcp26, "revision_2_rcp26")
-    rcp85_forest_list = load_forests(yrs_rcp85, "revision_2_rcp85")
+    #rcp26_forest_list = load_forests(yrs_rcp26, "revision_2_rcp26")
+    #rcp85_forest_list = load_forests(yrs_rcp85, "revision_2_rcp85")
     #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04,
     #                             print_importances=True)
     #all_Stemp_max_split_boxplots(list_10_yrs, ECS_splits_folder_path=revision_2_path, print_IQR=True,
     #                             print_medians=True, print_in_latex_table_format=True)
-    all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150], ECS_splits_folder_path=revision_2_path)
+    #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150], ECS_splits_folder_path=revision_2_path)
 
     # 80th percentile boxplot:
-    #all_Stemp_max_split_boxplots(list_10_yrs, ECS_splits_folder_path=path_80th_percent)
+    all_Stemp_max_split_boxplots(list_10_yrs, ECS_splits_folder_path=revision_2_80th_percentile_path)
+    slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04,
+                                 print_importances=True)
 
     #forest_rcp85_2020 = rcp85_forest_list_10yrs[0]
     #features = df.columns.tolist()
