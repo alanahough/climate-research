@@ -12,7 +12,6 @@ import matplotlib.ticker as mticker
 import matplotlib.patches as mpatches
 from pprint import pprint
 
-
 # hyperparameters (via gridsearch)
 MAX_DEPTH = 15
 MAX_FEATURES = 24
@@ -62,16 +61,16 @@ MODEL_DICT = {"Climate": ['S.temperature', 'diff.temperature', 'alpha.temperatur
                           'sigma.Tgav_obs', 'rho.Tgav_obs', 'offset.ocheat_obs', 'sigma.ocheat_obs',
                           'rho.ocheat_obs'],
               "\nGlaciers &\nIce Caps": ['beta0_gsic.slr_brick', 'V0_gsic.slr_brick', 'n_gsic.slr_brick',
-                                      'Gs0_gsic.slr_brick', 'sigma.slr_gsic_obs', 'rho.slr_gsic_obs'],
+                                         'Gs0_gsic.slr_brick', 'sigma.slr_gsic_obs', 'rho.slr_gsic_obs'],
               "\nThermal\nExpansion": ['a_tee.slr_brick'],
               "\nGreenland\nIce Sheet": ['sigma.slr_gis_obs', 'rho.slr_gis_obs', 'a_simple.slr_brick',
-                                      'b_simple.slr_brick', 'alpha_simple.slr_brick', 'beta_simple.slr_brick',
-                                      'V0_simple.slr_brick'],
+                                         'b_simple.slr_brick', 'alpha_simple.slr_brick', 'beta_simple.slr_brick',
+                                         'V0_simple.slr_brick'],
               "\nAntarctic\nIce Sheet": ['a_anto.slr_brick', 'b_anto.slr_brick', 'gamma_dais.slr_brick',
-                                      'alpha_dais.slr_brick', 'mu_dais.slr_brick', 'nu_dais.slr_brick',
-                                      'P0_dais.slr_brick', 'kappa_dais.slr_brick', 'f0_dais.slr_brick',
-                                      'h0_dais.slr_brick', 'c_dais.slr_brick', 'b0_dais.slr_brick',
-                                      'slope_dais.slr_brick', 'lambda_dais.slr_brick', 'Tcrit_dais.slr_brick']}
+                                         'alpha_dais.slr_brick', 'mu_dais.slr_brick', 'nu_dais.slr_brick',
+                                         'P0_dais.slr_brick', 'kappa_dais.slr_brick', 'f0_dais.slr_brick',
+                                         'h0_dais.slr_brick', 'c_dais.slr_brick', 'b0_dais.slr_brick',
+                                         'slope_dais.slr_brick', 'lambda_dais.slr_brick', 'Tcrit_dais.slr_brick']}
 
 
 def get_previous_splits(forest, feature_names, rcp, year, folder_path):
@@ -114,7 +113,7 @@ def get_previous_splits(forest, feature_names, rcp, year, folder_path):
             while split in dict:
                 split = split[:-2] + 'r'
 
-        max_Stemp = (None, 0)   # (node id, Stemp split value)
+        max_Stemp = (None, 0)  # (node id, Stemp split value)
         for node_id in dict:
             if dict[node_id][0] == "S.temperature" and dict[node_id][1] > max_Stemp[1]:
                 max_Stemp = (node_id, dict[node_id][1])
@@ -149,7 +148,6 @@ def get_previous_splits(forest, feature_names, rcp, year, folder_path):
     prev_feature_summary_df.to_csv(file_path, index=False)
 
 
-
 def find_forest_splits(forest, feature_names, feature, firstsplit=False):
     """
     Determines the split values from all the trees in the forest for the splits of a specific feature.
@@ -161,16 +159,16 @@ def find_forest_splits(forest, feature_names, feature, firstsplit=False):
     :return: a list of lists, each inner list contains the desired feature's split values for a tree-- the length of
              the outer list is equal to the number of trees in the forest
     """
-    tot_split=[]
-    for i in range (0, len(forest.estimators_)):
-        estimator= forest.estimators_[i]
+    tot_split = []
+    for i in range(0, len(forest.estimators_)):
+        estimator = forest.estimators_[i]
         tree_feature = estimator.tree_.feature
         feature_new = []
         for node in tree_feature:
             feature_new.append(feature_names[node])
-        split_list=[]
-        for i in range (0, len(feature_new)):
-            if feature_new[i] == feature and estimator.tree_.threshold[i] != -2:    #used -2 when leaf node
+        split_list = []
+        for i in range(0, len(feature_new)):
+            if feature_new[i] == feature and estimator.tree_.threshold[i] != -2:  # used -2 when leaf node
                 split_list.append(estimator.tree_.threshold[i])
                 if firstsplit == True:
                     break
@@ -197,7 +195,7 @@ def split_stats(split_list, split_feature):
     print("Median of", split_feature, "splits:", quantiles[2])
     print("Q3 of", split_feature, "splits:", quantiles[3])
     print("Maximum of", split_feature, "splits:", quantiles[4])
-    quantiles_list=[val for val in quantiles]
+    quantiles_list = [val for val in quantiles]
     quantiles_list.append(np.nanmean(split_array))
     return splitdf, quantiles_list
 
@@ -213,7 +211,7 @@ def splits_table(forest, feature_names):
                             feature names
     """
     features = feature_names.copy()
-    dict_list=[]
+    dict_list = []
     for i in range(len(forest.estimators_)):
         estimator = forest.estimators_[i]
         tree_feature = estimator.tree_.feature
@@ -263,7 +261,7 @@ def splits_table(forest, feature_names):
 
     for node in nodes:
         feature_list = []
-        for i in range (len(dict_list)):
+        for i in range(len(dict_list)):
             if node in dict_list[i]:
                 feature_list.append(dict_list[i][node])
         feature_sums = {}
@@ -271,8 +269,8 @@ def splits_table(forest, feature_names):
             feature_sums[name] = 0
         for f in feature_list:
             feature_sums[f] += 1
-        tot=len(feature_list)
-        feature_fractions=[]
+        tot = len(feature_list)
+        feature_fractions = []
         for f in feature_sums.keys():
             feature_fractions.append(feature_sums[f] / tot)
         row_list.append(feature_fractions)
@@ -281,25 +279,27 @@ def splits_table(forest, feature_names):
     return df
 
 
-def slr_forest(x_train, y_train, x_validation, y_validation, x_test, y_test, year, rcp, feature_list,
+def slr_forest(x_train, y_train, x_validation, y_validation, x_test, y_test, feature_list,
                max_feat="auto", max_d=None, n_estimators=100, min_impurity_decrease=0, print_forest=False):
     """
-    Creates a forest using the desired parameters and fits the forest with 60% of the data in df
+    Creates a random forest using the desired parameters and fits the forest with the give training data
+    :param x_train: dataframe of the feature values used for training
+    :param y_train: dataframe of the response values used for training
+    :param x_validation: dataframe of the feature values used for validation
+    :param y_validation: dataframe of the response values used for validation
+    :param x_test: dataframe of the feature values used for testing
+    :param y_test: dataframe of the response value used for testing
     :param feature_list: list of the input column names as strings
-    :param df: dataframe that contains both the input data and the output data, NOT already split into training,
-    validation, and testing subsets
-    :param year: string of the year to use as the output data
     :param max_feat: integer number of features to consider when determining the best split -- default = "auto" which
     takes the square root of the total number of features
     :param max_d: the maximum depth of the tree as an integer -- default = None
-    :param min_samp_leaf: the minimum integer number of samples required to be in a leaf node -- default = 1
     :param n_estimators: the number of trees in the forest as an integer -- default = 100
-    :param min_samples_split: the minimum integer number of samples required in a node to be able to split --
-    default = 2
+    :param min_impurity_decrease: the minimum impurity decrease for a node to split -- default = 0
     :param print_forest: boolean that controls whether the trees in the forest should be printed out in text form
-    :return: forest, v_accuracy, t_accuracy -- forest is the forest that was created and fit with the data
-                                            -- v_accuracy is the validation accuracy as a decimal value
-                                            -- t_accuracy is the training accuracy as a decimal value
+    :return: forest, performance_dict -- forest: the forest that was created and fit with the training data
+                                      -- performance_dict: a dictionary containing the accuracy and confusion matrix
+                                                            values of the forest evaluated on each of the training,
+                                                            validation, and test data
     """
     # random forest creation
     forest = ensemble.RandomForestClassifier(n_estimators=n_estimators, criterion="entropy", max_features=max_feat,
@@ -357,15 +357,14 @@ def slr_forest(x_train, y_train, x_validation, y_validation, x_test, y_test, yea
 def make_forest_and_export(yrs_to_output, rcp_str, forest_path, performance_path,
                            data_path="../data/new_csv/preprocessed_data/"):
     """
-    Creates forests for the given years, saves each forest as a file, and saves the validation and training accuracy
-    of each forest in a CSV file
-    :param parameter_sample_df: dataframe of the input feature values
-    :param slr_df: dataframe of the output year values
+    Creates forests for the given years, saves each forest as a file, and saves the performance of each forest
+    in a CSV file
     :param yrs_to_output: list of the years as strings to create and export forests for
     :param rcp_str: RCP name as a string with no spaces (ex: "rcp85")
     :param forest_path: path of the folder to save the forests into (ex: "./forests/")
     :param performance_path: path of the folder to save the performance measurements CSV files into
     (ex: "./forests/forest_accuracy/")
+    :param data_path: path of the folder containing the preprocessed and split training, validation, and test data
     :return: None
     """
     for yr in yrs_to_output:
@@ -435,6 +434,7 @@ def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_
     :param forests_list: a list of already fit forests for this function to be perfomred on
     :param year_list: list of the years (as integers) that correspond to years of the forests in forest_list
     :param folder_path: path to the folder where the CSV files will be saved
+    :param show_plot: boolean controlling whether to show the Gini importances of the features in the forest
     :return: None
     """
     fig, axs = plt.subplots(1, len(year_list), squeeze=False)
@@ -451,7 +451,7 @@ def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_
         all = (all_label,)
         first = (first_label,)
         forest = forests_list[j]
-        split_df, all_quartiles, first_quartiles=perform_splits(forest, features,"S.temperature")
+        split_df, all_quartiles, first_quartiles = perform_splits(forest, features, "S.temperature")
         if isinstance(split_df, pd.DataFrame):
             pass
         else:
@@ -465,9 +465,9 @@ def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_
         first_quartile_data.append(first)
         all_quartile_data.append(all)
 
-       # table_df = splits_table(forest, features)
-       # split_table_file_path = folder_path + rcp_no_space_no_period + "_" + yr + "_split_table.csv"
-       # table_df.to_csv(split_table_file_path, index=True)
+        # table_df = splits_table(forest, features)
+        # split_table_file_path = folder_path + rcp_no_space_no_period + "_" + yr + "_split_table.csv"
+        # table_df.to_csv(split_table_file_path, index=True)
 
         # importances plot
         importances = forest.feature_importances_
@@ -482,13 +482,13 @@ def tree_splits(param_sample_df, response, rcp, forests_list, year_list, folder_
                 std_list.append(std[idx])
                 features_list.append(features[idx])
         axs[0, j].bar(range(len(importances_list)), importances_list, color="tab:blue",
-                       yerr=std_list, align="center")
+                      yerr=std_list, align="center")
         title = yr
         axs[0, j].set_title(title)
         axs[0, j].set_xticks(range(len(importances_list)))
         axs[0, j].set_xticklabels(features_list, rotation=90)
         axs[0, j].set_ylim(top=1.0)
-        axs[0, j].set_ylim(bottom= 0.0)
+        axs[0, j].set_ylim(bottom=0.0)
     main_title = response + " " + rcp + " Feature Importances"
     fig.suptitle(main_title, fontsize=15)
     fig.text(0.52, 0.04, 'Features', ha='center', fontsize=12)
@@ -536,11 +536,12 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
     rcp85_forest_list
     :param importance_threshold: decimal value where every feature whose feature importance is under this threshold
     will be added into the "Other" category on the plot
+    :param print_importances: boolean controlling whether to print the importances of the features in the forests
     :return: None
     """
     features = param_sample_df.columns.tolist()
     name = ["RCP2.6", "RCP8.5"]
-    forest_masterlist=[rcp26_forest_list, rcp85_forest_list]
+    forest_masterlist = [rcp26_forest_list, rcp85_forest_list]
     importances_info_list = []
 
     for i in range(len(forest_masterlist)):
@@ -555,7 +556,7 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
 
             sum = 0
             if j == 0:
-                #set up importances_info dictionary with first pass through
+                # set up importances_info dictionary with first pass through
                 for idx in indices:
                     feature = features[idx]
                     importance = importances[idx]
@@ -564,7 +565,7 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
                         sum += importance
                 importances_info['Other'] = [1 - sum]
             else:
-                #add to importances_info dictionary that's already set up
+                # add to importances_info dictionary that's already set up
                 for idx in indices:
                     feature = features[idx]
                     importance = importances[idx]
@@ -602,7 +603,7 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
     color_dict = feature_color_dict(features_on_plot_ordered)
 
     # set up alternating hatching
-    len_plot_features_even = len(features_on_plot_ordered) % 2 == 0     # length doesn't include "other" category
+    len_plot_features_even = len(features_on_plot_ordered) % 2 == 0  # length doesn't include "other" category
     hatch_dict = {}
     idx = 0
     for feature in features_on_plot_ordered:
@@ -643,14 +644,14 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
                     axs[i].bar(x, importances_info[feature], bottom=bottom, label=PARAMETER_DICT[feature], color=color,
                                hatch=hatch_dict[feature])
                     bottom += np.array(importances_info[feature])
-        percent_label = "Other (< " + str(round(importance_threshold*100, 1)) + " %)"
+        percent_label = "Other (< " + str(round(importance_threshold * 100, 1)) + " %)"
         axs[i].bar(x, importances_info["Other"], bottom=bottom, label=percent_label, color='white',
                    hatch='//')
         axs[i].set_ylabel("Relative Importances", fontsize=14)
         ticks_loc = axs[i].get_yticks().tolist()
         axs[i].yaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
         axs[i].set_yticklabels(["{:.1f}".format(x) for x in ticks_loc], fontsize=12)
-        yrs_10=[]
+        yrs_10 = []
         for yr in years:
             if int(yr) % 10 == 0:
                 yrs_10.append(yr)
@@ -691,7 +692,7 @@ def slr_stacked_importances_plot(param_sample_df, rcp26_forest_list, rcp85_fores
     adder = 0
     for idx in model_components_to_plot:
         label_values.insert(idx + adder, mpatches.Patch(color='none'))
-        label_keys.insert(idx + adder,  model_components_to_plot[idx])
+        label_keys.insert(idx + adder, model_components_to_plot[idx])
         adder += 1
 
     label_values.insert(-1, mpatches.Patch(color='none'))
@@ -708,6 +709,8 @@ def Stemp_histograms(year_list, rcp, data_path, first_only=False):
     the S.temperature splits in each tree for each year
     :param year_list: list of the years (string or int) for the dataframes in split_df_list
     :param rcp: RCP name as a string (ex: "RCP 8.5")
+    :param data_path: path of the folder containing the split information from the forests
+    (ex:'../data/new_csv/SLR_splits/classification_forest/')
     :param first_only: boolean that controls whether to only plot the values of the first S.temperture split in
     the trees
     :return: None
@@ -731,7 +734,7 @@ def Stemp_histograms(year_list, rcp, data_path, first_only=False):
 
     fig, axs = plt.subplots(1, len(year_list), squeeze=False)
     i = 0
-    bin_seq=np.arange(0, 10, step=.5)
+    bin_seq = np.arange(0, 10, step=.5)
     for i in range(len(split_list)):
         data = split_list[i]
         yr = year_list[i]
@@ -760,11 +763,13 @@ def Stemp_max_split_histogram(year_list, rcp, data_path):
     the highest S.temperature split in each tree for each year
     :param year_list: list of the years (string or int) for the dataframes in split_df_list
     :param rcp: RCP name as a string (ex: "RCP 8.5")
+    :param data_path: path of the folder containing the split information from the forests
+    (ex:'../data/new_csv/SLR_splits/classification_forest/')
     :return: None
     """
     rcp_no_space = rcp.replace(" ", "")
     rcp_no_space_no_period = rcp_no_space.replace(".", "")
-    df_dict={}
+    df_dict = {}
     for yr in year_list:
         file_path = data_path + rcp_no_space_no_period + "_" + str(yr) \
                     + "_splits.csv"
@@ -790,12 +795,14 @@ def Stemp_max_split_histogram(year_list, rcp, data_path):
     plt.show()
 
 
-def all_Stemp_max_split_histograms(year_list, ECS_splits_folder_path="../data/new_csv/SLR_splits/classification_forest/",):
+def all_Stemp_max_split_histograms(year_list,
+                                   ECS_splits_folder_path="../data/new_csv/SLR_splits/classification_forest/", ):
     """
     Opens the saved CSV files of the S.temperature splits for each year in the year_list for both RCPs and creates
     density histograms of the highest S.temperature split in each tree for each year.  The left plots are RCP 2.6 and
     the right plots are RCP 8.5
     :param year_list: list of the years (string or int) for the dataframes in split_df_list
+    :param ECS_splits_folder_path: path of the folder containing the split information from the forests
     :return: None
     """
     rcp26_split_dict = {}
@@ -846,6 +853,8 @@ def Stemp_boxplots(year_list, rcp, data_path, first_only=False, show_outliers=Tr
     boxplots of the S.temperature splits
     :param year_list: list of the years (string or int) for the dataframes in split_df_list
     :param rcp: RCP name as a string (ex: "RCP 8.5")
+    :param data_path: path of the folder containing the split information from the forests
+    (ex:'../data/new_csv/SLR_splits/classification_forest/')
     :param first_only: boolean that controls whether to only plot the values of the first S.temperture split in
     the trees
     :param show_outliers: boolean that controls whether to show outliers on the plot
@@ -886,12 +895,14 @@ def Stemp_max_split_boxplots(year_list, rcp, data_path, show_outliers=True):
     the highest S.temperature split in each tree for each year
     :param year_list: list of the years (string or int) for the dataframes in split_df_list
     :param rcp: RCP name as a string (ex: "RCP 8.5")
+    :param data_path: path of the folder containing the split information from the forests
+    (ex:'../data/new_csv/SLR_splits/classification_forest/')
     :param show_outliers: boolean that controls whether to show outliers on the plot
     :return: None
     """
     rcp_no_space = rcp.replace(" ", "")
     rcp_no_space_no_period = rcp_no_space.replace(".", "")
-    split_lists=[]
+    split_lists = []
     for yr in year_list:
         file_path = data_path + rcp_no_space_no_period + "_" + str(yr) \
                     + "_splits.csv"
@@ -917,9 +928,14 @@ def all_Stemp_max_split_boxplots(year_list, show_outliers=True,
     Opens the saved CSV files of the S.temperature splits for each year in the year_list for both RCPs and creates
     boxplots of the highest S.temperature split in each tree for each year.  The top panel of the plot is RCP 2.6 and
     the bottom panel is RCP 8.5
-    :param year_list: list of the years (string or int) for the dataframes in split_df_list
+    :param year_list: list of the years as a string to plot
     :param show_outliers: boolean that controls whether to show outliers on the plot
-    :return: None
+    :param ECS_splits_folder_path: path of the folder containing the split information from the forests
+    :param print_medians: boolean that controls whether to print the medians of the splits
+    :param print_IQR: boolean that controls whether to print the interquartile ranges of splits
+    :param print_in_latex_table_format:  boolean that controls whether to print the statistics of the splits as a
+    LaTeX formatted table
+    :return:
     """
     rcp26_split_lists = []
     rcp85_split_lists = []
@@ -955,13 +971,12 @@ def all_Stemp_max_split_boxplots(year_list, show_outliers=True,
                       "\tQ3 = %5.4f" % np.quantile(rcp85_max_list, .75),
                       "\tIQR = %5.4f" % (np.quantile(rcp85_max_list, .75) - np.quantile(rcp85_max_list, .25)))
 
-
     all_split_lists = [rcp26_split_lists, rcp85_split_lists]
 
     fig, axs = plt.subplots(2, 1)
     for i in range(2):
         axs[i].boxplot(all_split_lists[i], showfliers=show_outliers, patch_artist=True, medianprops=dict(color="black"),
-                   flierprops=dict(markeredgecolor='silver'))
+                       flierprops=dict(markeredgecolor='silver'))
         if i == 0:
             axs[i].xaxis.set_visible(False)
         elif i == 1:
@@ -977,28 +992,25 @@ def all_Stemp_max_split_boxplots(year_list, show_outliers=True,
     plt.show()
 
 
-def gridsearch(year, rcp):
+def gridsearch(year, rcp, data_path="../data/new_csv/preprocessed_data/"):
     """
     Perform a gridsearch of the parameters used to create the forests, saves the best parameters to a CSV, and saves
     the cross validation information/result to another CSV.
-    :param param_samples_df: dataframe of the input feature values
-    :param slr_df: dataframe of the output year values
     :param year: string of the year for the data to use when making the forests in the gridsearch
     :param rcp: RCP name as a string (ex: "RCP 8.5")
-    :param folder_path: path to the folder where the CSV files will be saved
+    :param data_path: path of the folder containing the preprocessed and split training, validation, and test data
     :return: None
     """
     rcp_no_space = rcp.replace(" ", "")
     rcp = rcp_no_space.replace(".", "")
 
-    data_path = "../data/new_csv/preprocessed_data/" + rcp + "_" + str(yr)
-    x_train = pd.read_csv(data_path + "_Xtrain.csv")
-    y_train = pd.read_csv(data_path + "_ytrain.csv", header=None)
-    x_validation = pd.read_csv(data_path + "_Xvalidation.csv")
-    y_validation = pd.read_csv(data_path + "_yvalidation.csv", header=None)
-    x_test = pd.read_csv(data_path + "_Xtest.csv")
-    y_test = pd.read_csv(data_path + "_ytest.csv", header=None)
-
+    path = data_path + rcp + "_" + str(yr)
+    x_train = pd.read_csv(path + "_Xtrain.csv")
+    y_train = pd.read_csv(path + "_ytrain.csv", header=None)
+    x_validation = pd.read_csv(path + "_Xvalidation.csv")
+    y_validation = pd.read_csv(path + "_yvalidation.csv", header=None)
+    x_test = pd.read_csv(path + "_Xtest.csv")
+    y_test = pd.read_csv(path + "_ytest.csv", header=None)
 
     revision_2_values_param_grid = {
         'n_estimators': [25, 50, 100, 150, 200, 250],
@@ -1007,16 +1019,17 @@ def gridsearch(year, rcp):
         'min_impurity_decrease': [0.001]
     }
 
-    grid_search = GridSearch(model=ensemble.RandomForestClassifier(criterion="entropy"), param_grid=revision_2_values_param_grid)
+    grid_search = GridSearch(model=ensemble.RandomForestClassifier(criterion="entropy"),
+                             param_grid=revision_2_values_param_grid)
     grid_search.fit(x_train, y_train, x_validation, y_validation)
-    
+
     print("BEST PARAMETERS:")
     print(grid_search.best_params)
-    
+
     print("Mean cross-validated score of the best_estimator: ", grid_search.best_score)
     best_params_df = pd.DataFrame(grid_search.best_params, index=[0])
     # ****CHANGE FILE NAME WHEN CHANGE PARAM_GRID****
-    best_params_df.to_csv("./gridsearchcv_results/revisions_2_"+rcp+"-"+year+".csv",
+    best_params_df.to_csv("./gridsearchcv_results/revisions_2_" + rcp + "-" + year + ".csv",
                           index=False)
     score_dict = {}
     for nn in grid_search.param_grid.keys():
@@ -1024,10 +1037,10 @@ def gridsearch(year, rcp):
     score_dict["score"] = [grid_search.param_scores[k][1] for k in range(len(grid_search.param_scores))]
     score_df = pd.DataFrame(score_dict)
     # ****CHANGE FILE NAME WHEN CHANGE PARAM_GRID****
-    score_df.to_csv("./gridsearchcv_results/revisions_2_cv_results_"+rcp+"-"+year+".csv", index=False)
+    score_df.to_csv("./gridsearchcv_results/revisions_2_cv_results_" + rcp + "-" + year + ".csv", index=False)
 
     # Compare with default model without hyperopt
-    outofbox = ensemble.RandomForestClassifier(criterion="entropy",random_state=0)
+    outofbox = ensemble.RandomForestClassifier(criterion="entropy", random_state=0)
     outofbox.fit(x_train, y_train)
     print('Out-of-box hyperparameters:', outofbox.score(x_test, y_test))
     print('Optimized harameters:', grid_search.score(x_test, y_test))
@@ -1055,16 +1068,16 @@ if __name__ == '__main__':
     yrs_rcp26 = slr_rcp26_5step.columns.tolist()
     yrs_rcp85 = slr_rcp85_5step.columns.tolist()
 
-    #make_forest_and_export(yrs_rcp26, "rcp26", "./forests/revision_2_",
+    # make_forest_and_export(yrs_rcp26, "rcp26", "./forests/revision_2_",
     #                       "./forests/forest_accuracy/revision_2_")
-    #make_forest_and_export(yrs_rcp85, "rcp85", "./forests/revision_2_",
+    # make_forest_and_export(yrs_rcp85, "rcp85", "./forests/revision_2_",
     #                       "./forests/forest_accuracy/revision_2_")
 
     # make w/ 80th percentile
-    #make_forest_and_export(yrs_rcp26, "rcp26", "./forests/revision_2_80th_percentile_",
+    # make_forest_and_export(yrs_rcp26, "rcp26", "./forests/revision_2_80th_percentile_",
     #                       "./forests/forest_performance/revision_2_80th_percentile_",
     #                       data_path="../data/new_csv/preprocessed_data/80th_percentile/")
-    #make_forest_and_export(yrs_rcp85, "rcp85", "./forests/revision_2_80th_percentile_",
+    # make_forest_and_export(yrs_rcp85, "rcp85", "./forests/revision_2_80th_percentile_",
     #                       "./forests/forest_performance/revision_2_80th_percentile_",
     #                       data_path="../data/new_csv/preprocessed_data/80th_percentile/")
 
@@ -1072,49 +1085,46 @@ if __name__ == '__main__':
     list_10_yrs = []
     for yr in range(2020, 2151, 10):
         list_10_yrs.append(yr)
-    #rcp26_forest_list_10yrs = load_forests(list_10_yrs, "rcp26")
-    #rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
-    #rcp26_forest_list_10yrs = load_forests(list_10_yrs, "new_hyperparams_80th_percentilercp26") # path for 80th percentile forests
-    #rcp85_forest_list_10yrs = load_forests(list_10_yrs, "new_hyperparams_80th_percentilercp85") # path for 80th percentile forests
-    #path = "../data/new_csv/SLR_splits/classification_forest/"
-    #path_80th_percent = "../data/new_csv/SLR_splits/classification_forest/new_hyperparams/new_hyperparams_80th_percentile"
-    #rcp26_forest_list = load_forests(yrs_rcp26,
+    # rcp26_forest_list_10yrs = load_forests(list_10_yrs, "rcp26")
+    # rcp85_forest_list_10yrs = load_forests(list_10_yrs, "rcp85")
+    # rcp26_forest_list_10yrs = load_forests(list_10_yrs, "new_hyperparams_80th_percentilercp26") # path for 80th percentile forests
+    # rcp85_forest_list_10yrs = load_forests(list_10_yrs, "new_hyperparams_80th_percentilercp85") # path for 80th percentile forests
+    # path = "../data/new_csv/SLR_splits/classification_forest/"
+    # path_80th_percent = "../data/new_csv/SLR_splits/classification_forest/new_hyperparams/new_hyperparams_80th_percentile"
+    # rcp26_forest_list = load_forests(yrs_rcp26,
     #                                       "new_hyperparams_rcp26")  # path for new hyperparameters (post-review) forests
-    #rcp85_forest_list = load_forests(yrs_rcp85,
+    # rcp85_forest_list = load_forests(yrs_rcp85,
     #                                       "new_hyperparams_rcp85")  # path for new hyperparameters (post-review) forests
-    #new_hyperparams_path = "../data/new_csv/SLR_splits/classification_forest/new_hyperparams/new_hyperparams"  # path for new hyperparameters (post-review) forests
+    # new_hyperparams_path = "../data/new_csv/SLR_splits/classification_forest/new_hyperparams/new_hyperparams"  # path for new hyperparameters (post-review) forests
 
-
-    #rcp26_forest_list = load_forests(yrs_rcp26, "revision_2_rcp26")
-    #rcp85_forest_list = load_forests(yrs_rcp85, "revision_2_rcp85")
+    # rcp26_forest_list = load_forests(yrs_rcp26, "revision_2_rcp26")
+    # rcp85_forest_list = load_forests(yrs_rcp85, "revision_2_rcp85")
     rcp26_forest_list = load_forests(yrs_rcp26, "revision_2_80th_percentile_rcp26")  # path for 80th percentile forests
     rcp85_forest_list = load_forests(yrs_rcp85, "revision_2_80th_percentile_rcp85")  # path for 80th percentile forests
     revision_2_path = "../data/new_csv/SLR_splits/classification_forest/revisions_2/"
-    #tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, revision_2_path)
-    #tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, revision_2_path)
+    # tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, revision_2_path)
+    # tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, revision_2_path)
     revision_2_80th_percentile_path = "../data/new_csv/SLR_splits/classification_forest/revisions_2/80th_percentile/"
     tree_splits(df, "SLR", "RCP 2.6", rcp26_forest_list, yrs_rcp26, revision_2_80th_percentile_path)
     tree_splits(df, "SLR", "RCP 8.5", rcp85_forest_list, yrs_rcp85, revision_2_80th_percentile_path)
 
     # plots
-    #rcp26_forest_list = load_forests(yrs_rcp26, "revision_2_rcp26")
-    #rcp85_forest_list = load_forests(yrs_rcp85, "revision_2_rcp85")
-    #slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04,
+    # rcp26_forest_list = load_forests(yrs_rcp26, "revision_2_rcp26")
+    # rcp85_forest_list = load_forests(yrs_rcp85, "revision_2_rcp85")
+    # slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04,
     #                             print_importances=True)
-    #all_Stemp_max_split_boxplots(list_10_yrs, ECS_splits_folder_path=revision_2_path, print_IQR=True,
+    # all_Stemp_max_split_boxplots(list_10_yrs, ECS_splits_folder_path=revision_2_path, print_IQR=True,
     #                             print_medians=True, print_in_latex_table_format=True)
-    #all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150], ECS_splits_folder_path=revision_2_path)
+    # all_Stemp_max_split_histograms([2025, 2050, 2075, 2100, 2125, 2150], ECS_splits_folder_path=revision_2_path)
 
     # 80th percentile boxplot:
     all_Stemp_max_split_boxplots(list_10_yrs, ECS_splits_folder_path=revision_2_80th_percentile_path)
     slr_stacked_importances_plot(df, rcp26_forest_list, rcp85_forest_list, yrs_rcp26, importance_threshold=.04,
                                  print_importances=True)
 
-    #forest_rcp85_2020 = rcp85_forest_list_10yrs[0]
-    #features = df.columns.tolist()
-    #get_previous_splits(forest_rcp85_2020, features, "RCP 8.5", 2020, path)
-
+    # forest_rcp85_2020 = rcp85_forest_list_10yrs[0]
+    # features = df.columns.tolist()
+    # get_previous_splits(forest_rcp85_2020, features, "RCP 8.5", 2020, path)
 
     # perform grid search
-    #gridsearch("2100", "RCP 8.5")
-
+    # gridsearch("2100", "RCP 8.5")
