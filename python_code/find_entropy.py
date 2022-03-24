@@ -1,3 +1,8 @@
+"""
+Prints from every split in every tree of the specified forest
+"""
+
+
 import joblib
 
 
